@@ -30,15 +30,20 @@
         .input-ceut {
             width: 100%;
             padding: 1.25rem;
-            background-color: white;
+            background-color: white !important;
             border: 2px solid #e2e8f0;
             border-radius: 1rem;
             font-size: 1.125rem;
             font-weight: 800;
-            color: var(--ceutBlue);
+            color: #1e40af !important;
             text-transform: uppercase;
             transition: all 0.3s ease;
             outline: none;
+        }
+
+        .input-ceut::placeholder {
+            color: #94a3b8;
+            text-transform: none;
         }
 
         .input-ceut:focus {
@@ -54,7 +59,17 @@
             cursor: pointer; transition: all 0.3s;
         }
 
-        .card-admin { background: white; border-radius: 1.5rem; padding: 1.5rem; color: #1e293b; margin-bottom: 1rem; border: 1px solid #e2e8f0; position: relative; }
+        .card-admin { 
+            background: white; 
+            border-radius: 1.5rem; 
+            padding: 1.5rem; 
+            color: #1e293b !important; 
+            margin-bottom: 1rem; 
+            border: 1px solid #e2e8f0; 
+            position: relative;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+        }
+
         .badge { padding: 4px 10px; border-radius: 6px; font-size: 10px; font-weight: 800; text-transform: uppercase; }
         .badge-teacher { background: var(--ceutBlueLight); color: var(--ceutBlue); }
         
@@ -68,25 +83,30 @@
         }
         .success-anim { animation: success-pulse 0.6s ease-out; }
 
-        /* Botón de PDF flotante en cards */
         .pdf-btn {
             position: absolute; top: 1.5rem; right: 1.5rem;
             background: #f1f5f9; color: #ef4444; padding: 8px; border-radius: 10px;
             cursor: pointer; transition: all 0.2s;
+            display: flex; align-items: center; justify-content: center;
         }
         .pdf-btn:hover { background: #fee2e2; }
+        
+        /* Corrección para scrollbar en escritorio */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f5f9; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
     </style>
 
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;700;800&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-    <!-- Librerías para PDF -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
 </head>
 <body>
 
-    <div id="master-access-trigger" onclick="prepareAuth('admin')" class="no-print">
+    <div id="master-access-trigger" onclick="prepareAuth('admin')" class="no-print" title="Acceso Administrador">
         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#d4af37" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
     </div>
 
@@ -103,11 +123,11 @@
                 <h1 class="text-4xl font-extrabold tracking-tighter mb-2 text-white">CEUT <span class="text-[#d4af37]">CLOUD</span></h1>
                 <p class="text-[10px] tracking-[0.4em] text-white/40 font-bold uppercase mb-10">AUTO-REGISTRO QR</p>
                 <div class="space-y-5">
-                    <button onclick="prepareAuth('teacher')" class="w-full glass p-6 rounded-3xl flex items-center gap-5 action-btn">
+                    <button id="btn-teacher-access" onclick="handleProtectedAccess('teacher')" class="w-full glass p-6 rounded-3xl flex items-center gap-5 action-btn">
                         <div class="w-16 h-16 bg-[#d4af37] rounded-2xl flex items-center justify-center text-3xl">👨‍🏫</div>
                         <div class="text-left"><p class="text-[14px] font-black uppercase text-white">Docentes</p><p class="text-[10px] text-white/50">Gestionar Clases</p></div>
                     </button>
-                    <button onclick="prepareAuth('student')" class="w-full bg-white p-6 rounded-3xl flex items-center gap-5 action-btn shadow-xl">
+                    <button id="btn-student-access" onclick="handleProtectedAccess('student')" class="w-full bg-white p-6 rounded-3xl flex items-center gap-5 action-btn shadow-xl">
                         <div class="w-16 h-16 bg-[#1e40af] rounded-2xl flex items-center justify-center text-3xl text-white">🎓</div>
                         <div class="text-left"><p class="text-[14px] font-black text-[#1e40af] uppercase">Alumnos</p><p class="text-[10px] text-slate-400">Acceso Estudiantil</p></div>
                     </button>
@@ -117,7 +137,7 @@
 
         <!-- AUTH -->
         <section id="view-auth" class="view-section p-6 bg-slate-50 items-center justify-center">
-            <div class="w-full max-w-sm text-slate-800">
+            <div class="w-full max-w-sm">
                 <button onclick="switchView('home')" class="mb-8 text-[12px] font-bold text-slate-400 uppercase tracking-widest">← Inicio</button>
                 <h2 id="auth-title" class="text-3xl font-black text-[#1e40af] mb-6 uppercase tracking-tighter">Acceso</h2>
                 <div id="auth-mode-selector" class="flex bg-slate-200/50 p-1 rounded-2xl mb-6">
@@ -142,7 +162,7 @@
                 <div class="w-20 h-20 bg-white/10 rounded-3xl mx-auto mb-6 flex items-center justify-center text-4xl">🎓</div>
                 <h2 class="text-2xl font-black text-white uppercase mb-1" id="std-nav-name">ESTUDIANTE</h2>
                 <p class="text-[#d4af37] text-[10px] font-black uppercase tracking-widest mb-10" id="std-nav-id">MATRÍCULA: ---</p>
-                <div id="status-area" class="space-y-6">
+                <div id="status-area" class="space-y-6 text-white">
                     <p class="text-white/40 text-[10px] font-bold uppercase tracking-[0.2em]">Escanea el código QR de tu clase</p>
                     <div class="w-12 h-12 border-2 border-white/20 border-t-white rounded-full animate-spin mx-auto"></div>
                 </div>
@@ -153,10 +173,15 @@
         <!-- PANEL DOCENTE -->
         <section id="view-teacher-panel" class="view-section bg-slate-100">
             <nav class="bg-[#1e40af] p-5 flex justify-between items-center text-white sticky top-0 z-50">
-                <span id="nav-name" class="text-[12px] font-black uppercase">DOCENTE</span>
-                <button onclick="logout()" class="text-[10px] font-black bg-white/10 px-4 py-2 rounded-xl">SALIR</button>
+                <div class="flex items-center gap-3">
+                    <button onclick="switchView('home')" class="p-2 bg-white/10 rounded-lg">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+                    </button>
+                    <span id="nav-name" class="text-[12px] font-black uppercase">DOCENTE</span>
+                </div>
+                <button onclick="logout()" class="text-[10px] font-black bg-white/10 px-4 py-2 rounded-xl">CERRAR SESIÓN</button>
             </nav>
-            <div class="p-6 space-y-6">
+            <div class="p-6 space-y-6 max-w-2xl mx-auto w-full">
                 <div class="bg-white p-8 rounded-[2.5rem] shadow-sm border-2 border-slate-100">
                     <input type="text" id="sCourse" placeholder="MATERIA" class="input-ceut mb-4">
                     <div class="grid grid-cols-2 gap-4 mb-4">
@@ -175,11 +200,16 @@
         <!-- PANEL ADMIN -->
         <section id="view-admin-panel" class="view-section bg-slate-100">
             <nav class="bg-slate-900 p-5 flex justify-between items-center text-white sticky top-0 z-50">
-                <span class="font-black text-[12px]">CEUT MASTER</span>
-                <button onclick="logout()" class="bg-red-600 text-[10px] font-black px-4 py-2 rounded-xl">SALIR DEL SITIO</button>
+                <div class="flex items-center gap-3">
+                    <button onclick="switchView('home')" class="p-2 bg-white/10 rounded-lg hover:bg-white/20 transition-colors">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+                    </button>
+                    <span class="font-black text-[12px]">CEUT MASTER</span>
+                </div>
+                <button onclick="logout()" class="bg-red-600 text-[10px] font-black px-4 py-2 rounded-xl action-btn">CERRAR SESIÓN</button>
             </nav>
-            <div class="p-5 flex flex-col gap-4">
-                <div class="bg-[#1e40af] p-6 rounded-3xl text-white flex justify-between items-center">
+            <div class="p-5 flex flex-col gap-4 max-w-2xl mx-auto w-full">
+                <div class="bg-[#1e40af] p-6 rounded-3xl text-white flex justify-between items-center shadow-lg">
                     <div>
                         <p class="text-[10px] font-black uppercase opacity-60">Supervisión Global</p>
                         <h2 class="text-2xl font-black tracking-tighter">HISTORIAL DE CLASES</h2>
@@ -194,10 +224,10 @@
     <!-- MODAL QR -->
     <div id="qr-modal" class="fixed inset-0 bg-[#0f172a]/98 backdrop-blur-2xl z-[200] hidden flex flex-col items-center justify-center p-8">
         <div id="qrcode-box" class="p-8 bg-white rounded-[3rem] shadow-2xl mb-8 border-8 border-[#d4af37]"></div>
-        <h4 id="modal-code" class="text-7xl font-black text-white tracking-tighter mb-4">000000</h4>
+        <h4 id="modal-code" class="text-5xl md:text-7xl font-black text-white tracking-tighter mb-4">000000</h4>
         <p id="modal-course-name" class="text-[#d4af37] font-black uppercase tracking-widest text-sm mb-6">MATERIA</p>
         <p class="text-white/30 text-[9px] uppercase tracking-widest mb-10">Escanea para registro directo</p>
-        <button onclick="closeQR()" class="bg-white text-[#1e40af] w-full max-w-sm py-6 rounded-3xl font-black text-[14px] uppercase">Cerrar</button>
+        <button onclick="closeQR()" class="bg-white text-[#1e40af] w-full max-w-sm py-6 rounded-3xl font-black text-[14px] uppercase shadow-xl">Cerrar</button>
     </div>
 
     <script type="module">
@@ -251,11 +281,6 @@
 
                             if (directCode) {
                                 await autoRegister(directCode);
-                            } else {
-                                document.getElementById('status-area').innerHTML = `
-                                    <p class="text-white/40 text-[10px] font-bold uppercase tracking-[0.2em]">Cámara no detectada</p>
-                                    <p class="text-white text-xs mt-2">Por favor escanea el código QR de la clase directamente desde tu cámara para entrar.</p>
-                                `;
                             }
                         }
                     }
@@ -268,14 +293,12 @@
             });
         }
 
-        // --- EXPORTAR A PDF ---
         window.exportSessionPDF = (sessionDataJson) => {
             const s = JSON.parse(decodeURIComponent(sessionDataJson));
             const { jsPDF } = window.jspdf;
             const docPdf = new jsPDF();
 
-            // Estilos de encabezado
-            docPdf.setFillColor(30, 64, 175); // Azul CEUT
+            docPdf.setFillColor(30, 64, 175); 
             docPdf.rect(0, 0, 210, 40, 'F');
             
             docPdf.setTextColor(255, 255, 255);
@@ -286,7 +309,6 @@
             docPdf.setFontSize(10);
             docPdf.text(`CEUT CLOUD V10 - SISTEMA INSTITUCIONAL`, 15, 33);
 
-            // Información de la Clase
             docPdf.setTextColor(0, 0, 0);
             docPdf.setFontSize(12);
             docPdf.text(`MATERIA: ${s.course}`, 15, 55);
@@ -294,7 +316,6 @@
             docPdf.text(`CÓDIGO DE ACCESO: ${s.code}`, 15, 69);
             docPdf.text(`FECHA: ${new Date(s.timestamp).toLocaleDateString()}`, 150, 55);
 
-            // Tabla de Alumnos
             const tableData = s.attendees.map((a, index) => [
                 index + 1,
                 a.id,
@@ -320,9 +341,7 @@
             docPdf.save(fileName);
         };
 
-        // --- MONITOREO ADMIN ---
         function listenToAllSessions() {
-            // Usamos collectionGroup para traer todas las sesiones de todos los profesores
             onSnapshot(collectionGroup(db, 'sessions'), (snap) => {
                 const list = document.getElementById('global-sessions-list');
                 const docs = snap.docs.sort((a, b) => b.data().timestamp - a.data().timestamp);
@@ -331,7 +350,7 @@
                     const s = d.data();
                     const sessionJson = encodeURIComponent(JSON.stringify(s));
                     return `
-                        <div class="card-admin shadow-sm">
+                        <div class="card-admin">
                             <div class="flex justify-between items-start mb-2">
                                 <span class="badge badge-teacher">${s.level}</span>
                                 <div onclick="exportSessionPDF('${sessionJson}')" class="pdf-btn action-btn">
@@ -340,24 +359,24 @@
                             </div>
                             <h4 class="font-black text-[#1e40af] text-lg uppercase pr-10">${s.course}</h4>
                             <div class="flex items-center gap-2 mt-1">
-                                <p class="text-[10px] text-slate-400 font-bold uppercase">GRUPO ${s.grade}</p>
+                                <p class="text-[10px] text-slate-500 font-bold uppercase">GRUPO ${s.grade}</p>
                                 <span class="text-slate-300">•</span>
                                 <p class="text-[10px] text-[#d4af37] font-bold uppercase">CÓDIGO ${s.code}</p>
                             </div>
                             <div class="mt-4 p-3 bg-slate-50 rounded-xl border border-slate-100">
-                                <div class="flex justify-between items-center text-[9px] font-bold text-slate-400 uppercase mb-2">
+                                <div class="flex justify-between items-center text-[9px] font-bold text-slate-500 uppercase mb-2">
                                     <span>Alumnos Registrados</span>
-                                    <span class="text-[#1e40af]">${s.attendees.length}</span>
+                                    <span class="text-[#1e40af] font-black">${s.attendees.length}</span>
                                 </div>
                                 <div class="flex -space-x-2 overflow-hidden">
-                                    ${s.attendees.slice(0, 5).map(() => `<div class="inline-block h-6 w-6 rounded-full ring-2 ring-white bg-slate-200"></div>`).join('')}
-                                    ${s.attendees.length > 5 ? `<div class="flex items-center justify-center h-6 w-6 rounded-full ring-2 ring-white bg-slate-100 text-[8px] font-bold">+${s.attendees.length - 5}</div>` : ''}
+                                    ${s.attendees.slice(0, 5).map(() => `<div class="inline-block h-6 w-6 rounded-full ring-2 ring-white bg-slate-300"></div>`).join('')}
+                                    ${s.attendees.length > 5 ? `<div class="flex items-center justify-center h-6 w-6 rounded-full ring-2 ring-white bg-slate-200 text-[8px] font-bold text-slate-600">+${s.attendees.length - 5}</div>` : ''}
                                 </div>
                             </div>
                         </div>
                     `;
                 }).join('');
-            }, (err) => console.error("Error admin monitoring:", err));
+            });
         }
 
         async function autoRegister(code) {
@@ -375,13 +394,12 @@
                             attendees: [...att, { name: userData.name, id: userData.id, time: new Date().toLocaleTimeString() }] 
                         });
                         
-                        const card = document.getElementById('student-card');
-                        card.classList.add('success-anim');
+                        document.getElementById('student-card').classList.add('success-anim');
                         document.getElementById('status-area').innerHTML = `
                             <div class="text-[#22c55e] text-5xl mb-4">✓</div>
                             <h3 class="text-white font-black uppercase tracking-tighter">¡LISTO!</h3>
                             <p class="text-white/70 text-[10px] font-bold uppercase mb-4">${data.course}</p>
-                            <p class="text-white/40 text-[9px] uppercase">Tu asistencia ha sido guardada en la nube</p>
+                            <p class="text-white/40 text-[9px] uppercase">Tu asistencia ha sido guardada</p>
                         `;
                     } else {
                         document.getElementById('status-area').innerHTML = `
@@ -418,7 +436,15 @@
             document.getElementById('qr-modal').classList.remove('hidden'); 
         };
 
-        window.logout = () => signOut(auth).then(() => window.location.href = window.location.origin + window.location.pathname);
+        window.logout = async () => {
+            await signOut(auth);
+            currentUser = null;
+            userData = null;
+            // Limpiamos los inputs de auth para seguridad
+            document.getElementById('authEmail').value = "";
+            document.getElementById('authPass').value = "";
+            window.location.href = window.location.origin + window.location.pathname;
+        };
         
         window.switchView = (id) => {
             document.querySelectorAll('.view-section').forEach(s => s.classList.remove('active'));
@@ -426,9 +452,19 @@
             if(el) el.classList.add('active');
         };
 
+        window.handleProtectedAccess = (role) => {
+            if (currentUser && userData && userData.role === role) {
+                switchView(`${role}-panel`);
+            } else {
+                prepareAuth(role);
+            }
+        };
+
         window.prepareAuth = (role) => { 
             window.userRole = role; 
-            if(role === 'admin') { document.getElementById('authEmail').value = ADMIN_EMAIL; toggleAuthMode('login'); }
+            document.getElementById('authEmail').value = (role === 'admin') ? ADMIN_EMAIL : "";
+            document.getElementById('authPass').value = "";
+            toggleAuthMode('login');
             switchView('auth'); 
         };
 
@@ -457,7 +493,7 @@
                     window.location.search = `?c=${pending}`;
                     localStorage.removeItem('pending_code');
                 }
-            } catch (e) { alert("ERROR DE ACCESO"); }
+            } catch (e) { alert("ERROR DE ACCESO: Verifica tus credenciales."); }
         };
 
         window.closeQR = () => document.getElementById('qr-modal').classList.add('hidden');
@@ -468,13 +504,13 @@
                 list.innerHTML = snap.docs.map(d => {
                     const s = d.data();
                     const sessionJson = encodeURIComponent(JSON.stringify(s));
-                    return `<div class="card-admin shadow-sm">
+                    return `<div class="card-admin">
                         <div class="flex justify-between items-center mb-2"><span class="badge badge-teacher">${s.level}</span><p class="text-[9px] font-bold text-slate-300">ID: ${s.code}</p></div>
                         <h4 class="font-black text-[#1e40af] text-lg uppercase">${s.course}</h4>
-                        <p class="text-[10px] text-slate-400 font-bold uppercase">GRUPO ${s.grade} • ${s.attendees.length} Presentes</p>
+                        <p class="text-[10px] text-slate-500 font-bold uppercase">GRUPO ${s.grade} • ${s.attendees.length} Presentes</p>
                         <div class="grid grid-cols-2 gap-3 mt-4">
-                            <button onclick="showQR('${s.code}', '${s.course}')" class="bg-slate-100 text-[#1e40af] py-3 rounded-xl font-black text-[10px] uppercase">Ver QR</button>
-                            <button onclick="exportSessionPDF('${sessionJson}')" class="bg-red-50 text-red-600 py-3 rounded-xl font-black text-[10px] uppercase flex items-center justify-center gap-2">
+                            <button onclick="showQR('${s.code}', '${s.course}')" class="bg-slate-100 text-[#1e40af] py-3 rounded-xl font-black text-[10px] uppercase hover:bg-slate-200 transition-colors">Ver QR</button>
+                            <button onclick="exportSessionPDF('${sessionJson}')" class="bg-red-50 text-red-600 py-3 rounded-xl font-black text-[10px] uppercase flex items-center justify-center gap-2 hover:bg-red-100 transition-colors">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
                                 PDF
                             </button>
