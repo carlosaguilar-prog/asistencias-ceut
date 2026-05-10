@@ -46,38 +46,34 @@
             font-size: 11px; font-weight: 800; z-index: 10000; display: none;
             box-shadow: 0 10px 15px rgba(0,0,0,0.2);
         }
+
+        .qr-container canvas { margin: 0 auto; border: 10px solid white; border-radius: 15px; }
     </style>
 </head>
 <body>
 
     <div id="toast">MENSAJE</div>
 
-    <!-- MODAL EDICIÓN CLASE -->
-    <div id="modal-edit-class" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-[10000] hidden items-center justify-center p-4">
-        <div class="bg-white rounded-[2.5rem] p-8 max-w-md w-full shadow-2xl">
-            <h3 class="text-xl font-black mb-6 flex items-center gap-3"><i data-lucide="edit-3" class="text-blue-600"></i> EDITAR CLASE</h3>
-            <div class="space-y-3">
-                <input type="hidden" id="editClassId">
-                <input type="text" id="editClassName" placeholder="MATERIA" class="input-ceut uppercase">
-                <select id="editClassLevel" class="input-ceut">
-                    <option value="PREPARATORIA">PREPARATORIA</option>
-                    <option value="UNIVERSIDAD">UNIVERSIDAD</option>
-                    <option value="POSTGRADO">POSTGRADO</option>
-                </select>
-                <div class="grid grid-cols-2 gap-3">
-                    <input type="text" id="editClassDegree" placeholder="GRADO" class="input-ceut uppercase">
-                    <input type="text" id="editClassGroup" placeholder="GRUPO" class="input-ceut uppercase">
+    <!-- MODAL QR Y CONTROL DE ASISTENCIA -->
+    <div id="modal-qr" class="fixed inset-0 bg-slate-950/90 backdrop-blur-xl z-[10000] hidden items-center justify-center p-4">
+        <div class="bg-white rounded-[3rem] p-8 max-w-sm w-full text-center shadow-2xl">
+            <h3 id="qr-class-name" class="text-xl font-black mb-1 uppercase tracking-tighter italic">MATERIA</h3>
+            <p id="qr-class-info" class="text-[9px] font-bold text-slate-400 mb-6 uppercase tracking-widest italic">GRADO - GRUPO</p>
+            
+            <div id="qrcode" class="qr-container mb-6 flex justify-center"></div>
+            
+            <div class="bg-slate-50 p-4 rounded-2xl border border-slate-100 mb-6">
+                <p class="text-[10px] font-black text-slate-400 mb-2 uppercase italic">Estado de Sesión</p>
+                <div class="flex items-center justify-center gap-4">
+                    <span id="status-text" class="text-xs font-black text-green-600">ABIERTA</span>
+                    <button id="toggle-session-btn" class="w-12 h-6 bg-green-500 rounded-full relative p-1 transition-all">
+                        <div class="w-4 h-4 bg-white rounded-full absolute right-1"></div>
+                    </button>
                 </div>
-                <input type="text" id="editClassCareer" placeholder="CARRERA" class="input-ceut uppercase">
-                <select id="editClassMode" class="input-ceut">
-                    <option value="ESCOLARIZADA">ESCOLARIZADA</option>
-                    <option value="MIXTA">MIXTA</option>
-                </select>
-                <div class="flex gap-3 mt-6">
-                    <button onclick="closeClassModal()" class="flex-1 py-4 font-bold text-slate-400 uppercase text-[10px]">Cancelar</button>
-                    <button id="btn-save-edit" class="flex-1 btn-primary py-4">Actualizar</button>
-                </div>
+                <p class="text-[8px] text-slate-400 mt-2 font-bold italic">Radio de validación: 100 metros</p>
             </div>
+
+            <button onclick="closeQRModal()" class="w-full py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">Cerrar Panel</button>
         </div>
     </div>
 
@@ -102,8 +98,6 @@
                     <i data-lucide="arrow-left" class="w-4 h-4"></i> REGRESAR
                 </button>
                 <h2 class="text-3xl font-black mb-2 uppercase text-slate-900 tracking-tighter italic">REGISTRO ÚNICO</h2>
-                <p class="text-[10px] font-bold text-slate-400 mb-8 uppercase tracking-widest">Credenciales del sistema</p>
-                
                 <div class="space-y-4">
                     <div id="reg-fields" class="space-y-4">
                         <input type="text" id="authName" placeholder="NOMBRE COMPLETO" class="input-ceut uppercase">
@@ -111,7 +105,7 @@
                     </div>
                     <input type="email" id="authEmail" placeholder="correo@ceut.edu.mx" class="input-ceut">
                     <input type="password" id="authPass" placeholder="CONTRASEÑA" class="input-ceut">
-                    <button id="btn-submit-auth" class="btn-primary mt-6 py-5 italic tracking-tighter">INICIAR SESIÓN</button>
+                    <button id="btn-submit-auth" class="btn-primary mt-6 py-5 italic tracking-tighter">ACCEDER AL SISTEMA</button>
                 </div>
             </div>
         </section>
@@ -131,44 +125,44 @@
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div class="card-glass p-8">
-                    <h3 class="text-xs font-black uppercase text-slate-400 mb-6 tracking-widest">INSCRIBIR MATERIA</h3>
+                    <h3 class="text-xs font-black uppercase text-slate-400 mb-6 tracking-widest">REGISTRAR ASISTENCIA</h3>
                     <div class="flex gap-2">
                         <input type="text" id="joinClassId" placeholder="CÓDIGO (CLS-XXXX)" class="input-ceut uppercase">
-                        <button onclick="joinClass()" class="bg-blue-600 text-white px-6 rounded-2xl font-black text-[10px]">UNIRSE</button>
+                        <button onclick="joinClass()" class="bg-blue-600 text-white px-6 rounded-2xl font-black text-[10px]">ENVIAR</button>
                     </div>
                 </div>
                 <div class="card-glass p-8 md:row-span-2">
-                    <h3 class="text-xs font-black uppercase text-slate-400 mb-6 tracking-widest">MIS ASISTENCIAS (VISUALIZACIÓN)</h3>
+                    <h3 class="text-xs font-black uppercase text-slate-400 mb-6 tracking-widest">MI HISTORIAL (VISUALIZACIÓN)</h3>
                     <div id="student-classes-list" class="space-y-4"></div>
                 </div>
             </div>
         </section>
 
-        <!-- PANEL DOCENTE (CONTROL INTERNO) -->
+        <!-- PANEL DOCENTE -->
         <section id="view-teacher" class="view-section p-6 bg-slate-50 overflow-y-auto">
             <header class="flex justify-between items-center mb-8">
                 <div class="flex items-center gap-4">
                     <img src="https://lh3.googleusercontent.com/d/17NobXQ3JbRnLGejZe4Mn2x-Jl45F4rPm" class="w-10" alt="Logo">
                     <div>
                         <p id="prof-name" class="text-sm font-black uppercase text-slate-900 leading-none">...</p>
-                        <span class="text-blue-600 text-[9px] font-black uppercase tracking-widest italic">GESTIÓN INTERNA DOCENTE</span>
+                        <span class="text-blue-600 text-[9px] font-black uppercase tracking-widest italic">CONTROL INTERNO DOCENTE</span>
                     </div>
                 </div>
                 <button onclick="handleLogout()" class="text-rose-500 p-2"><i data-lucide="log-out"></i></button>
             </header>
 
             <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-                <!-- FORMULARIO DE REGISTRO DE CLASE -->
                 <div class="lg:col-span-4 card-glass p-8 h-fit">
-                    <h3 class="text-xs font-black uppercase text-slate-400 mb-6 tracking-widest flex items-center gap-2">
+                    <h3 class="text-xs font-black uppercase text-slate-400 mb-6 tracking-widest flex items-center gap-2 italic">
                         <i data-lucide="plus" class="w-4 h-4"></i> NUEVA MATERIA
                     </h3>
                     <div class="space-y-3">
-                        <input type="text" id="classMat" placeholder="NOMBRE DE LA MATERIA" class="input-ceut uppercase">
+                        <input type="text" id="classMat" placeholder="NOMBRE MATERIA" class="input-ceut uppercase">
                         <select id="classLev" class="input-ceut">
-                            <option value="PREPARATORIA">NIVEL: PREPARATORIA</option>
-                            <option value="UNIVERSIDAD">NIVEL: UNIVERSIDAD</option>
-                            <option value="POSTGRADO">NIVEL: POSTGRADO</option>
+                            <option value="">SELECCIONE NIVEL</option>
+                            <option value="PREPARATORIA">PREPARATORIA</option>
+                            <option value="LICENCIATURA">LICENCIATURA</option>
+                            <option value="POSTGRADO">POSTGRADO</option>
                         </select>
                         <div class="grid grid-cols-2 gap-3">
                             <input type="text" id="classDeg" placeholder="GRADO" class="input-ceut uppercase">
@@ -176,21 +170,18 @@
                         </div>
                         <input type="text" id="classCar" placeholder="CARRERA" class="input-ceut uppercase">
                         <select id="classMod" class="input-ceut">
-                            <option value="ESCOLARIZADA">MOD: ESCOLARIZADA</option>
-                            <option value="MIXTA">MOD: MIXTA</option>
+                            <option value="ESCOLARIZADO">ESCOLARIZADO</option>
+                            <option value="MIXTO">MIXTO</option>
                         </select>
-                        <button onclick="createNewClass()" class="btn-primary py-4 mt-4 italic">REGISTRAR MATERIA</button>
+                        <button onclick="createNewClass()" class="btn-primary py-4 mt-4 italic">CREAR Y ACTIVAR GPS</button>
                     </div>
                 </div>
 
-                <!-- DASHBOARD DE CONTROL DE CLASES -->
                 <div class="lg:col-span-8 card-glass p-8">
-                    <h3 class="text-xs font-black uppercase text-slate-400 mb-6 tracking-widest flex items-center gap-2">
-                        <i data-lucide="layers" class="w-4 h-4"></i> CONTROL INTERNO DE CLASES
+                    <h3 class="text-xs font-black uppercase text-slate-400 mb-6 tracking-widest flex items-center gap-2 italic">
+                        <i data-lucide="layers" class="w-4 h-4"></i> GESTIÓN DE CLASES
                     </h3>
-                    <div id="teacher-classes-list" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <!-- Clases aquí -->
-                    </div>
+                    <div id="teacher-classes-list" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
                 </div>
             </div>
         </section>
@@ -202,7 +193,7 @@
         import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
 
         const firebaseConfig = JSON.parse(__firebase_config);
-        const APP_ID = typeof __app_id !== 'undefined' ? __app_id : 'ceut_v21_cloud';
+        const APP_ID = typeof __app_id !== 'undefined' ? __app_id : 'ceut_v21_cloud_gps';
         
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
@@ -210,8 +201,28 @@
 
         let currentUser = null;
         let myClasses = [];
+        let qrInstance = null;
 
-        // --- GESTIÓN DOCENTE (CONTROL INTERNO) ---
+        // --- UTILIDADES GEOLOCALIZACIÓN ---
+        const getCoords = () => new Promise((res, rej) => {
+            navigator.geolocation.getCurrentPosition(
+                p => res({ lat: p.coords.latitude, lng: p.coords.longitude }),
+                e => rej(e),
+                { enableHighAccuracy: true }
+            );
+        });
+
+        const getDistance = (c1, c2) => {
+            const R = 6371e3;
+            const dLat = (c2.lat - c1.lat) * Math.PI / 180;
+            const dLng = (c2.lng - c1.lng) * Math.PI / 180;
+            const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+                      Math.cos(c1.lat * Math.PI / 180) * Math.cos(c2.lat * Math.PI / 180) *
+                      Math.sin(dLng/2) * Math.sin(dLng/2);
+            return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+        };
+
+        // --- GESTIÓN DOCENTE ---
         window.createNewClass = async () => {
             const mat = document.getElementById('classMat').value.trim();
             const lev = document.getElementById('classLev').value;
@@ -220,90 +231,92 @@
             const car = document.getElementById('classCar').value.trim();
             const mod = document.getElementById('classMod').value;
 
-            if(!mat || !lev || !deg || !gru || !car || !mod) return window.showToast("⚠️ COMPLETE EL REGISTRO");
+            if(!mat || !lev || !deg || !gru || !car) return window.showToast("⚠️ COMPLETE LOS CAMPOS ACADÉMICOS");
 
-            const classId = `CLS-${Math.random().toString(36).substr(2, 6).toUpperCase()}`;
-            const classData = {
-                id: classId,
-                name: mat.toUpperCase(),
-                level: lev,
-                degree: deg.toUpperCase(),
-                group: gru.toUpperCase(),
-                career: car.toUpperCase(),
-                mode: mod,
-                teacher: currentUser.name,
-                teacherId: currentUser.uid,
-                createdAt: Date.now(),
-                isOpen: true
-            };
+            try {
+                window.showToast("📍 OBTENIENDO GPS...");
+                const coords = await getCoords();
+                const classId = `CLS-${Math.random().toString(36).substr(2, 6).toUpperCase()}`;
+                
+                const classData = {
+                    id: classId,
+                    name: mat.toUpperCase(),
+                    level: lev,
+                    degree: deg.toUpperCase(),
+                    group: gru.toUpperCase(),
+                    career: car.toUpperCase(),
+                    mode: mod,
+                    teacher: currentUser.name,
+                    teacherId: currentUser.uid,
+                    coords: coords,
+                    isOpen: true,
+                    createdAt: Date.now()
+                };
 
-            await setDoc(doc(db, 'artifacts', APP_ID, 'public', 'data', 'classes', classId), classData);
-            window.showToast("✅ CLASE CREADA EXITOSAMENTE");
-            document.getElementById('classMat').value = "";
-        };
-
-        window.deleteClass = async (id) => {
-            if(confirm("¿ELIMINAR ESTA MATERIA? Se perderán todos los registros asociados.")) {
-                await deleteDoc(doc(db, 'artifacts', APP_ID, 'public', 'data', 'classes', id));
-                window.showToast("🗑️ MATERIA ELIMINADA");
+                await setDoc(doc(db, 'artifacts', APP_ID, 'public', 'data', 'classes', classId), classData);
+                window.showToast("✅ CLASE REGISTRADA CON GPS");
+                document.getElementById('classMat').value = "";
+            } catch(e) {
+                window.showToast("❌ ERROR GPS: ACTIVA TU UBICACIÓN");
             }
         };
 
-        window.openEditModal = (id) => {
+        window.openQR = (id) => {
             const c = myClasses.find(x => x.id === id);
             if(!c) return;
-            document.getElementById('editClassId').value = c.id;
-            document.getElementById('editClassName').value = c.name;
-            document.getElementById('editClassLevel').value = c.level;
-            document.getElementById('editClassDegree').value = c.degree;
-            document.getElementById('editClassGroup').value = c.group;
-            document.getElementById('editClassCareer').value = c.career;
-            document.getElementById('editClassMode').value = c.mode;
-            document.getElementById('modal-edit-class').classList.replace('hidden', 'flex');
-        };
-
-        window.closeClassModal = () => document.getElementById('modal-edit-class').classList.replace('flex', 'hidden');
-
-        document.getElementById('btn-save-edit').onclick = async () => {
-            const id = document.getElementById('editClassId').value;
-            const upData = {
-                name: document.getElementById('editClassName').value.toUpperCase(),
-                level: document.getElementById('editClassLevel').value,
-                degree: document.getElementById('editClassDegree').value.toUpperCase(),
-                group: document.getElementById('editClassGroup').value.toUpperCase(),
-                career: document.getElementById('editClassCareer').value.toUpperCase(),
-                mode: document.getElementById('editClassMode').value
+            
+            document.getElementById('qr-class-name').innerText = c.name;
+            document.getElementById('qr-class-info').innerText = `${c.level} | ${c.degree}-${c.group} | ${c.mode}`;
+            
+            const qrdiv = document.getElementById('qrcode');
+            qrdiv.innerHTML = "";
+            qrInstance = new QRCode(qrdiv, { text: id, width: 200, height: 200, colorDark: "#1e40af", correctLevel: QRCode.CorrectLevel.H });
+            
+            const btn = document.getElementById('toggle-session-btn');
+            const stxt = document.getElementById('status-text');
+            
+            const updateUI = (isOpen) => {
+                btn.className = `w-12 h-6 rounded-full relative p-1 transition-all ${isOpen ? 'bg-green-500' : 'bg-slate-300'}`;
+                btn.innerHTML = `<div class="w-4 h-4 bg-white rounded-full absolute transition-all ${isOpen ? 'right-1' : 'left-1'}"></div>`;
+                stxt.innerText = isOpen ? 'ABIERTA' : 'CERRADA';
+                stxt.className = `text-xs font-black ${isOpen ? 'text-green-600' : 'text-slate-400'}`;
             };
-            await updateDoc(doc(db, 'artifacts', APP_ID, 'public', 'data', 'classes', id), upData);
-            window.showToast("✅ DATOS ACTUALIZADOS");
-            window.closeClassModal();
+
+            updateUI(c.isOpen);
+            btn.onclick = async () => {
+                const newState = !c.isOpen;
+                await updateDoc(doc(db, 'artifacts', APP_ID, 'public', 'data', 'classes', id), { isOpen: newState });
+                c.isOpen = newState;
+                updateUI(newState);
+                window.showToast(newState ? "✅ LISTA ABIERTA" : "🔒 LISTA CERRADA");
+            };
+
+            document.getElementById('modal-qr').classList.replace('hidden', 'flex');
         };
+
+        window.closeQRModal = () => document.getElementById('modal-qr').classList.replace('flex', 'hidden');
 
         function renderTeacherDashboard(classes) {
             myClasses = classes;
             const container = document.getElementById('teacher-classes-list');
             if(classes.length === 0) {
-                container.innerHTML = `<div class="col-span-full py-10 text-center opacity-40 font-bold text-xs">NO HAY CLASES REGISTRADAS</div>`;
+                container.innerHTML = `<div class="col-span-full py-10 text-center opacity-30 font-bold text-[10px]">SIN MATERIAS REGISTRADAS</div>`;
                 return;
             }
 
             container.innerHTML = classes.map(c => `
-                <div class="p-6 bg-slate-900 rounded-[2rem] text-white border border-white/5 relative overflow-hidden group">
+                <div class="p-6 bg-slate-900 rounded-[2.5rem] text-white border border-white/5 relative overflow-hidden group">
                     <div class="flex justify-between items-start mb-4">
                         <span class="text-[7px] font-black bg-blue-600 px-3 py-1 rounded-full uppercase tracking-widest">${c.mode}</span>
                         <div class="flex gap-2">
-                             <button onclick="window.openEditModal('${c.id}')" class="p-2 hover:bg-white/10 rounded-full transition-all text-blue-400"><i data-lucide="edit-2" class="w-4 h-4"></i></button>
-                             <button onclick="window.deleteClass('${c.id}')" class="p-2 hover:bg-rose-500/20 rounded-full transition-all text-rose-500"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+                             <button onclick="window.deleteClass('${c.id}')" class="p-2 text-rose-500/40 hover:text-rose-500 transition-all"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
                         </div>
                     </div>
-                    <h4 class="font-black text-lg leading-tight uppercase mb-1">${c.name}</h4>
-                    <p class="text-[9px] text-slate-400 font-bold uppercase mb-4">${c.level} | ${c.career}</p>
-                    <div class="flex justify-between items-end mt-6">
-                        <div>
-                            <p class="text-[10px] font-black text-[#d4af37] tracking-tighter">CÓDIGO: ${c.id}</p>
-                            <p class="text-[8px] opacity-40 font-bold">${c.degree} - ${c.group}</p>
-                        </div>
-                        <button onclick="window.showToast('ID CLASE: ${c.id}')" class="bg-white/10 p-3 rounded-2xl group-hover:bg-blue-600 transition-all">
+                    <h4 class="font-black text-lg leading-tight uppercase mb-1 italic tracking-tighter">${c.name}</h4>
+                    <p class="text-[8px] text-slate-400 font-bold uppercase mb-4 tracking-tighter">${c.level} | ${c.career} | ${c.degree}-${c.group}</p>
+                    <div class="flex justify-between items-center mt-6 pt-4 border-t border-white/5">
+                        <span class="text-[10px] font-black text-blue-400">ID: ${c.id}</span>
+                        <button onclick="window.openQR('${c.id}')" class="bg-blue-600 p-3 rounded-2xl shadow-lg shadow-blue-900/40 active:scale-95 transition-all">
                             <i data-lucide="qr-code" class="w-4 h-4"></i>
                         </button>
                     </div>
@@ -317,20 +330,34 @@
             const cid = document.getElementById('joinClassId').value.trim().toUpperCase();
             if(!cid) return window.showToast("⚠️ INGRESE CÓDIGO");
 
-            const snap = await getDoc(doc(db, 'artifacts', APP_ID, 'public', 'data', 'classes', cid));
-            if(!snap.exists()) return window.showToast("❌ CÓDIGO INVÁLIDO");
+            try {
+                window.showToast("📍 VALIDANDO UBICACIÓN...");
+                const stdCoords = await getCoords();
+                
+                const snap = await getDoc(doc(db, 'artifacts', APP_ID, 'public', 'data', 'classes', cid));
+                if(!snap.exists()) return window.showToast("❌ CÓDIGO INVÁLIDO");
+                
+                const c = snap.data();
+                if(!c.isOpen) return window.showToast("🔒 EL DOCENTE CERRÓ EL PASE");
 
-            await updateDoc(doc(db, 'artifacts', APP_ID, 'users', currentUser.uid, 'profile', 'info'), {
-                classes: arrayUnion(cid)
-            });
-            window.showToast("✅ INSCRITO CORRECTAMENTE");
-            document.getElementById('joinClassId').value = "";
+                const dist = getDistance(stdCoords, c.coords);
+                if(dist > 100) return window.showToast(`❌ DEMASIADO LEJOS (${Math.round(dist)}m). Máx: 100m`);
+
+                await updateDoc(doc(db, 'artifacts', APP_ID, 'users', currentUser.uid, 'profile', 'info'), {
+                    classes: arrayUnion(cid)
+                });
+                
+                window.showToast("✅ ASISTENCIA REGISTRADA");
+                document.getElementById('joinClassId').value = "";
+            } catch(e) {
+                window.showToast("❌ ACTIVA EL GPS PARA ASISTIR");
+            }
         };
 
         async function refreshStudentList(cids) {
             const container = document.getElementById('student-classes-list');
             if(!cids || cids.length === 0) {
-                container.innerHTML = `<p class="text-center py-10 opacity-40 text-[10px] font-bold">SIN MATERIAS INSCRITAS</p>`;
+                container.innerHTML = `<p class="text-center py-10 opacity-30 text-[10px] font-bold italic uppercase">No hay registros aún</p>`;
                 return;
             }
             container.innerHTML = "";
@@ -339,17 +366,13 @@
                 if(s.exists()){
                     const c = s.data();
                     container.innerHTML += `
-                        <div class="p-5 bg-slate-50 border border-slate-200 rounded-3xl">
+                        <div class="p-5 bg-white border border-slate-100 rounded-[2rem] shadow-sm">
                             <div class="flex justify-between items-start">
                                 <div>
-                                    <h4 class="font-black text-slate-900 uppercase text-[12px]">${c.name}</h4>
+                                    <h4 class="font-black text-slate-900 uppercase text-[12px] italic tracking-tighter">${c.name}</h4>
                                     <p class="text-[8px] text-blue-600 font-bold uppercase tracking-widest">${c.level} | ${c.career}</p>
                                 </div>
-                                <span class="text-[8px] font-black opacity-30"># ${id}</span>
-                            </div>
-                            <div class="mt-4 pt-3 border-t border-slate-200/50 flex justify-between items-center">
-                                <span class="text-[8px] font-black text-slate-400 uppercase italic">Prof: ${c.teacher}</span>
-                                <button onclick="window.showToast('VISTA DE ASISTENCIAS CARGANDO...')" class="text-blue-700 font-black text-[9px] uppercase italic">Ver Historial →</button>
+                                <span class="bg-blue-50 text-blue-600 px-2 py-1 rounded-lg text-[7px] font-black tracking-widest italic">ASISTENTE</span>
                             </div>
                         </div>
                     `;
@@ -357,7 +380,7 @@
             }
         }
 
-        // --- AUTH & INITIALIZATION ---
+        // --- AUTH ---
         document.getElementById('btn-submit-auth').onclick = async () => {
             const email = document.getElementById('authEmail').value.trim().toLowerCase();
             const pass = document.getElementById('authPass').value.trim();
@@ -371,9 +394,8 @@
                     const res = await createUserWithEmailAndPassword(auth, email, pass);
                     const userData = { uid: res.user.uid, name: name.toUpperCase(), id: id.toUpperCase(), email, role: window.selectedRole, classes: [], date: Date.now() };
                     await setDoc(doc(db, 'artifacts', APP_ID, 'users', res.user.uid, 'profile', 'info'), userData);
-                    await setDoc(doc(db, 'artifacts', APP_ID, 'public', 'data', 'users', res.user.uid), userData);
-                    window.showToast("🚀 REGISTRO COMPLETADO");
-                } else window.showToast("❌ ERROR: DATOS REQUERIDOS");
+                    window.showToast("🚀 BIENVENIDO A CEUT");
+                } else window.showToast("❌ ERROR EN CREDENCIALES");
             }
         };
 
@@ -381,10 +403,9 @@
             if(u) {
                 const snap = await getDoc(doc(db, 'artifacts', APP_ID, 'users', u.uid, 'profile', 'info'));
                 currentUser = snap.data();
-                
                 if(currentUser.role === 'student') {
                     document.getElementById('std-name-display').innerText = currentUser.name;
-                    document.getElementById('std-id-display').innerText = `ID: ${currentUser.id}`;
+                    document.getElementById('std-id-display').innerText = `MATRÍCULA: ${currentUser.id}`;
                     refreshStudentList(currentUser.classes);
                     window.switchView('student');
                 } else {
@@ -397,7 +418,6 @@
         });
 
         window.handleLogout = () => signOut(auth);
-        window.selectedRole = 'student';
         window.initFlow = (r) => { window.selectedRole = r; window.switchView('auth'); };
         window.switchView = (id) => {
             document.querySelectorAll('.view-section').forEach(s => s.classList.remove('active'));
@@ -406,7 +426,7 @@
         };
         window.showToast = (m) => {
             const t = document.getElementById('toast'); t.innerText = m; t.style.display = 'block';
-            setTimeout(() => t.style.display = 'none', 3000);
+            setTimeout(() => t.style.display = 'none', 4000);
         };
     </script>
 </body>
