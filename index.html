@@ -3,13 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CEUT | Sistema de Asistencia Cloud</title>
+    <title>CEUT | GESTIÓN ACADÉMICA CENTRALIZADA</title>
     
-    <!-- CSS & Fonts -->
+    <!-- Librerías -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">
-    
-    <!-- Libraries -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
@@ -19,8 +17,10 @@
             theme: {
                 extend: {
                     colors: {
-                        ceutBlue: '#2A1B54',
-                        ceutGold: '#D4AF37'
+                        ceutBlue: '#1a103d',
+                        ceutGold: '#c5a028',
+                        ceutLight: '#f8fafc',
+                        ceutAdmin: '#1e293b'
                     }
                 }
             }
@@ -28,178 +28,219 @@
     </script>
 
     <style>
-        body { font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; overflow-x: hidden; }
         .view-section { display: none; min-height: 100vh; width: 100%; }
         .view-section.active { display: flex; flex-direction: column; }
         #loading-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: #2A1B54; z-index: 9999; display: flex;
-            align-items: center; justify-content: center; transition: opacity 0.5s;
+            position: fixed; inset: 0; background: #1a103d; z-index: 9999;
+            display: flex; align-items: center; justify-content: center;
         }
-        #qrcode { padding: 10px; background: white; border-radius: 1rem; display: inline-block; }
-        #qrcode canvas, #qrcode img { margin: 0 auto; display: block; }
         
-        /* Animación suave para errores */
-        @keyframes slideUp {
-            from { transform: translateY(20px); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
-        }
-        .error-animate { animation: slideUp 0.4s ease-out forwards; }
+        input, select, textarea { text-transform: uppercase; }
+        input::placeholder { text-transform: none; font-weight: 400; opacity: 0.5; }
+
+        .animate-fade-in { animation: fadeIn 0.3s ease-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
-<body class="bg-slate-50">
+<body class="bg-ceutLight">
 
-    <!-- Pantalla de Carga e Indicador de Error de Configuración -->
+    <!-- Pantalla de Carga -->
     <div id="loading-overlay">
-        <div class="text-white font-bold text-center p-6 w-full max-w-md">
-            <img src="https://lh3.googleusercontent.com/d/17NobXQ3JbRnLGejZe4Mn2x-Jl45F4rPm" alt="CEUT Logo" class="w-32 h-32 mb-6 mx-auto animate-pulse">
-            
-            <div id="status-container">
-                <div id="loader-icon" class="w-10 h-10 border-4 border-ceutGold border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-                <p id="loader-text" class="tracking-widest text-[10px] uppercase italic opacity-70">Sincronizando con Firebase...</p>
-            </div>
-
-            <!-- Panel de Auxilio para el Error auth/configuration-not-found -->
-            <div id="setup-error" class="hidden mt-8 p-6 bg-white rounded-[2rem] text-slate-900 shadow-2xl error-animate">
-                <div class="w-12 h-12 bg-red-100 text-red-600 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                    </svg>
-                </div>
-                <h3 class="font-black text-xl mb-2 italic">Acceso no configurado</h3>
-                <p class="text-sm text-slate-500 mb-6 leading-relaxed">
-                    Firebase bloqueó la conexión porque el <b>Inicio de sesión Anónimo</b> está desactivado en tu consola.
-                </p>
-                <div class="text-left bg-slate-50 p-4 rounded-2xl mb-6 space-y-3 border border-slate-100">
-                    <div class="flex gap-3 items-start">
-                        <span class="bg-ceutBlue text-white text-[10px] w-5 h-5 flex items-center justify-center rounded-full shrink-0 mt-0.5">1</span>
-                        <p class="text-[11px] font-medium text-slate-700">Ve a <b>Authentication</b> en la consola de Firebase.</p>
-                    </div>
-                    <div class="flex gap-3 items-start">
-                        <span class="bg-ceutBlue text-white text-[10px] w-5 h-5 flex items-center justify-center rounded-full shrink-0 mt-0.5">2</span>
-                        <p class="text-[11px] font-medium text-slate-700">Pestaña <b>Sign-in method</b> (Método de inicio).</p>
-                    </div>
-                    <div class="flex gap-3 items-start">
-                        <span class="bg-ceutBlue text-white text-[10px] w-5 h-5 flex items-center justify-center rounded-full shrink-0 mt-0.5">3</span>
-                        <p class="text-[11px] font-medium text-slate-700">Habilita el proveedor <b>Anónimo</b> y guarda.</p>
-                    </div>
-                </div>
-                <button onclick="location.reload()" class="w-full bg-ceutBlue text-white py-4 rounded-xl font-bold text-sm shadow-lg active:scale-95 transition-transform">Ya lo hice, reintentar</button>
-            </div>
+        <div class="text-center">
+            <img src="https://lh3.googleusercontent.com/d/17NobXQ3JbRnLGejZe4Mn2x-Jl45F4rPm" class="w-24 h-24 mx-auto mb-4 animate-pulse">
+            <div class="w-8 h-8 border-4 border-ceutGold border-t-transparent rounded-full animate-spin mx-auto"></div>
         </div>
     </div>
 
-    <!-- VISTA: Inicio -->
-    <main id="view-home" class="view-section items-center justify-center bg-ceutBlue p-6">
-        <div class="text-center w-full max-w-sm">
-            <img src="https://lh3.googleusercontent.com/d/17NobXQ3JbRnLGejZe4Mn2x-Jl45F4rPm" alt="CEUT Logo" class="w-56 h-56 mx-auto mb-8">
-            <h1 class="text-4xl font-black text-white italic mb-2 tracking-tighter">CEUT <span class="text-ceutGold">QR</span></h1>
-            <p class="text-white/40 text-[10px] tracking-[0.3em] uppercase mb-12 font-bold">Asistencia Digital Institucional</p>
-            <div class="space-y-4">
-                <button onclick="switchView('teacher-login')" class="w-full bg-white/10 backdrop-blur-md p-5 rounded-2xl flex items-center gap-4 text-white border border-white/5 hover:bg-white/20 transition-all">
-                    <div class="bg-ceutGold p-3 rounded-xl text-ceutBlue"><i data-lucide="qr-code"></i></div>
-                    <div class="text-left">
-                        <p class="font-bold">Panel de Docente</p>
-                        <p class="text-[10px] opacity-50 uppercase font-semibold tracking-widest">Gestionar Clases</p>
+    <!-- VISTA 1: Inicio -->
+    <main id="view-home" class="view-section items-center justify-center p-6 bg-ceutBlue">
+        <div class="w-full max-w-sm text-center animate-fade-in">
+            <img src="https://lh3.googleusercontent.com/d/17NobXQ3JbRnLGejZe4Mn2x-Jl45F4rPm" class="w-40 mx-auto mb-8 drop-shadow-2xl">
+            <h1 class="text-3xl font-extrabold text-white mb-2 italic tracking-tight">CEUT <span class="text-ceutGold">CLOUD</span></h1>
+            <p class="text-white/40 text-[10px] tracking-[0.4em] uppercase mb-12 font-bold italic">SISTEMA INTEGRAL v7.0</p>
+            
+            <div class="grid gap-4">
+                <button onclick="prepareAuth('teacher')" class="bg-white/10 backdrop-blur-xl p-6 rounded-[2.5rem] flex items-center gap-4 hover:bg-white/20 transition-all text-left border border-white/10 group">
+                    <div class="bg-ceutGold text-white p-3 rounded-2xl group-hover:scale-110 transition-transform">👨‍🏫</div>
+                    <div>
+                        <p class="font-bold text-white leading-tight uppercase">PERSONAL DOCENTE</p>
+                        <p class="text-[10px] text-white/50 font-bold uppercase italic tracking-widest">CONTROL CLASES</p>
                     </div>
                 </button>
-                <button onclick="switchView('student')" class="w-full bg-white/10 backdrop-blur-md p-5 rounded-2xl flex items-center gap-4 text-white border border-white/5 hover:bg-white/20 transition-all">
-                    <div class="bg-white/20 p-3 rounded-xl text-white"><i data-lucide="user-check"></i></div>
-                    <div class="text-left">
-                        <p class="font-bold">Soy Estudiante</p>
-                        <p class="text-[10px] opacity-50 uppercase font-semibold tracking-widest">Registrar Asistencia</p>
+                <button onclick="prepareAuth('student')" class="bg-white p-6 rounded-[2.5rem] flex items-center gap-4 hover:scale-[1.02] transition-all text-left shadow-2xl group">
+                    <div class="bg-ceutBlue text-white p-3 rounded-2xl group-hover:scale-110 transition-transform">🎓</div>
+                    <div>
+                        <p class="font-bold text-ceutBlue leading-tight uppercase">COMUNIDAD ESTUDIANTIL</p>
+                        <p class="text-[10px] text-slate-400 font-bold uppercase italic tracking-wider">REGISTRO ASISTENCIA</p>
                     </div>
                 </button>
+                
+                <div class="mt-8 border-t border-white/5 pt-6">
+                    <button onclick="prepareAuth('admin')" class="text-white/30 text-[9px] font-bold uppercase tracking-[0.3em] hover:text-ceutGold transition-colors">Acceso Administrativo 🔒</button>
+                </div>
             </div>
         </div>
     </main>
 
-    <!-- VISTA: Login Maestro -->
-    <section id="view-teacher-login" class="view-section bg-white p-8 items-center justify-center">
-        <div class="max-w-sm w-full">
-            <button onclick="switchView('home')" class="mb-8 text-ceutBlue flex items-center gap-2 font-bold text-sm">
-                <i data-lucide="arrow-left" class="w-4 h-4"></i> Volver
-            </button>
-            <h2 class="text-3xl font-black text-ceutBlue mb-2 uppercase italic leading-tight">Acceso Docente</h2>
-            <p class="text-slate-400 text-sm mb-8 italic">Ingresa con tu clave institucional.</p>
-            <div class="space-y-4">
-                <input type="text" id="teacherNameInput" placeholder="Nombre completo" class="w-full p-4 bg-slate-100 rounded-2xl outline-none border-2 border-transparent focus:border-ceutBlue transition-all">
-                <input type="password" id="passInput" placeholder="Clave de Acceso" class="w-full p-4 bg-slate-100 rounded-2xl text-center font-bold tracking-widest outline-none border-2 border-transparent focus:border-ceutBlue transition-all">
-                <button onclick="login()" class="w-full bg-ceutBlue text-white p-5 rounded-2xl font-bold shadow-xl active:scale-95 transition-transform">Entrar al Panel</button>
+    <!-- VISTA 2: Autenticación -->
+    <section id="view-auth" class="view-section items-center justify-center p-6 bg-white">
+        <div class="w-full max-w-sm animate-fade-in">
+            <button onclick="switchView('home')" class="mb-8 font-bold text-ceutBlue flex items-center gap-2 uppercase tracking-tighter">← VOLVER</button>
+            
+            <div id="auth-container">
+                <div id="auth-mode-selector" class="flex bg-slate-100 p-1 rounded-2xl mb-8">
+                    <button onclick="toggleAuthMode('login')" id="btn-mode-login" class="flex-1 py-3 rounded-xl font-bold text-xs transition-all bg-white shadow-sm text-ceutBlue uppercase">ENTRAR</button>
+                    <button onclick="toggleAuthMode('register')" id="btn-mode-register" class="flex-1 py-3 rounded-xl font-bold text-xs transition-all text-slate-400 uppercase">REGISTRARSE</button>
+                </div>
+
+                <h2 id="auth-title" class="text-3xl font-black text-ceutBlue italic mb-2 uppercase tracking-widest text-center">BIENVENIDO</h2>
+                <p id="auth-desc" class="text-slate-400 mb-8 font-medium text-xs uppercase italic text-center">CONTROL DE ACCESO CENTRALIZADO</p>
+                
+                <div class="space-y-4">
+                    <div id="reg-fields" class="hidden space-y-4">
+                        <div class="space-y-1">
+                            <label class="text-[10px] font-bold text-slate-400 uppercase ml-2">NOMBRE COMPLETO</label>
+                            <input type="text" id="authName" placeholder="EJ. JUAN PÉREZ" oninput="cleanInput(this, 'text')" class="w-full p-4 bg-slate-50 border rounded-2xl outline-none focus:border-ceutGold transition-all font-bold">
+                        </div>
+                        <div id="student-only-fields" class="space-y-4">
+                            <div class="space-y-1">
+                                <label class="text-[10px] font-bold text-slate-400 uppercase ml-2">MATRÍCULA / ID</label>
+                                <input type="text" id="authId" placeholder="20240001" oninput="cleanInput(this, 'alphanumeric')" class="w-full p-4 bg-slate-50 border rounded-2xl outline-none focus:border-ceutGold transition-all font-bold">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="space-y-1">
+                        <label class="text-[10px] font-bold text-slate-400 uppercase ml-2">CORREO INSTITUCIONAL</label>
+                        <input type="email" id="authEmail" placeholder="usuario@ceut.edu.mx" style="text-transform: none;" class="w-full p-4 bg-slate-50 border rounded-2xl outline-none focus:border-ceutGold transition-all font-bold">
+                    </div>
+                    <div class="space-y-1">
+                        <label class="text-[10px] font-bold text-slate-400 uppercase ml-2">CONTRASEÑA</label>
+                        <input type="password" id="authPass" placeholder="••••••••" style="text-transform: none;" class="w-full p-4 bg-slate-50 border rounded-2xl outline-none focus:border-ceutGold transition-all text-center font-black tracking-widest">
+                    </div>
+                    <button id="btn-auth-action" onclick="handleAuth()" class="w-full bg-ceutBlue text-white p-5 rounded-2xl font-bold shadow-xl shadow-ceutBlue/20 active:scale-95 transition-all mt-4 uppercase">VALIDAR ACCESO</button>
+                </div>
             </div>
-            <p class="mt-8 text-center text-[10px] text-slate-300 font-bold uppercase tracking-widest">Clave: CEUT2026</p>
         </div>
     </section>
 
-    <!-- VISTA: Panel Maestro -->
-    <section id="view-teacher" class="view-section bg-slate-50">
-        <header class="bg-ceutBlue text-white p-5 flex justify-between items-center sticky top-0 z-10 shadow-lg">
+    <!-- VISTA: Panel Administrador -->
+    <section id="view-admin-panel" class="view-section bg-slate-900 text-white">
+        <nav class="bg-slate-800 p-4 border-b border-white/5 flex justify-between items-center sticky top-0 z-50">
             <div class="flex items-center gap-3">
-                <div class="w-10 h-10 bg-ceutGold rounded-full flex items-center justify-center text-ceutBlue font-black" id="teacher-initials">?</div>
-                <div class="flex flex-col text-left">
-                    <span id="display-teacher-name" class="font-bold text-sm italic leading-none">Docente</span>
-                    <span class="text-[9px] opacity-50 uppercase font-bold tracking-tighter">Nube Sincronizada</span>
+                <div class="w-10 h-10 bg-red-600 rounded-xl flex items-center justify-center font-black text-white shadow-lg shadow-red-600/20">A</div>
+                <div class="flex flex-col">
+                    <span class="font-bold text-sm italic uppercase tracking-tighter">DIRECCIÓN / COORDINACIÓN</span>
+                    <span class="text-[8px] uppercase tracking-widest text-red-500 font-black">SUPER ADMINISTRADOR</span>
                 </div>
             </div>
-            <button onclick="logout()" class="p-2 bg-white/10 rounded-xl hover:bg-red-500/20 transition-colors text-white"><i data-lucide="log-out" class="w-5 h-5"></i></button>
-        </header>
-        
-        <div class="p-6 max-w-2xl mx-auto w-full space-y-6">
-            <div class="bg-white p-6 rounded-[2.5rem] shadow-sm border border-slate-200 text-left relative overflow-hidden">
-                <div class="absolute top-0 left-0 w-full h-1 bg-ceutGold"></div>
-                <h3 class="font-bold mb-4 text-slate-400 text-[10px] uppercase tracking-widest">Nueva Sesión de Clase</h3>
-                <div class="space-y-3">
-                    <select id="level" class="w-full p-4 bg-slate-50 rounded-2xl border outline-none font-semibold text-ceutBlue appearance-none">
-                        <option value="" disabled selected>Nivel Educativo</option>
-                        <option value="PREPARATORIA">PREPARATORIA</option>
-                        <option value="LICENCIATURA">LICENCIATURA</option>
-                        <option value="POSTGRADO">POSTGRADO</option>
-                    </select>
-                    <input type="text" id="course" placeholder="Nombre de la Materia" class="w-full p-4 bg-slate-50 rounded-2xl border outline-none">
-                    <div class="flex gap-2">
-                        <input type="text" id="grade" placeholder="Grado" class="w-1/2 p-4 bg-slate-50 rounded-2xl border outline-none">
-                        <input type="text" id="group" placeholder="Grupo" class="w-1/2 p-4 bg-slate-50 rounded-2xl border outline-none">
+            <button onclick="logout()" class="p-3 bg-white/5 rounded-xl hover:bg-red-500/20 transition-all font-bold text-[10px] uppercase">Cerrar Sesión</button>
+        </nav>
+
+        <div class="p-6 max-w-6xl mx-auto space-y-10 animate-fade-in">
+            <!-- Stats -->
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div class="bg-slate-800 p-6 rounded-3xl border border-white/5">
+                    <p class="text-[10px] font-black text-slate-400 uppercase">Total Clases</p>
+                    <p id="stat-classes" class="text-4xl font-black text-ceutGold">0</p>
+                </div>
+                <div class="bg-slate-800 p-6 rounded-3xl border border-white/5">
+                    <p class="text-[10px] font-black text-slate-400 uppercase">Docentes Activos</p>
+                    <p id="stat-teachers" class="text-4xl font-black text-white">0</p>
+                </div>
+                <div class="bg-slate-800 p-6 rounded-3xl border border-white/5">
+                    <p class="text-[10px] font-black text-slate-400 uppercase">Asistencias Hoy</p>
+                    <p id="stat-today" class="text-4xl font-black text-green-400">0</p>
+                </div>
+                <div class="bg-slate-800 p-6 rounded-3xl border border-white/5">
+                    <p class="text-[10px] font-black text-slate-400 uppercase">Acceso</p>
+                    <p class="text-[9px] font-black text-blue-400 mt-2 truncate">CARLOS AGUILAR</p>
+                </div>
+            </div>
+
+            <!-- Listado -->
+            <div class="space-y-6">
+                <div class="flex flex-col md:flex-row items-center justify-between gap-4">
+                    <h3 class="text-xl font-black uppercase italic tracking-tighter">Control Global de Clases</h3>
+                    <input type="text" id="adminSearch" oninput="filterAdminTable()" placeholder="FILTRAR POR MATERIA O DOCENTE..." class="bg-slate-800 border-none rounded-2xl px-6 py-3 text-xs w-full md:w-80 outline-none focus:ring-2 ring-ceutGold transition-all">
+                </div>
+                
+                <div class="bg-slate-800 rounded-[2.5rem] overflow-hidden border border-white/5 shadow-2xl">
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-sm">
+                            <thead class="bg-slate-950 text-[10px] font-black uppercase tracking-widest text-slate-500">
+                                <tr>
+                                    <th class="p-6">Docente</th>
+                                    <th class="p-6">Materia / Grupo</th>
+                                    <th class="p-6">Código</th>
+                                    <th class="p-6 text-center">Registros</th>
+                                    <th class="p-6 text-right">Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="admin-global-list" class="divide-y divide-white/5"></tbody>
+                        </table>
                     </div>
                 </div>
-                <button onclick="createSession()" class="w-full bg-ceutBlue text-white p-5 rounded-2xl font-bold shadow-lg mt-6 flex items-center justify-center gap-3 active:scale-95 transition-all">
-                    <i data-lucide="qr-code" class="w-5 h-5"></i> Generar Código QR
-                </button>
             </div>
-            <div id="container" class="space-y-4 pb-32"></div>
         </div>
     </section>
 
-    <!-- PANTALLA QR DINÁMICO -->
-    <div id="qr-display" class="fixed inset-0 bg-white z-[60] hidden flex flex-col items-center justify-center p-8 text-center">
-        <h2 id="qr-course-title" class="text-3xl font-black text-ceutBlue mb-2 uppercase italic leading-tight">MATERIA</h2>
-        <div id="qrcode" class="mb-10 p-4 bg-white rounded-[2rem] shadow-2xl border-4 border-slate-50"></div>
-        <div class="bg-slate-50 p-6 rounded-[2.5rem] w-full max-w-xs text-center border-2 border-dashed border-slate-200">
-            <span id="qr-code-text" class="text-5xl font-black text-ceutBlue tracking-[0.2em]">000000</span>
+    <!-- VISTA: Panel Docente -->
+    <section id="view-teacher-panel" class="view-section bg-slate-50">
+        <nav class="bg-ceutBlue p-4 text-white flex justify-between items-center sticky top-0 z-50">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 bg-ceutGold rounded-xl flex items-center justify-center font-black text-ceutBlue text-xl" id="nav-initials">?</div>
+                <div class="flex flex-col">
+                    <span class="font-bold text-sm italic leading-none uppercase" id="nav-name">DOCENTE</span>
+                    <span class="text-[8px] uppercase tracking-widest opacity-50 font-bold">PANEL DOCENTE</span>
+                </div>
+            </div>
+            <button onclick="logout()" class="p-2 bg-white/10 rounded-xl font-bold text-[10px] uppercase">Salir</button>
+        </nav>
+
+        <div class="p-6 max-w-5xl mx-auto space-y-8 animate-fade-in">
+            <div class="bg-white p-8 rounded-[2.5rem] shadow-sm border border-slate-100">
+                <h3 class="font-black text-ceutBlue uppercase italic text-xl mb-6">GENERAR CLASE</h3>
+                <div class="grid gap-4 md:grid-cols-4">
+                    <select id="sLevel" class="p-4 bg-slate-50 border rounded-2xl font-bold text-xs"><option value="LIC">LICENCIATURA</option><option value="BAC">BACHILLERATO</option></select>
+                    <input type="text" id="sCourse" oninput="cleanInput(this, 'text')" placeholder="MATERIA" class="p-4 bg-slate-50 border rounded-2xl font-bold text-xs uppercase outline-none">
+                    <input type="text" id="sGrade" oninput="cleanInput(this, 'alphanumeric')" placeholder="GRUPO" class="p-4 bg-slate-50 border rounded-2xl font-bold text-xs uppercase outline-none">
+                    <select id="sMode" class="p-4 bg-slate-50 border rounded-2xl font-bold text-xs"><option value="ESCOLARIZADO">ESCOLARIZADO</option><option value="MIXTO">MIXTO</option></select>
+                </div>
+                <button onclick="saveClass()" class="w-full bg-ceutBlue text-white p-5 rounded-3xl font-black mt-6 shadow-xl active:scale-95 transition-all uppercase text-sm">CREAR REGISTRO</button>
+            </div>
+            <div id="sessions-list" class="grid gap-4 md:grid-cols-2"></div>
         </div>
-        <button onclick="closeQR()" class="mt-12 bg-ceutBlue text-white px-12 py-5 rounded-full font-bold shadow-xl active:scale-95 transition-all">Finalizar y Ver Lista</button>
+    </section>
+
+    <!-- VISTA: Panel Alumno -->
+    <section id="view-student-panel" class="view-section bg-ceutBlue p-6 items-center justify-center">
+        <div class="bg-white p-8 rounded-[3rem] w-full max-w-sm shadow-2xl animate-fade-in text-center relative">
+            <div class="absolute top-0 right-0 p-6"><button onclick="logout()" class="text-slate-300 font-black text-[10px] uppercase">Salir</button></div>
+            <h2 class="text-xl font-black text-ceutBlue italic uppercase" id="std-nav-name">ALUMNO</h2>
+            <p class="text-slate-400 text-[8px] font-bold uppercase tracking-widest mb-8" id="std-nav-id">MATRÍCULA</p>
+            <div class="space-y-6">
+                <input type="text" id="regCode" oninput="onCodeInput(this)" placeholder="000000" class="w-full p-6 bg-ceutBlue/5 text-ceutBlue text-center text-5xl font-black rounded-[2rem] outline-none" maxlength="6">
+                <div id="class-detected-info" class="hidden bg-slate-50 p-4 rounded-2xl border-2 border-ceutGold/20">
+                    <h3 id="det-course" class="font-black text-ceutBlue text-sm uppercase">MATERIA</h3>
+                </div>
+                <button id="btn-register-attendance" onclick="studentRegister()" disabled class="w-full bg-slate-200 text-slate-400 p-6 rounded-3xl font-black uppercase">VALIDAR CÓDIGO</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- MODAL QR -->
+    <div id="qr-modal" class="fixed inset-0 bg-white z-[100] hidden flex flex-col items-center justify-center p-8 text-center">
+        <div id="qrcode-box" class="p-6 bg-white border-[12px] border-slate-50 rounded-[3.5rem] shadow-2xl mb-10"></div>
+        <p id="modal-code" class="text-6xl font-black text-ceutBlue tracking-tighter mb-4">000000</p>
+        <button onclick="closeQR()" class="bg-slate-100 text-ceutBlue px-14 py-5 rounded-full font-black uppercase">CERRAR</button>
     </div>
 
-    <!-- VISTA: Estudiante -->
-    <section id="view-student" class="view-section bg-ceutBlue p-6 items-center justify-center">
-        <div class="bg-white p-10 rounded-[3.5rem] w-full max-w-sm shadow-2xl text-left relative overflow-hidden">
-            <div class="absolute top-0 left-0 w-full h-2 bg-ceutGold"></div>
-            <h2 class="text-2xl font-black text-ceutBlue italic mb-1 uppercase">Registro</h2>
-            <p class="text-[10px] text-slate-400 font-bold mb-8 uppercase tracking-widest text-center">Ingresa el código que muestra el profesor</p>
-            <div class="space-y-4">
-                <input type="text" id="sName" placeholder="Nombre completo" class="w-full p-5 bg-slate-50 rounded-2xl border outline-none focus:border-ceutBlue border-2 transition-all">
-                <input type="text" id="sId" placeholder="Matrícula" class="w-full p-5 bg-slate-50 rounded-2xl border outline-none focus:border-ceutBlue border-2 transition-all">
-                <input type="text" id="sCode" placeholder="CÓDIGO" class="w-full p-6 bg-ceutBlue/5 rounded-2xl text-center text-5xl font-black text-ceutBlue border-2 border-ceutBlue outline-none" maxlength="6" inputmode="numeric">
-                <button id="btnStudent" onclick="register()" class="w-full bg-ceutBlue text-white p-6 rounded-2xl font-bold shadow-xl active:scale-95 transition-all">Confirmar Asistencia</button>
-                <button onclick="switchView('home')" class="w-full text-slate-300 text-[10px] font-bold uppercase mt-6 text-center tracking-widest">Volver al inicio</button>
-            </div>
-        </div>
-    </section>
-
-    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- SCRIPTS CORE -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
-        import { getFirestore, collection, addDoc, onSnapshot, doc, updateDoc, getDocs, setDoc } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
-        import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-auth.js";
+        import { getFirestore, collection, addDoc, onSnapshot, doc, updateDoc, setDoc, deleteDoc, getDoc } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
+        import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-auth.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyCefP6qEqaCMpo8ZpUiLpN4e_-E4ZNTp94",
@@ -210,190 +251,223 @@
             appId: "1:130615246146:web:6ae2c17c828fb28a809cdb"
         };
 
-        let db, auth, user = null;
-        const appId = "ceut-asistencia-v1";
-        const MASTER_KEY = "CEUT2026";
-        let sessions = [];
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const auth = getAuth(app);
+        const APP_ID = "ceut-cloud-v7";
+        
+        // --- CAMBIO DE CORREO ADMIN ---
+        const ADMIN_EMAIL = "carlos.aguilar@ceut.edu.mx"; 
+        
+        let currentUser = null;
+        let userData = null;
+        let globalAdminSessions = [];
 
-        async function initApp() {
-            lucide.createIcons();
-            
-            try {
-                const app = initializeApp(firebaseConfig);
-                db = getFirestore(app);
-                auth = getAuth(app);
+        window.cleanInput = (el, type) => {
+            let val = el.value.toUpperCase();
+            if (type === 'text') val = val.replace(/[^A-ZÁÉÍÓÚÑ ]/g, '');
+            else if (type === 'alphanumeric') val = val.replace(/[^A-Z0-9- ]/g, '');
+            el.value = val;
+        };
 
-                onAuthStateChanged(auth, (u) => {
-                    if (u) {
-                        user = u;
-                        hideLoader();
-                        if(localStorage.getItem('ceut_logged')) setupTeacherUI();
-                    }
-                });
+        window.switchView = (id) => { 
+            document.querySelectorAll('.view-section').forEach(s => s.classList.remove('active')); 
+            document.getElementById('view-' + id).classList.add('active'); 
+        };
 
-                // Este es el punto que causa el error configuration-not-found
-                await signInAnonymously(auth);
-                
-            } catch (error) {
-                console.error("Config Error:", error.code);
-                if (error.code === 'auth/configuration-not-found') {
-                    showSetupError();
+        window.prepareAuth = (role) => {
+            window.userRole = role;
+            switchView('auth');
+            toggleAuthMode('login');
+            document.getElementById('auth-mode-selector').style.display = (role === 'admin') ? 'none' : 'flex';
+        };
+
+        onAuthStateChanged(auth, async (user) => {
+            document.getElementById('loading-overlay').style.display = 'none';
+            if (user) {
+                currentUser = user;
+                if(user.email === ADMIN_EMAIL) {
+                    userData = { name: "CARLOS AGUILAR", role: "admin" };
+                    switchView('admin-panel');
+                    loadAdminData();
                 } else {
-                    alert("Error de conexión: " + error.code);
+                    const profile = await getDoc(doc(db, 'artifacts', APP_ID, 'users', user.uid, 'profile', 'info'));
+                    if (profile.exists()) {
+                        userData = profile.data();
+                        if (userData.role === 'teacher') {
+                            document.getElementById('nav-name').innerText = userData.name;
+                            document.getElementById('nav-initials').innerText = userData.name[0];
+                            switchView('teacher-panel');
+                            listenToTeacherSessions();
+                        } else {
+                            document.getElementById('std-nav-name').innerText = userData.name;
+                            document.getElementById('std-nav-id').innerText = `MATRÍCULA: ${userData.id}`;
+                            switchView('student-panel');
+                        }
+                    }
                 }
-            }
-        }
+            } else { switchView('home'); }
+        });
 
-        function showSetupError() {
-            document.getElementById('status-container').classList.add('hidden');
-            document.getElementById('setup-error').classList.remove('hidden');
-        }
-
-        function hideLoader() {
-            const loader = document.getElementById('loading-overlay');
-            loader.style.opacity = '0';
-            setTimeout(() => {
-                loader.style.display = 'none';
-                document.getElementById('view-home').classList.add('active');
-            }, 500);
-        }
-
-        window.switchView = (v) => {
-            document.querySelectorAll('.view-section').forEach(s => s.classList.remove('active'));
-            document.getElementById('view-' + v).classList.add('active');
-            lucide.createIcons();
-        };
-
-        window.login = () => {
-            const name = document.getElementById('teacherNameInput').value.trim();
-            const pass = document.getElementById('passInput').value;
-            if(!name) return alert("Ingresa tu nombre.");
-            if(pass !== MASTER_KEY) return alert("Clave incorrecta.");
-            
-            localStorage.setItem('ceut_logged', 'true');
-            localStorage.setItem('ceut_teacher_name', name);
-            setupTeacherUI();
-        };
-
-        function setupTeacherUI() {
-            if(!user) return;
-            const name = localStorage.getItem('ceut_teacher_name');
-            document.getElementById('display-teacher-name').innerText = name;
-            document.getElementById('teacher-initials').innerText = name[0].toUpperCase();
-            switchView('teacher');
-
-            onSnapshot(collection(db, 'artifacts', appId, 'users', user.uid, 'sessions'), (snap) => {
-                sessions = snap.docs.map(d => ({id: d.id, ...d.data()}));
-                renderSessions();
-            }, (err) => {
-                console.error("Firestore Error:", err);
+        // --- ADMIN LOGIC ---
+        async function loadAdminData() {
+            onSnapshot(collection(db, 'artifacts', APP_ID, 'public_codes'), async (codesSnap) => {
+                const temp = [];
+                let tCount = new Set();
+                for (const codeDoc of codesSnap.docs) {
+                    const { teacherId, sessionId } = codeDoc.data();
+                    tCount.add(teacherId);
+                    const sSnap = await getDoc(doc(db, 'artifacts', APP_ID, 'users', teacherId, 'sessions', sessionId));
+                    if(sSnap.exists()) temp.push({ id: sSnap.id, teacherId, ...sSnap.data() });
+                }
+                globalAdminSessions = temp;
+                renderAdminTable(temp);
+                document.getElementById('stat-classes').innerText = temp.length;
+                document.getElementById('stat-teachers').innerText = tCount.size;
+                document.getElementById('stat-today').innerText = temp.reduce((acc, s) => acc + (s.attendees?.length || 0), 0);
             });
         }
 
-        window.createSession = async () => {
-            if(!user) return alert("No hay conexión.");
-            const level = document.getElementById('level').value;
-            const course = document.getElementById('course').value.trim();
-            if(!level || !course) return alert("Completa Materia y Nivel.");
-
-            const code = Math.floor(100000 + Math.random() * 900000).toString();
-            const newSession = {
-                level, course, code,
-                grade: document.getElementById('grade').value,
-                group: document.getElementById('group').value,
-                attendees: [],
-                createdAt: Date.now(),
-                dateLabel: new Date().toLocaleDateString('es-MX', { weekday: 'long', day: 'numeric', month: 'long' })
-            };
-
-            try {
-                const docRef = await addDoc(collection(db, 'artifacts', appId, 'users', user.uid, 'sessions'), newSession);
-                await setDoc(doc(db, 'artifacts', appId, 'public', 'active_codes', code), {
-                    teacherId: user.uid,
-                    sessionId: docRef.id
-                });
-                window.showQR(docRef.id);
-            } catch (e) {
-                alert("Error al crear sesión: " + e.message);
-            }
-        };
-
-        window.showQR = (id) => {
-            const s = sessions.find(x => x.id === id);
-            document.getElementById('qr-course-title').innerText = s.course;
-            document.getElementById('qr-code-text').innerText = s.code;
-            const qrContainer = document.getElementById('qrcode');
-            qrContainer.innerHTML = "";
-            new QRCode(qrContainer, { text: s.code, width: 250, height: 250, colorDark: "#2A1B54" });
-            document.getElementById('qr-display').classList.remove('hidden');
-        };
-
-        window.register = async () => {
-            const code = document.getElementById('sCode').value.trim();
-            const sName = document.getElementById('sName').value.trim();
-            const sId = document.getElementById('sId').value.trim();
-            if(!code || !sName) return alert("Faltan datos.");
-
-            const btn = document.getElementById('btnStudent');
-            btn.disabled = true;
-            btn.innerText = "Registrando...";
-
-            try {
-                const snap = await getDocs(collection(db, 'artifacts', appId, 'public', 'active_codes'));
-                const reg = snap.docs.find(d => d.id === code);
-                if(!reg) throw new Error("Código no válido.");
-
-                const { teacherId, sessionId } = reg.data();
-                const sessSnap = await getDocs(collection(db, 'artifacts', appId, 'users', teacherId, 'sessions'));
-                const docFound = sessSnap.docs.find(d => d.id === sessionId);
-                if(!docFound) throw new Error("La sesión ya no existe.");
-                
-                const currentData = docFound.data();
-                if(currentData.attendees.some(a => a.id === sId && sId !== "")) throw new Error("Ya estás en la lista.");
-
-                const updated = [...currentData.attendees, { 
-                    name: sName, 
-                    id: sId, 
-                    time: new Date().toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit' }) 
-                }];
-
-                await updateDoc(doc(db, 'artifacts', appId, 'users', teacherId, 'sessions', sessionId), { attendees: updated });
-                
-                alert("✅ ¡Asistencia registrada!");
-                switchView('home');
-            } catch (e) {
-                alert("❌ " + e.message);
-            } finally {
-                btn.disabled = false;
-                btn.innerText = "Confirmar Asistencia";
-            }
-        };
-
-        function renderSessions() {
-            const cont = document.getElementById('container');
-            if(sessions.length === 0) {
-                cont.innerHTML = `<div class="py-12 text-center text-slate-300 opacity-50 uppercase text-[10px] font-bold tracking-widest">Sin clases hoy</div>`;
-                return;
-            }
-            cont.innerHTML = sessions.sort((a,b) => b.createdAt - a.createdAt).map(s => `
-                <div class="bg-white p-5 rounded-[2rem] border shadow-sm flex justify-between items-center text-left">
-                    <div class="truncate pr-4">
-                        <p class="text-[9px] text-ceutGold font-black uppercase tracking-widest">${s.level}</p>
-                        <h3 class="font-bold text-ceutBlue truncate italic leading-tight">${s.course}</h3>
-                        <p class="text-[10px] text-slate-400 font-bold uppercase">${s.dateLabel} • ${s.attendees.length} alumnos</p>
-                    </div>
-                    <button onclick="showQR('${s.id}')" class="p-4 bg-slate-50 text-ceutBlue rounded-2xl active:bg-ceutBlue active:text-white transition-all shadow-sm">
-                        <i data-lucide="qr-code"></i>
-                    </button>
-                </div>
+        window.renderAdminTable = (data) => {
+            const list = document.getElementById('admin-global-list');
+            list.innerHTML = data.map(s => `
+                <tr class="hover:bg-white/5 border-b border-white/5">
+                    <td class="p-6">
+                        <p class="font-bold text-white text-[11px] mb-1">DOCENTE</p>
+                        <p class="text-[9px] text-slate-500 font-mono">${s.teacherId}</p>
+                    </td>
+                    <td class="p-6">
+                        <p class="font-bold text-ceutGold text-xs">${s.course}</p>
+                        <p class="text-[9px] text-slate-400 font-black">${s.level} | ${s.grade}</p>
+                    </td>
+                    <td class="p-6">
+                        <span class="bg-slate-700 px-3 py-1 rounded text-[10px] text-white font-mono">${s.code}</span>
+                    </td>
+                    <td class="p-6 text-center">
+                        <span class="bg-green-500/20 text-green-400 px-3 py-1 rounded-full text-xs font-black">${s.attendees?.length || 0}</span>
+                    </td>
+                    <td class="p-6 text-right space-x-2">
+                        <button onclick="adminAction('edit', '${s.teacherId}', '${s.id}')" class="text-blue-400 hover:text-white text-[9px] font-bold uppercase">Editar</button>
+                        <button onclick="adminAction('delete', '${s.teacherId}', '${s.id}', '${s.code}')" class="text-red-500 hover:text-red-300 text-[9px] font-bold uppercase">Borrar</button>
+                    </td>
+                </tr>
             `).join('');
-            lucide.createIcons();
+        };
+
+        window.filterAdminTable = () => {
+            const queryText = document.getElementById('adminSearch').value.toUpperCase();
+            const filtered = globalAdminSessions.filter(s => s.course.toUpperCase().includes(queryText) || s.teacherId.toUpperCase().includes(queryText));
+            renderAdminTable(filtered);
+        };
+
+        window.adminAction = async (type, tId, sId, code) => {
+            if(type === 'delete') {
+                if(!confirm("¿ELIMINAR ESTE REGISTRO PERMANENTEMENTE?")) return;
+                await deleteDoc(doc(db, 'artifacts', APP_ID, 'users', tId, 'sessions', sId));
+                await deleteDoc(doc(db, 'artifacts', APP_ID, 'public_codes', code));
+            } else if (type === 'edit') {
+                const n = prompt("NUEVA MATERIA:");
+                if(n) await updateDoc(doc(db, 'artifacts', APP_ID, 'users', tId, 'sessions', sId), { course: n.toUpperCase() });
+            }
+        };
+
+        // --- AUTH ---
+        window.toggleAuthMode = (mode) => {
+            window.authMode = mode;
+            const isReg = mode === 'register';
+            document.getElementById('reg-fields').classList.toggle('hidden', !isReg);
+            document.getElementById('auth-title').innerText = isReg ? 'REGISTRO' : 'ACCESO';
+        };
+
+        window.handleAuth = async () => {
+            const email = document.getElementById('authEmail').value.trim();
+            const pass = document.getElementById('authPass').value;
+            if (!email || !pass) return alert("DATOS INCOMPLETOS.");
+            try {
+                if (window.authMode === 'register') {
+                    const name = document.getElementById('authName').value.trim();
+                    const res = await createUserWithEmailAndPassword(auth, email, pass);
+                    const profile = { name, email, role: window.userRole, createdAt: Date.now() };
+                    if (window.userRole === 'student') profile.id = document.getElementById('authId').value.trim();
+                    await setDoc(doc(db, 'artifacts', APP_ID, 'users', res.user.uid, 'profile', 'info'), profile);
+                } else {
+                    await signInWithEmailAndPassword(auth, email, pass);
+                }
+            } catch (e) { alert("ERROR DE CREDENCIALES."); }
+        };
+
+        // --- TEACHER ---
+        function listenToTeacherSessions() {
+            onSnapshot(collection(db, 'artifacts', APP_ID, 'users', currentUser.uid, 'sessions'), (snap) => {
+                const sessions = snap.docs.map(d => ({id: d.id, ...d.data()}));
+                document.getElementById('sessions-list').innerHTML = sessions.map(s => `
+                    <div class="bg-white p-6 rounded-3xl border shadow-sm flex flex-col justify-between">
+                        <div>
+                            <h4 class="font-black text-ceutBlue uppercase text-sm">${s.course}</h4>
+                            <p class="text-[10px] text-slate-400 mb-4">${s.level} | GRUPO: ${s.grade}</p>
+                        </div>
+                        <div class="flex gap-2">
+                            <button onclick="showQR('${s.code}', '${s.course}')" class="flex-1 bg-ceutBlue text-white py-4 rounded-2xl font-bold text-[10px] uppercase">MOSTRAR QR</button>
+                            <button onclick="deleteSession('${s.id}', '${s.code}')" class="p-4 bg-red-50 text-red-500 rounded-2xl">🗑️</button>
+                        </div>
+                    </div>
+                `).join('');
+            });
         }
 
-        window.closeQR = () => document.getElementById('qr-display').classList.add('hidden');
-        window.logout = () => { localStorage.clear(); location.reload(); };
+        window.saveClass = async () => {
+            const l = document.getElementById('sLevel').value, c = document.getElementById('sCourse').value.trim(), g = document.getElementById('sGrade').value.trim(), m = document.getElementById('sMode').value;
+            if(!c || !g) return alert("LLENA LA MATERIA Y GRUPO.");
+            const code = Math.floor(100000 + Math.random() * 900000).toString();
+            const docRef = await addDoc(collection(db, 'artifacts', APP_ID, 'users', currentUser.uid, 'sessions'), { level: l, course: c, grade: g, mode: m, code, attendees: [], timestamp: Date.now() });
+            await setDoc(doc(db, 'artifacts', APP_ID, 'public_codes', code), { teacherId: currentUser.uid, sessionId: docRef.id });
+            alert("CLASE GENERADA.");
+            document.getElementById('sCourse').value = ""; document.getElementById('sGrade').value = "";
+        };
 
-        initApp();
+        window.deleteSession = async (id, code) => {
+            if(!confirm("¿ELIMINAR CLASE?")) return;
+            await deleteDoc(doc(db, 'artifacts', APP_ID, 'users', currentUser.uid, 'sessions', id));
+            await deleteDoc(doc(db, 'artifacts', APP_ID, 'public_codes', code));
+        };
+
+        window.showQR = (code, course) => {
+            document.getElementById('modal-code').innerText = code;
+            document.getElementById('qrcode-box').innerHTML = "";
+            new QRCode(document.getElementById('qrcode-box'), { text: code, width: 250, height: 250 });
+            document.getElementById('qr-modal').classList.remove('hidden');
+        };
+
+        // --- STUDENT ---
+        window.onCodeInput = async (el) => {
+            if(el.value.length === 6) {
+                const codeSnap = await getDoc(doc(db, 'artifacts', APP_ID, 'public_codes', el.value));
+                if(codeSnap.exists()) {
+                    const { teacherId, sessionId } = codeSnap.data();
+                    const sSnap = await getDoc(doc(db, 'artifacts', APP_ID, 'users', teacherId, 'sessions', sessionId));
+                    window.detectedSession = { ref: doc(db, 'artifacts', APP_ID, 'users', teacherId, 'sessions', sessionId), data: sSnap.data() };
+                    document.getElementById('det-course').innerText = sSnap.data().course;
+                    document.getElementById('class-detected-info').classList.remove('hidden');
+                    document.getElementById('btn-register-attendance').disabled = false;
+                    document.getElementById('btn-register-attendance').classList.replace('bg-slate-200', 'bg-ceutGold');
+                    document.getElementById('btn-register-attendance').classList.replace('text-slate-400', 'text-white');
+                }
+            }
+        };
+
+        window.studentRegister = async () => {
+            if(!window.detectedSession) return;
+            try {
+                if(window.detectedSession.data.attendees.some(a => a.id === userData.id)) throw new Error("YA REGISTRADO.");
+                const list = [...window.detectedSession.data.attendees, { name: userData.name, id: userData.id, time: new Date().toLocaleTimeString() }];
+                await updateDoc(window.detectedSession.ref, { attendees: list });
+                alert("ASISTENCIA REGISTRADA.");
+                location.reload();
+            } catch (e) { alert(e.message); }
+        };
+
+        window.closeQR = () => document.getElementById('qr-modal').classList.add('hidden');
+        window.logout = () => signOut(auth).then(() => location.reload());
     </script>
 </body>
 </html>
