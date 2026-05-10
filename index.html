@@ -3,182 +3,223 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>CEUT | SISTEMA INTEGRAL V20</title>
+    <title>CEUT | MASTER MANAGEMENT V21</title>
     
-    <!-- Librerías Críticas (CDNs) -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Librerías para Exportación -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script>
 
     <style>
         :root { 
             --ceut-blue: #1e40af; 
             --ceut-gold: #d4af37; 
             --bg-slate: #f8fafc;
+            --admin-bg: #020617;
         }
         
         * { -webkit-tap-highlight-color: transparent; box-sizing: border-box; outline: none; }
         body, html { margin: 0; padding: 0; background-color: var(--bg-slate); font-family: 'Plus Jakarta Sans', sans-serif; color: #1e293b; height: 100%; overflow-x: hidden; }
 
-        .view-section { display: none; width: 100%; min-height: 100vh; flex-direction: column; animation: fadeIn 0.3s ease-out; }
+        .view-section { display: none; width: 100%; min-height: 100vh; flex-direction: column; animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
         .view-section.active { display: flex; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeIn { from { opacity: 0; transform: scale(0.98); } to { opacity: 1; transform: scale(1); } }
 
         .input-ceut {
-            width: 100%; padding: 0.85rem; border: 2px solid #e2e8f0; border-radius: 14px; 
-            font-size: 13px; font-weight: 600; transition: all 0.2s; background: white;
+            width: 100%; padding: 0.8rem 1rem; border: 2px solid #e2e8f0; border-radius: 14px; 
+            font-size: 14px; font-weight: 600; transition: all 0.2s; background: white;
         }
-        .input-ceut:focus { border-color: var(--ceut-blue); box-shadow: 0 0 0 4px rgba(30, 64, 175, 0.05); }
+        .input-ceut:focus { border-color: var(--ceut-blue); box-shadow: 0 0 0 4px rgba(30, 64, 175, 0.1); }
 
         .btn-primary {
-            background: var(--ceut-blue); color: white; padding: 1rem; border-radius: 16px; font-weight: 800;
+            background: var(--ceut-blue); color: white; padding: 1.1rem; border-radius: 20px; font-weight: 800;
             font-size: 11px; text-transform: uppercase; border: none; cursor: pointer; width: 100%;
-            transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 8px;
-            box-shadow: 0 10px 15px -3px rgba(30, 64, 175, 0.2);
+            transition: all 0.3s; display: flex; align-items: center; justify-content: center; gap: 10px;
+            box-shadow: 0 10px 25px -5px rgba(30, 64, 175, 0.3);
         }
-        .btn-primary:active { transform: scale(0.96); }
-        .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
+        .btn-primary:active { transform: scale(0.95); }
 
-        #error-toast {
-            position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
-            background: #0f172a; color: white; padding: 14px 28px; border-radius: 20px;
-            font-size: 11px; font-weight: 700; z-index: 10000; display: none; text-align: center;
-            box-shadow: 0 20px 25px -5px rgba(0,0,0,0.3);
+        .admin-card {
+            background: linear-gradient(145deg, #0f172a, #020617);
+            border: 1px solid rgba(255,255,255,0.1);
         }
 
-        .loader {
-            border: 2px solid rgba(255,255,255,0.3); border-top: 2px solid white;
-            border-radius: 50%; width: 16px; height: 16px; animation: spin 0.8s linear infinite;
+        .custom-scrollbar::-webkit-scrollbar { width: 5px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(212, 175, 55, 0.2); border-radius: 10px; }
+
+        #toast {
+            position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
+            background: #0f172a; color: white; padding: 12px 24px; border-radius: 50px;
+            font-size: 11px; font-weight: 800; z-index: 10000; display: none;
+            box-shadow: 0 10px 15px rgba(0,0,0,0.2);
         }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        @media print {
+            .no-print { display: none !important; }
+            .print-only { display: block !important; }
+            body { background: white; color: black; }
+        }
     </style>
 </head>
 <body>
 
-    <!-- MODAL DE BIENVENIDA RESTAURADO CON TODAS LAS ESPECIFICACIONES -->
-    <div id="modal-welcome" class="fixed inset-0 bg-slate-900/95 backdrop-blur-md z-[9999] flex items-center justify-center p-4">
-        <div class="bg-white rounded-[2.5rem] p-8 max-w-md w-full shadow-2xl overflow-y-auto max-h-[95vh]">
-            <div class="text-center mb-6">
-                <img src="https://lh3.googleusercontent.com/d/17NobXQ3JbRnLGejZe4Mn2x-Jl45F4rPm" class="w-16 mx-auto mb-4" alt="Logo">
-                <h2 class="text-xl font-black text-slate-900 uppercase tracking-tight">CEUT CLOUD V20</h2>
-                <p class="text-[9px] text-slate-400 font-bold tracking-widest mt-1">SISTEMA INTEGRAL DE ASISTENCIAS</p>
-                <div class="h-1 w-12 bg-[#d4af37] mx-auto mt-3 rounded-full"></div>
-            </div>
+    <div id="toast">MENSAJE</div>
 
-            <div class="space-y-3 mb-8">
-                <!-- Perfil Admin -->
-                <div class="flex gap-4 p-4 rounded-2xl bg-slate-900 text-white">
-                    <span class="text-xl">🛡️</span>
-                    <div class="text-left">
-                        <p class="text-[10px] font-black uppercase tracking-tight">Administrador Maestro</p>
-                        <p class="text-[9px] text-slate-400 leading-tight mt-1">Gestión total de la base de datos y herramientas de clase integradas.</p>
-                    </div>
-                </div>
-                <!-- Perfil Docente -->
-                <div class="flex gap-4 p-4 rounded-2xl bg-blue-50 border border-blue-100">
-                    <span class="text-xl">👨‍🏫</span>
-                    <div class="text-left">
-                        <p class="text-[10px] font-black text-blue-900 uppercase tracking-tight">Personal Docente</p>
-                        <p class="text-[9px] text-blue-600/70 leading-tight mt-1">Generación de códigos QR dinámicos por materia y grupo.</p>
-                    </div>
-                </div>
-                <!-- Perfil Alumno -->
-                <div class="flex gap-4 p-4 rounded-2xl bg-amber-50 border border-amber-100">
-                    <span class="text-xl">🎓</span>
-                    <div class="text-left">
-                        <p class="text-[10px] font-black text-amber-900 uppercase tracking-tight">Comunidad Estudiantil</p>
-                        <p class="text-[9px] text-amber-700/70 leading-tight mt-1">Registro de asistencia mediante escaneo seguro y GPS.</p>
-                    </div>
+    <!-- MODAL DE EDICIÓN -->
+    <div id="modal-edit" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-[10000] hidden items-center justify-center p-4">
+        <div class="bg-white rounded-[2.5rem] p-8 max-w-md w-full shadow-2xl">
+            <h3 class="text-xl font-black mb-6 flex items-center gap-3">
+                <i data-lucide="edit-3" class="text-blue-600"></i> EDITAR REGISTRO
+            </h3>
+            <div class="space-y-4">
+                <input type="hidden" id="editUid">
+                <input type="text" id="editName" placeholder="NOMBRE" class="input-ceut uppercase">
+                <input type="text" id="editId" placeholder="ID INSTITUCIONAL" class="input-ceut uppercase">
+                <select id="editRole" class="input-ceut">
+                    <option value="student">ESTUDIANTE</option>
+                    <option value="teacher">DOCENTE</option>
+                </select>
+                <div class="flex gap-3 mt-6">
+                    <button onclick="closeEditModal()" class="flex-1 py-4 font-bold text-slate-400 uppercase text-[10px]">Cancelar</button>
+                    <button onclick="saveUserEdit()" class="flex-1 btn-primary py-4">Guardar</button>
                 </div>
             </div>
-
-            <button onclick="document.getElementById('modal-welcome').style.display='none'" class="btn-primary py-4">INICIAR PORTAL</button>
         </div>
     </div>
 
-    <div id="error-toast">MENSAJE</div>
+    <!-- BIENVENIDA -->
+    <div id="modal-welcome" class="fixed inset-0 bg-slate-950/90 backdrop-blur-xl z-[9999] flex items-center justify-center p-6">
+        <div class="bg-white rounded-[3rem] p-10 max-w-lg w-full shadow-2xl relative overflow-hidden">
+            <div class="text-center mb-10">
+                <div class="inline-block p-4 bg-slate-50 rounded-3xl mb-4 border border-slate-100 shadow-sm">
+                    <img src="https://lh3.googleusercontent.com/d/17NobXQ3JbRnLGejZe4Mn2x-Jl45F4rPm" class="w-16 h-16 object-contain" alt="Logo">
+                </div>
+                <h2 class="text-2xl font-black text-slate-900 uppercase tracking-tighter">CEUT CLOUD <span class="text-[#d4af37]">V21</span></h2>
+                <p class="text-[10px] text-slate-400 font-bold tracking-[0.3em] mt-2">REGISTRO ÚNICO INSTITUCIONAL</p>
+            </div>
+            <button onclick="document.getElementById('modal-welcome').style.display='none'" class="btn-primary py-5 italic tracking-tighter">ACCEDER AL PORTAL</button>
+        </div>
+    </div>
 
     <div id="app-container">
         <!-- HOME -->
-        <main id="view-home" class="view-section active items-center justify-center p-8">
+        <main id="view-home" class="view-section active items-center justify-center p-8 bg-white">
              <div class="max-w-xs w-full text-center">
-                <img src="https://lh3.googleusercontent.com/d/17NobXQ3JbRnLGejZe4Mn2x-Jl45F4rPm" class="w-20 mx-auto mb-6" alt="Logo">
-                <h1 class="text-3xl font-black mb-1 text-slate-900">CEUT <span class="text-[#d4af37]">CLOUD</span></h1>
-                <p class="text-[8px] tracking-[0.4em] text-slate-400 font-bold uppercase mb-12">Portal de Servicios</p>
-                
-                <div class="space-y-3">
-                    <button onclick="initFlow('admin')" class="btn-primary bg-slate-900">🛡️ ADMINISTRADOR / MAESTRO</button>
-                    <button onclick="initFlow('teacher')" class="btn-primary bg-white !text-slate-800 border-2 border-slate-100">👨‍🏫 DOCENTE</button>
-                    <button onclick="initFlow('student')" class="btn-primary">🎓 ALUMNO</button>
+                <img src="https://lh3.googleusercontent.com/d/17NobXQ3JbRnLGejZe4Mn2x-Jl45F4rPm" class="w-24 mx-auto mb-10 drop-shadow-2xl" alt="Logo">
+                <h1 class="text-4xl font-black mb-10 text-slate-950 tracking-tighter italic">CEUT CLOUD</h1>
+                <div class="space-y-4">
+                    <button onclick="initFlow('admin')" class="btn-primary bg-slate-900">🛡️ ADMINISTRADOR</button>
+                    <button onclick="initFlow('teacher')" class="btn-primary bg-blue-50 !text-blue-900 border border-blue-100 shadow-none">👨‍🏫 DOCENTE</button>
+                    <button onclick="initFlow('student')" class="btn-primary py-4">🎓 ESTUDIANTE</button>
                 </div>
              </div>
         </main>
 
         <!-- AUTH -->
-        <section id="view-auth" class="view-section p-8 items-center justify-center">
+        <section id="view-auth" class="view-section p-8 items-center justify-center bg-slate-50">
             <div class="w-full max-w-sm">
-                <button onclick="switchView('home')" class="mb-8 text-[10px] font-black text-slate-400 uppercase flex items-center gap-2">
-                    <i data-lucide="chevron-left" class="w-4 h-4"></i> Volver
+                <button onclick="switchView('home')" class="mb-10 text-[10px] font-black text-slate-400 uppercase flex items-center gap-3">
+                    <i data-lucide="arrow-left" class="w-4 h-4"></i> REGRESAR
                 </button>
-                <h2 id="auth-title" class="text-2xl font-black mb-1 uppercase text-slate-900">ACCESO</h2>
+                <h2 class="text-3xl font-black mb-2 uppercase text-slate-900 tracking-tighter">IDENTIFICACIÓN</h2>
+                <p class="text-[10px] font-bold text-slate-400 mb-8 uppercase tracking-widest">Ingrese sus credenciales oficiales</p>
+                
                 <div class="space-y-4">
                     <div id="reg-fields" class="space-y-4">
-                        <input type="text" id="authName" placeholder="NOMBRE COMPLETO" class="input-ceut uppercase">
-                        <input type="text" id="authId" placeholder="MATRÍCULA / ID" class="input-ceut uppercase">
+                        <input type="text" id="authName" placeholder="NOMBRE COMPLETO (Solo registro)" class="input-ceut uppercase">
+                        <input type="text" id="authId" placeholder="MATRÍCULA / ID (Solo registro)" class="input-ceut uppercase">
                     </div>
                     <input type="email" id="authEmail" placeholder="correo@ceut.edu.mx" class="input-ceut">
                     <input type="password" id="authPass" placeholder="CONTRASEÑA" class="input-ceut">
-                    <button id="btn-submit-auth" class="btn-primary mt-4 py-4">
-                        <span id="btn-label">ACCEDER</span>
-                        <div id="btn-spin" class="loader hidden"></div>
-                    </button>
+                    
+                    <button id="btn-submit-auth" class="btn-primary mt-6 py-5">INGRESAR / REGISTRARSE</button>
+                    <p class="text-[9px] text-center text-slate-400 font-bold uppercase mt-4">El registro se realiza por única ocasión. Si ya tiene cuenta, ingrese solo correo y contraseña.</p>
                 </div>
             </div>
         </section>
 
-        <!-- STUDENT -->
-        <section id="view-student" class="view-section items-center justify-center p-8 bg-blue-900 text-white">
-            <h2 id="std-name" class="text-xl font-black uppercase">...</h2>
-            <p id="std-id" class="text-[#d4af37] text-[10px] font-bold">ID: ---</p>
-            <div class="mt-12 p-12 bg-white/5 rounded-[3rem] border border-white/10">
-                <i data-lucide="scan" class="w-12 h-12 mx-auto mb-4 opacity-20"></i>
-                <p class="text-[10px] font-black uppercase tracking-widest">Listo para QR</p>
+        <!-- ESTUDIANTE -->
+        <section id="view-student" class="view-section items-center justify-center p-8 bg-[#020617] text-white">
+            <div class="text-center w-full max-w-xs">
+                <div class="w-20 h-20 bg-blue-600/20 rounded-3xl mx-auto mb-6 flex items-center justify-center border border-blue-500/30">
+                    <i data-lucide="user" class="w-8 h-8 text-blue-400"></i>
+                </div>
+                <h2 id="std-name" class="text-2xl font-black uppercase">...</h2>
+                <p id="std-id" class="text-[#d4af37] text-[11px] font-bold mt-1 tracking-widest opacity-80 uppercase">---</p>
+                <div class="mt-12 p-10 bg-white/5 rounded-[3rem] border border-white/10 backdrop-blur-xl">
+                    <i data-lucide="maximize" class="w-12 h-12 mx-auto mb-4 opacity-20 animate-pulse"></i>
+                    <p class="text-[10px] font-black uppercase tracking-widest text-blue-400">ESCANEAR CÓDIGO DOCENTE</p>
+                </div>
+                <button onclick="handleLogout()" class="mt-20 text-white/30 text-[10px] font-black uppercase tracking-widest">Cerrar Sesión</button>
             </div>
-            <button onclick="handleLogout()" class="mt-20 text-white/30 text-[10px] font-black uppercase">Cerrar Sesión</button>
         </section>
 
-        <!-- TEACHER / ADMIN -->
-        <section id="view-teacher" class="view-section p-8">
-            <header class="flex justify-between items-center mb-6">
-                <div>
-                    <p class="text-[9px] font-black text-slate-400 uppercase">Bienvenido</p>
-                    <h2 id="prof-name" class="text-lg font-black uppercase">...</h2>
+        <!-- DOCENTE / MASTER -->
+        <section id="view-teacher" class="view-section p-6 bg-slate-50 overflow-y-auto">
+            <header class="flex justify-between items-center mb-8 no-print">
+                <div class="flex items-center gap-4">
+                    <img src="https://lh3.googleusercontent.com/d/17NobXQ3JbRnLGejZe4Mn2x-Jl45F4rPm" class="w-10" alt="Logo">
+                    <div>
+                        <p id="prof-name" class="text-lg font-black uppercase text-slate-900 leading-none">...</p>
+                        <span id="badge-master" class="hidden text-[#d4af37] text-[9px] font-black uppercase tracking-widest">Master Admin Access</span>
+                    </div>
                 </div>
-                <button onclick="handleLogout()" class="w-10 h-10 bg-rose-50 text-rose-500 rounded-xl flex items-center justify-center">
-                    <i data-lucide="log-out" class="w-5 h-5"></i>
-                </button>
+                <button onclick="handleLogout()" class="text-rose-500 p-2 hover:bg-rose-50 rounded-xl transition-all"><i data-lucide="log-out"></i></button>
             </header>
 
-            <div class="bg-white p-6 rounded-[2rem] shadow-sm border border-slate-100 mb-6">
-                <h3 class="text-[10px] font-black uppercase text-blue-600 mb-4">Generar Pase de Lista</h3>
-                <div class="space-y-3">
-                    <input type="text" id="classMat" placeholder="MATERIA" class="input-ceut uppercase">
-                    <input type="text" id="classGru" placeholder="GRUPO" class="input-ceut uppercase">
-                    <button onclick="createQR()" class="btn-primary">GENERAR QR</button>
-                </div>
-                <div id="qr-container" class="hidden mt-6 text-center">
-                    <div id="qrcode-box" class="inline-block p-4 bg-white border-2 border-slate-50 rounded-xl"></div>
-                </div>
-            </div>
-
-            <div id="admin-only-tools" class="hidden">
-                <div class="bg-slate-900 p-6 rounded-[2rem] text-white">
-                    <h3 class="text-[10px] font-black uppercase text-gold mb-4 flex items-center gap-2">
-                        <i data-lucide="shield-check" class="w-4 h-4 text-[#d4af37]"></i> Panel Administrativo Global
+            <div class="grid grid-cols-1 xl:grid-cols-12 gap-6">
+                <!-- QR -->
+                <div class="xl:col-span-4 bg-white p-8 rounded-[2.5rem] shadow-xl border border-slate-100 no-print">
+                    <h3 class="text-xs font-black uppercase text-slate-400 mb-6 tracking-widest flex items-center gap-2">
+                        <i data-lucide="qr-code" class="w-4 h-4"></i> Control de Clase
                     </h3>
-                    <div id="admin-list" class="space-y-2 max-h-64 overflow-y-auto">
-                        <p class="text-[9px] opacity-40">Cargando base de datos...</p>
+                    <div class="space-y-4 mb-6">
+                        <input type="text" id="classMat" placeholder="MATERIA" class="input-ceut uppercase">
+                        <input type="text" id="classGru" placeholder="GRUPO" class="input-ceut uppercase">
+                        <button onclick="createQR()" class="btn-primary py-4">GENERAR PASE</button>
+                    </div>
+                    <div id="qr-container" class="hidden text-center p-6 bg-slate-50 rounded-3xl border-2 border-dashed border-slate-200">
+                        <div id="qrcode-box" class="mx-auto inline-block p-2 bg-white rounded-xl"></div>
+                        <p class="mt-4 text-[9px] font-bold text-slate-400 uppercase">QR Activo para Asistencia</p>
+                    </div>
+                </div>
+
+                <!-- CONSOLA MAESTRA -->
+                <div id="admin-master-view" class="xl:col-span-8 hidden">
+                    <div class="admin-card p-8 rounded-[2.5rem] h-full flex flex-col shadow-2xl">
+                        <div class="flex flex-wrap items-center justify-between gap-4 mb-8">
+                            <h3 class="text-sm font-black uppercase text-[#d4af37] tracking-[0.2em] flex items-center gap-2">
+                                <i data-lucide="database" class="w-4 h-4"></i> Base de Datos Maestra
+                            </h3>
+                            <div class="flex gap-2 no-print">
+                                <button onclick="window.print()" class="p-3 bg-white/10 text-white rounded-xl hover:bg-white/20 transition-all"><i data-lucide="printer" class="w-4 h-4"></i></button>
+                                <button onclick="exportToPDF()" class="p-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-all flex items-center gap-2 text-[10px] font-black uppercase"><i data-lucide="download" class="w-4 h-4"></i> PDF</button>
+                            </div>
+                        </div>
+
+                        <div class="mb-6 no-print">
+                            <input type="text" id="adminSearch" oninput="filterAdminList()" placeholder="BUSCAR USUARIO O MATRÍCULA..." class="w-full bg-white/5 border border-white/10 rounded-2xl py-3 px-6 text-sm text-white italic">
+                        </div>
+
+                        <div class="flex-1 overflow-hidden">
+                            <div class="overflow-x-auto custom-scrollbar">
+                                <table class="w-full text-left border-collapse min-w-[600px]">
+                                    <thead class="text-[10px] text-slate-500 uppercase font-black border-b border-white/10">
+                                        <tr>
+                                            <th class="pb-4">Nombre</th>
+                                            <th class="pb-4">Tipo</th>
+                                            <th class="pb-4">Matrícula</th>
+                                            <th class="pb-4 text-right no-print">Acción</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="admin-table-body" class="text-white"></tbody>
+                                </table>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -188,11 +229,12 @@
     <script>
         window.switchView = (id) => {
             document.querySelectorAll('.view-section').forEach(s => s.classList.remove('active'));
-            document.getElementById('view-' + id).classList.add('active');
-            if (window.lucide) lucide.createIcons();
+            const target = document.getElementById('view-' + id);
+            if(target) { target.classList.add('active'); if (window.lucide) lucide.createIcons(); }
         };
+
         window.showToast = (msg) => {
-            const t = document.getElementById('error-toast');
+            const t = document.getElementById('toast');
             t.innerText = msg; t.style.display = 'block';
             setTimeout(() => t.style.display = 'none', 3000);
         };
@@ -200,7 +242,7 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getFirestore, doc, setDoc, getDoc, collection, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getFirestore, doc, setDoc, getDoc, collection, onSnapshot, deleteDoc, updateDoc, query, where, getDocs } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
         import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
 
         const firebaseConfig = {
@@ -212,78 +254,136 @@
             appId: "1:130615246146:web:6ae2c17c828fb28a809cdb"
         };
 
-        const ADMIN_EMAIL = "carlos.aguilar@ceut.edu.mx";
-        const APP_ID = "ceut_production_v20";
+        const APP_ID = "ceut_production_v21";
+        const CARLOS_MASTER_EMAIL = "carlos.aguilar@ceut.edu.mx";
         
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
         const auth = getAuth(app);
 
         let selectedRole = 'student';
+        let allUsersData = [];
 
         window.initFlow = (role) => {
-            document.getElementById('modal-welcome').style.display = 'none';
             selectedRole = role;
             window.switchView('auth');
         };
 
         window.handleLogout = () => signOut(auth);
 
+        // --- ADMIN HELPERS ---
+        window.deleteUser = async (uid, name) => {
+            if (confirm(`¿ELIMINAR A ${name}?`)) {
+                await deleteDoc(doc(db, 'artifacts', APP_ID, 'public', 'data', 'users', uid));
+                window.showToast("🗑️ ELIMINADO");
+            }
+        };
+
+        window.openEditModal = (uid, name, id, role) => {
+            document.getElementById('editUid').value = uid;
+            document.getElementById('editName').value = name;
+            document.getElementById('editId').value = id;
+            document.getElementById('editRole').value = role;
+            document.getElementById('modal-edit').classList.remove('hidden');
+            document.getElementById('modal-edit').classList.add('flex');
+        };
+
+        window.closeEditModal = () => document.getElementById('modal-edit').classList.add('hidden');
+
+        window.saveUserEdit = async () => {
+            const uid = document.getElementById('editUid').value;
+            const d = { 
+                name: document.getElementById('editName').value.toUpperCase(),
+                id: document.getElementById('editId').value.toUpperCase(),
+                role: document.getElementById('editRole').value 
+            };
+            await updateDoc(doc(db, 'artifacts', APP_ID, 'public', 'data', 'users', uid), d);
+            await updateDoc(doc(db, 'artifacts', APP_ID, 'users', uid, 'profile', 'info'), d);
+            window.showToast("✅ ACTUALIZADO");
+            closeEditModal();
+        };
+
+        window.exportToPDF = () => {
+            const { jsPDF } = window.jspdf;
+            const docPdf = new jsPDF();
+            docPdf.text("CEUT CLOUD - REPORTE DE USUARIOS", 14, 20);
+            const rows = allUsersData.map(u => [u.name, u.role.toUpperCase(), u.id, u.email]);
+            docPdf.autoTable({ startY: 30, head: [['Nombre', 'Rol', 'ID', 'Correo']], body: rows });
+            docPdf.save(`Usuarios_CEUT_${Date.now()}.pdf`);
+        };
+
+        function renderAdminTable(users) {
+            const tbody = document.getElementById('admin-table-body');
+            tbody.innerHTML = users.map(u => `
+                <tr class="border-b border-white/5 hover:bg-white/5 transition-colors">
+                    <td class="py-4 text-[11px] font-bold uppercase">${u.name}</td>
+                    <td class="py-4 text-[9px] uppercase opacity-60">${u.role}</td>
+                    <td class="py-4 text-[10px] font-mono">${u.id}</td>
+                    <td class="py-4 text-right no-print">
+                        <button onclick="openEditModal('${u.uid}', '${u.name}', '${u.id}', '${u.role}')" class="text-blue-400 mr-2"><i data-lucide="edit-2" class="w-4 h-4"></i></button>
+                        <button onclick="deleteUser('${u.uid}', '${u.name}')" class="text-rose-500"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+                    </td>
+                </tr>`).join('');
+            lucide.createIcons();
+        }
+
         window.createQR = () => {
             const m = document.getElementById('classMat').value.trim();
             const g = document.getElementById('classGru').value.trim();
-            if (!m || !g) return window.showToast("LLENA MATERIA Y GRUPO");
-            const box = document.getElementById('qrcode-box');
-            box.innerHTML = "";
-            new QRCode(box, {
-                text: JSON.stringify({ a: APP_ID, m: m.toUpperCase(), g: g.toUpperCase(), d: Date.now() }),
-                width: 180, height: 180
-            });
+            if (!m || !g) return window.showToast("⚠️ REVISE CAMPOS");
+            const b = document.getElementById('qrcode-box'); b.innerHTML = "";
+            new QRCode(b, { text: JSON.stringify({ a: APP_ID, m: m.toUpperCase(), g: g.toUpperCase(), t: Date.now() }), width: 200, height: 200 });
             document.getElementById('qr-container').classList.remove('hidden');
         };
 
+        // --- AUTH LOGIC (UNIQUE REGISTRATION) ---
         document.getElementById('btn-submit-auth').onclick = async () => {
-            const email = document.getElementById('authEmail').value.trim();
+            const email = document.getElementById('authEmail').value.trim().toLowerCase();
             const pass = document.getElementById('authPass').value.trim();
             const name = document.getElementById('authName').value.trim();
-            const idNum = document.getElementById('authId').value.trim();
+            const instId = document.getElementById('authId').value.trim();
 
-            if (!email || !pass) return window.showToast("CAMPOS REQUERIDOS");
-            
+            if (!email || !pass) return window.showToast("⚠️ INGRESE CORREO Y CLAVE");
+
             try {
+                // Intento de login directo
                 await signInWithEmailAndPassword(auth, email, pass);
             } catch (err) {
-                if (name && idNum) {
-                    const res = await createUserWithEmailAndPassword(auth, email, pass);
-                    const profile = { name: name.toUpperCase(), id: idNum.toUpperCase(), email, role: selectedRole };
-                    await setDoc(doc(db, 'artifacts', APP_ID, 'users', res.user.uid, 'profile', 'info'), profile);
-                    await setDoc(doc(db, 'artifacts', APP_ID, 'public', 'data', 'users', res.user.uid), profile);
+                // Si falla el login y hay campos de registro, intentamos crear perfil único
+                if (name && instId) {
+                    try {
+                        const res = await createUserWithEmailAndPassword(auth, email, pass);
+                        const role = (email === CARLOS_MASTER_EMAIL) ? 'admin' : selectedRole;
+                        const userData = { uid: res.user.uid, name: name.toUpperCase(), id: instId.toUpperCase(), email, role, date: Date.now() };
+                        
+                        await setDoc(doc(db, 'artifacts', APP_ID, 'users', res.user.uid, 'profile', 'info'), userData);
+                        await setDoc(doc(db, 'artifacts', APP_ID, 'public', 'data', 'users', res.user.uid), userData);
+                        window.showToast("🚀 REGISTRO EXITOSO");
+                    } catch (e) { 
+                        window.showToast("❌ ERROR EN REGISTRO"); 
+                    }
                 } else {
-                    window.showToast("CREDENCIALES O DATOS INVÁLIDOS");
+                    window.showToast("❌ USUARIO NO ENCONTRADO");
                 }
             }
         };
 
         onAuthStateChanged(auth, async (user) => {
             if (user) {
-                if (user.email === ADMIN_EMAIL) {
-                    document.getElementById('prof-name').innerText = "Carlos Aguilar (Admin)";
-                    document.getElementById('admin-only-tools').classList.remove('hidden');
-                    initAdminMonitor();
-                    window.switchView('teacher');
-                    return;
-                }
-
-                const snap = await getDoc(doc(db, 'artifacts', APP_ID, 'users', user.uid, 'profile', 'info'));
-                if (snap.exists()) {
-                    const d = snap.data();
-                    if (d.role === 'student') {
-                        document.getElementById('std-name').innerText = d.name;
-                        document.getElementById('std-id').innerText = "ID: " + d.id;
-                        window.switchView('student');
-                    } else {
-                        document.getElementById('prof-name').innerText = d.name;
-                        window.switchView('teacher');
+                if (user.email.toLowerCase() === CARLOS_MASTER_EMAIL) {
+                    activateMasterUI();
+                } else {
+                    const snap = await getDoc(doc(db, 'artifacts', APP_ID, 'users', user.uid, 'profile', 'info'));
+                    if (snap.exists()) {
+                        const p = snap.data();
+                        if (p.role === 'student') {
+                            document.getElementById('std-name').innerText = p.name;
+                            document.getElementById('std-id').innerText = p.id;
+                            window.switchView('student');
+                        } else {
+                            document.getElementById('prof-name').innerText = p.name;
+                            window.switchView('teacher');
+                        }
                     }
                 }
             } else {
@@ -291,16 +391,15 @@
             }
         });
 
-        function initAdminMonitor() {
-            const list = document.getElementById('admin-list');
-            const q = collection(db, 'artifacts', APP_ID, 'public', 'data', 'users');
-            onSnapshot(q, (snap) => {
-                list.innerHTML = "";
-                snap.forEach(d => {
-                    const u = d.data();
-                    list.innerHTML += `<div class="p-2 border-b border-white/5 text-[9px] uppercase">${u.role}: ${u.name}</div>`;
-                });
+        function activateMasterUI() {
+            document.getElementById('prof-name').innerText = "MAESTRO CARLOS ÁGUILA";
+            document.getElementById('badge-master').classList.remove('hidden');
+            document.getElementById('admin-master-view').classList.remove('hidden');
+            onSnapshot(collection(db, 'artifacts', APP_ID, 'public', 'data', 'users'), (s) => {
+                allUsersData = s.docs.map(d => ({ ...d.data(), uid: d.id }));
+                renderAdminTable(allUsersData);
             });
+            window.switchView('teacher');
         }
     </script>
 </body>
