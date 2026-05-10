@@ -5,11 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>CEUT | SISTEMA ACADÉMICO</title>
     
+    <!-- Fallback de Estilos Críticos (Por si falla Tailwind CDN en móvil) -->
     <style>
         :root { 
             --bg-deep: #0f172a; 
             --accent-gold: #d4af37; 
             --surface: #1e293b;
+            --ceutBlue: #1e40af;
+            --ceutGold: #d4af37;
         }
         
         * { -webkit-tap-highlight-color: transparent; box-sizing: border-box; }
@@ -17,46 +20,63 @@
         body, html { 
             margin: 0; padding: 0; 
             background-color: var(--bg-deep); 
-            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-family: 'Plus Jakarta Sans', -apple-system, sans-serif;
             color: white;
             width: 100%;
             height: 100%;
             overflow: hidden;
         }
 
-        /* Contenedor principal siempre presente pero oculto tras el loading inicialmente */
+        /* Garantizar visibilidad de contenedores */
         #app-container {
             height: 100%;
             width: 100%;
             overflow-y: auto;
-            position: absolute;
-            top: 0; left: 0;
+            position: relative;
             z-index: 1;
-            background-color: var(--bg-deep);
-            display: none; /* Se activa por JS */
+            display: block;
+            opacity: 0;
+            transition: opacity 0.4s ease-in-out;
+            -webkit-overflow-scrolling: touch;
         }
 
         #loading-overlay {
             position: fixed; 
             inset: 0; 
-            background: radial-gradient(circle at center, #1e293b 0%, #0f172a 100%);
+            background: #0f172a;
             z-index: 9999; 
             display: flex; 
             flex-direction: column; 
             align-items: center; 
             justify-content: center;
-            opacity: 1;
-            transition: opacity 0.5s ease;
         }
 
         .view-section { 
             display: none; 
-            min-height: 100%; 
+            min-height: 100vh; 
             width: 100%; 
             opacity: 0; 
             flex-direction: column;
+            transform: translateY(10px);
+            transition: all 0.4s ease;
         }
-        .view-section.active { display: flex; opacity: 1; }
+
+        .view-section.active { 
+            display: flex; 
+            opacity: 1; 
+            transform: translateY(0);
+        }
+
+        /* Clases de utilidad manuales */
+        .glass { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.05); }
+        .spinner {
+            width: 32px; height: 32px;
+            border: 3px solid rgba(212, 175, 55, 0.1);
+            border-top: 3px solid var(--accent-gold);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
         @media (min-width: 768px) {
             .max-device-width {
@@ -65,20 +85,8 @@
                 border-left: 1px solid rgba(255,255,255,0.05);
                 border-right: 1px solid rgba(255,255,255,0.05);
                 box-shadow: 0 0 100px rgba(0,0,0,0.5);
-                min-height: 100vh;
             }
         }
-
-        .glass { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.05); }
-        
-        .spinner {
-            width: 40px; height: 40px;
-            border: 3px solid rgba(212, 175, 55, 0.1);
-            border-top: 3px solid var(--accent-gold);
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-        }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
 
     <script src="https://cdn.tailwindcss.com"></script>
@@ -87,127 +95,148 @@
 </head>
 <body>
 
-    <!-- Pantalla de Carga Imperativa -->
     <div id="loading-overlay">
         <div class="spinner mb-4"></div>
-        <p class="text-[10px] tracking-[0.4em] text-white/40 font-bold uppercase">Cargando Sistema...</p>
+        <p class="text-[9px] tracking-[0.4em] text-white/40 font-bold uppercase">Cargando Interfaz...</p>
     </div>
 
     <div id="app-container">
-        
-        <!-- VISTA: HOME (Predeterminada si falla algo) -->
+        <!-- HOME -->
         <main id="view-home" class="view-section items-center justify-center p-6 max-device-width relative">
-            <button onclick="prepareAuth('admin')" class="absolute top-8 right-8 w-10 h-10 glass rounded-full flex items-center justify-center text-white/20 hover:text-ceutGold transition-all z-20">
-                <span class="text-lg">🔒</span>
+            <button onclick="prepareAuth('admin')" class="absolute top-8 right-8 w-10 h-10 glass rounded-full flex items-center justify-center text-white/20 z-20">
+                <span class="text-sm">🔒</span>
             </button>
-
             <div class="w-full text-center py-10">
                 <img src="https://lh3.googleusercontent.com/d/17NobXQ3JbRnLGejZe4Mn2x-Jl45F4rPm" class="w-20 mx-auto mb-8 drop-shadow-2xl">
-                <h1 class="text-3xl font-extrabold tracking-tighter text-white mb-1 italic">CEUT <span class="text-ceutGold">CLOUD</span></h1>
-                <p class="text-[8px] tracking-[0.5em] text-white/30 font-black uppercase mb-12">v8.4 Resilient Edition</p>
+                <h1 class="text-3xl font-extrabold tracking-tighter text-white mb-1 italic">CEUT <span class="text-[#d4af37]">CLOUD</span></h1>
+                <p class="text-[8px] tracking-[0.5em] text-white/30 font-black uppercase mb-12">Mobile Ready v8.7</p>
                 
-                <div class="space-y-4">
-                    <button onclick="prepareAuth('teacher')" class="w-full glass p-5 rounded-3xl flex items-center justify-between active:scale-[0.98] transition-all">
+                <div class="space-y-4 px-2">
+                    <button onclick="prepareAuth('teacher')" class="w-full glass p-6 rounded-[2rem] flex items-center justify-between active:scale-[0.96] transition-all">
                         <div class="flex items-center gap-4">
-                            <div class="w-10 h-10 bg-ceutGold rounded-xl flex items-center justify-center text-lg">👨‍🏫</div>
+                            <div class="w-12 h-12 bg-[#d4af37] rounded-2xl flex items-center justify-center text-xl shadow-lg">👨‍🏫</div>
                             <div class="text-left">
                                 <p class="text-xs font-bold uppercase tracking-tight">Docentes</p>
                                 <p class="text-[8px] text-white/40 uppercase">Panel de Control</p>
                             </div>
                         </div>
-                        <span>→</span>
+                        <span class="text-white/20">→</span>
                     </button>
 
-                    <button onclick="prepareAuth('student')" class="w-full bg-white p-5 rounded-3xl flex items-center justify-between active:scale-[0.98] transition-all shadow-xl">
+                    <button onclick="prepareAuth('student')" class="w-full bg-white p-6 rounded-[2rem] flex items-center justify-between active:scale-[0.96] transition-all shadow-2xl">
                         <div class="flex items-center gap-4">
-                            <div class="w-10 h-10 bg-ceutBlue rounded-xl flex items-center justify-center text-lg text-white">🎓</div>
+                            <div class="w-12 h-12 bg-[#1e40af] rounded-2xl flex items-center justify-center text-xl text-white shadow-lg">🎓</div>
                             <div class="text-left">
-                                <p class="text-xs font-bold text-ceutBlue uppercase tracking-tight">Alumnos</p>
+                                <p class="text-xs font-bold text-[#1e40af] uppercase tracking-tight">Alumnos</p>
                                 <p class="text-[8px] text-slate-400 uppercase">Pasar Asistencia</p>
                             </div>
                         </div>
-                        <span class="text-ceutBlue/20">→</span>
+                        <span class="text-[#1e40af]/20">→</span>
                     </button>
                 </div>
             </div>
         </main>
 
-        <!-- VISTA: AUTH (Identica a anterior pero optimizada) -->
+        <!-- AUTH VIEW -->
         <section id="view-auth" class="view-section items-center justify-center p-8 bg-[#f8fafc] max-device-width">
             <div class="w-full text-center text-slate-800">
-                <button onclick="switchView('home')" class="mb-8 text-[9px] font-black text-slate-300 uppercase tracking-widest">← Regresar</button>
-                <h2 id="auth-title" class="text-2xl font-black text-ceutBlue uppercase tracking-tighter mb-8">Acceso</h2>
+                <button onclick="switchView('home')" class="mb-10 text-[9px] font-black text-slate-300 uppercase tracking-widest">← Volver al inicio</button>
+                <h2 id="auth-title" class="text-2xl font-black text-[#1e40af] uppercase tracking-tighter mb-8 italic">Acceso</h2>
                 
-                <div id="auth-mode-selector" class="flex bg-slate-200/50 p-1 rounded-2xl mb-6">
-                    <button onclick="toggleAuthMode('login')" id="btn-mode-login" class="flex-1 py-3 rounded-xl font-bold text-[9px] uppercase bg-white shadow-sm">Entrar</button>
-                    <button onclick="toggleAuthMode('register')" id="btn-mode-register" class="flex-1 py-3 rounded-xl font-bold text-[9px] uppercase text-slate-400">Registro</button>
+                <div id="auth-mode-selector" class="flex bg-slate-200/50 p-1.5 rounded-2xl mb-8">
+                    <button onclick="toggleAuthMode('login')" id="btn-mode-login" class="flex-1 py-3.5 rounded-xl font-bold text-[10px] uppercase bg-white shadow-sm transition-all">Entrar</button>
+                    <button onclick="toggleAuthMode('register')" id="btn-mode-register" class="flex-1 py-3.5 rounded-xl font-bold text-[10px] uppercase text-slate-400 transition-all">Registro</button>
                 </div>
 
-                <div class="space-y-3">
-                    <div id="reg-fields" class="hidden space-y-3">
-                        <input type="text" id="authName" placeholder="NOMBRE COMPLETO" class="w-full p-4 bg-white border border-slate-200 rounded-xl font-bold text-xs">
+                <div class="space-y-4">
+                    <div id="reg-fields" class="hidden space-y-4">
+                        <input type="text" id="authName" placeholder="NOMBRE COMPLETO" class="w-full p-5 bg-white border border-slate-200 rounded-2xl font-bold text-xs outline-none focus:border-[#d4af37]">
                         <div id="student-only-fields">
-                            <input type="text" id="authId" placeholder="MATRÍCULA" class="w-full p-4 bg-white border border-slate-200 rounded-xl font-bold text-xs">
+                            <input type="text" id="authId" placeholder="MATRÍCULA / ID" class="w-full p-5 bg-white border border-slate-200 rounded-2xl font-bold text-xs outline-none">
                         </div>
                     </div>
-                    <input type="email" id="authEmail" placeholder="CORREO ELECTRÓNICO" class="w-full p-4 bg-white border border-slate-200 rounded-xl font-bold text-xs">
-                    <input type="password" id="authPass" placeholder="CONTRASEÑA" class="w-full p-4 bg-white border border-slate-200 rounded-xl font-bold text-xs">
-                    <button onclick="handleAuth()" class="w-full bg-ceutBlue text-white p-5 rounded-2xl font-bold mt-4 uppercase text-[10px] tracking-widest shadow-lg">Confirmar</button>
+                    <input type="email" id="authEmail" placeholder="CORREO" class="w-full p-5 bg-white border border-slate-200 rounded-2xl font-bold text-xs outline-none">
+                    <input type="password" id="authPass" placeholder="CONTRASEÑA" class="w-full p-5 bg-white border border-slate-200 rounded-2xl font-bold text-xs outline-none">
+                    
+                    <button id="btn-auth-confirm" onclick="handleAuth()" class="w-full bg-[#1e40af] text-white p-6 rounded-2xl font-black mt-6 uppercase text-[10px] tracking-widest shadow-xl active:scale-95 transition-all">
+                        Confirmar Acceso
+                    </button>
                 </div>
             </div>
         </section>
 
         <!-- PANEL DOCENTE -->
         <section id="view-teacher-panel" class="view-section bg-[#f1f5f9] max-device-width">
-            <nav class="bg-ceutBlue p-5 flex justify-between items-center text-white sticky top-0 z-50">
+            <nav class="bg-[#1e40af] p-6 flex justify-between items-center text-white sticky top-0 z-50 shadow-lg">
                 <div class="flex items-center gap-3">
-                    <div id="nav-initials" class="w-8 h-8 bg-ceutGold text-ceutBlue rounded-lg flex items-center justify-center font-black text-xs">T</div>
-                    <span class="text-[10px] font-black uppercase" id="nav-name">Cargando...</span>
+                    <div id="nav-initials" class="w-9 h-9 bg-[#d4af37] text-[#1e40af] rounded-xl flex items-center justify-center font-black text-sm shadow-inner">T</div>
+                    <span class="text-[10px] font-black uppercase tracking-tight" id="nav-name">Docente</span>
                 </div>
-                <button onclick="logout()" class="text-[8px] font-black bg-red-500/20 px-3 py-2 rounded-lg">SALIR</button>
+                <button onclick="logout()" class="text-[9px] font-black bg-white/10 px-4 py-2.5 rounded-xl border border-white/10">SALIR</button>
             </nav>
-            <div class="p-5 space-y-6">
-                <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-200">
-                    <p class="text-[8px] font-black text-slate-400 uppercase mb-4 italic">Nueva Sesión</p>
-                    <div class="space-y-3">
-                        <input type="text" id="sCourse" placeholder="ASIGNATURA" class="w-full p-4 bg-slate-50 rounded-xl text-xs font-bold outline-none border border-transparent focus:border-ceutGold">
-                        <div class="grid grid-cols-2 gap-3">
-                            <input type="text" id="sGrade" placeholder="GRUPO" class="w-full p-4 bg-slate-50 rounded-xl text-xs font-bold border border-transparent focus:border-ceutGold">
-                            <select id="sLevel" class="w-full p-4 bg-slate-50 rounded-xl text-[10px] font-black">
+            
+            <div class="p-6 space-y-8">
+                <div class="bg-white p-8 rounded-[2.5rem] shadow-sm border border-slate-200">
+                    <p class="text-[9px] font-black text-slate-400 uppercase mb-5 italic tracking-widest text-center">Generar Pase de Lista</p>
+                    <div class="space-y-4">
+                        <input type="text" id="sCourse" placeholder="NOMBRE DE LA MATERIA" class="w-full p-5 bg-slate-50 rounded-2xl text-xs font-bold outline-none border border-transparent focus:border-[#d4af37] transition-all">
+                        <div class="grid grid-cols-2 gap-4">
+                            <input type="text" id="sGrade" placeholder="GRUPO" class="w-full p-5 bg-slate-50 rounded-2xl text-xs font-bold border border-transparent focus:border-[#d4af37]">
+                            <select id="sLevel" class="w-full p-5 bg-slate-50 rounded-2xl text-[10px] font-black outline-none border border-transparent">
                                 <option value="LIC">LICENCIATURA</option>
                                 <option value="BAC">BACHILLERATO</option>
+                                <option value="POS">POSGRADO</option>
                             </select>
                         </div>
-                        <button onclick="saveClass()" class="w-full bg-ceutGold text-ceutBlue p-5 rounded-2xl font-black text-[10px] tracking-widest uppercase">Generar Código QR</button>
+                        <button onclick="saveClass()" class="w-full bg-[#d4af37] text-[#1e40af] p-6 rounded-2xl font-black text-[11px] tracking-[0.2em] uppercase shadow-xl active:scale-95 transition-all mt-4">
+                            CREAR CÓDIGO QR
+                        </button>
                     </div>
                 </div>
-                <div id="sessions-list" class="space-y-3"></div>
+                
+                <div class="space-y-4">
+                    <h3 class="text-[10px] font-black text-slate-400 uppercase tracking-widest pl-2">Sesiones Recientes</h3>
+                    <div id="sessions-list" class="space-y-4 pb-24">
+                        <!-- Dinámico -->
+                    </div>
+                </div>
             </div>
         </section>
 
         <!-- PANEL ALUMNO -->
-        <section id="view-student-panel" class="view-section bg-ceutBlue p-6 items-center justify-center max-device-width">
-            <div class="w-full glass p-8 rounded-[3rem] text-center border border-white/5 shadow-2xl">
-                <h2 class="text-xl font-black text-white uppercase mb-1 tracking-tight" id="std-nav-name">Alumno</h2>
-                <p class="text-ceutGold text-[7px] font-black uppercase tracking-[0.4em] mb-10" id="std-nav-id">IDENTIFICANDO...</p>
+        <section id="view-student-panel" class="view-section bg-[#1e40af] p-8 items-center justify-center max-device-width">
+            <div class="w-full glass p-10 rounded-[3.5rem] text-center border border-white/10 shadow-2xl">
+                <div class="w-16 h-16 bg-white/10 rounded-3xl mx-auto mb-6 flex items-center justify-center text-3xl">🎓</div>
+                <h2 class="text-2xl font-black text-white uppercase mb-1 tracking-tight" id="std-nav-name">Alumno</h2>
+                <p class="text-[#d4af37] text-[8px] font-black uppercase tracking-[0.4em] mb-12" id="std-nav-id">IDENTIFICÁNDOSE...</p>
+                
                 <div class="space-y-6">
-                    <input type="text" id="regCode" oninput="onCodeInput(this)" placeholder="000000" class="w-full bg-white/5 border border-white/10 p-6 text-center text-4xl font-black rounded-3xl outline-none text-white tracking-tighter" maxlength="6" inputmode="numeric">
-                    <div id="class-detected-info" class="hidden bg-ceutGold/10 p-4 rounded-xl border border-ceutGold/20">
-                        <p id="det-course" class="text-ceutGold text-[9px] font-black uppercase tracking-widest"></p>
+                    <p class="text-white/40 text-[9px] font-bold uppercase tracking-widest">Ingresa el código del aula</p>
+                    <input type="text" id="regCode" oninput="onCodeInput(this)" placeholder="------" class="w-full bg-white/5 border border-white/10 p-6 text-center text-5xl font-black rounded-[2rem] outline-none text-white tracking-[0.2em] focus:border-[#d4af37] transition-all" maxlength="6" inputmode="numeric">
+                    
+                    <div id="class-detected-info" class="hidden bg-[#d4af37]/10 p-5 rounded-2xl border border-[#d4af37]/20 animate-pulse">
+                        <p id="det-course" class="text-[#d4af37] text-[10px] font-black uppercase tracking-widest"></p>
                     </div>
-                    <button id="btn-register-attendance" onclick="studentRegister()" disabled class="w-full bg-white/5 text-white/20 p-5 rounded-2xl font-black text-[9px] tracking-widest uppercase">Validar Asistencia</button>
+
+                    <button id="btn-register-attendance" onclick="studentRegister()" disabled class="w-full bg-white/5 text-white/10 p-6 rounded-2xl font-black text-[10px] tracking-widest uppercase transition-all">
+                        Validar mi Asistencia
+                    </button>
                 </div>
-                <button onclick="logout()" class="mt-10 text-white/10 text-[8px] font-black uppercase">Cerrar Sesión</button>
+
+                <button onclick="logout()" class="mt-12 text-white/20 text-[9px] font-black uppercase tracking-widest hover:text-white transition-all">Cerrar Sesión Segura</button>
             </div>
         </section>
     </div>
 
-    <!-- MODAL QR -->
-    <div id="qr-modal" class="fixed inset-0 bg-[#0f172a]/95 backdrop-blur-xl z-[100] hidden flex flex-col items-center justify-center p-8">
-        <div class="text-center w-full max-w-sm">
-            <div id="qrcode-box" class="p-6 bg-white rounded-[2rem] shadow-2xl mb-8 inline-block mx-auto border-4 border-ceutGold"></div>
-            <h4 id="modal-code" class="text-5xl font-black text-white tracking-tighter mb-10">000000</h4>
-            <button onclick="closeQR()" class="bg-white text-ceutBlue px-12 py-5 rounded-2xl font-black text-[10px] uppercase tracking-widest w-full">Finalizar / Salir</button>
+    <!-- MODAL QR (Full Screen Mobile) -->
+    <div id="qr-modal" class="fixed inset-0 bg-[#0f172a]/98 backdrop-blur-2xl z-[100] hidden flex flex-col items-center justify-center p-10">
+        <div class="text-center w-full max-w-xs">
+            <p class="text-[#d4af37] text-[10px] font-black uppercase tracking-[0.4em] mb-8">Escanea para Registrarte</p>
+            <div id="qrcode-box" class="p-8 bg-white rounded-[3rem] shadow-2xl mb-8 inline-block mx-auto border-8 border-[#d4af37]"></div>
+            <h4 id="modal-code" class="text-6xl font-black text-white tracking-tighter mb-12">------</h4>
+            <button onclick="closeQR()" class="bg-white text-[#1e40af] px-12 py-6 rounded-[2rem] font-black text-[11px] uppercase tracking-widest w-full shadow-2xl active:scale-95">
+                FINALIZAR SESIÓN
+            </button>
         </div>
     </div>
 
@@ -229,18 +258,19 @@
         const ADMIN_EMAIL = "carlos.aguilar@ceut.edu.mx";
         let db, auth, currentUser, userData;
 
-        // --- SISTEMA DE EMERGENCIA DE CARGA ---
+        // Desbloqueo forzado más agresivo para móviles
         window.forceUnlock = () => {
-            console.log("Desbloqueo manual activado");
-            document.getElementById('loading-overlay').style.opacity = '0';
-            document.getElementById('app-container').style.display = 'block';
-            setTimeout(() => {
-                document.getElementById('loading-overlay').style.display = 'none';
+            const overlay = document.getElementById('loading-overlay');
+            const container = document.getElementById('app-container');
+            if(overlay) overlay.style.opacity = '0';
+            if(container) container.style.opacity = '1';
+            setTimeout(() => { 
+                if(overlay) overlay.style.display = 'none'; 
             }, 500);
         };
 
-        // Si en 3.5 segundos no ha pasado nada, forzamos la entrada
-        const emergencyTimeout = setTimeout(window.forceUnlock, 3500);
+        // Reducido a 2.5s para evitar aburrimiento en cel
+        const emergencyTimeout = setTimeout(window.forceUnlock, 2500);
 
         async function init() {
             try {
@@ -250,7 +280,6 @@
 
                 onAuthStateChanged(auth, async (user) => {
                     clearTimeout(emergencyTimeout);
-                    
                     if (user) {
                         currentUser = user;
                         if(user.email === ADMIN_EMAIL) {
@@ -259,51 +288,62 @@
                             listenToTeacherSessions(user.uid);
                             updateNav("ADMIN", "A");
                         } else {
-                            const p = await getDoc(doc(db, 'artifacts', APP_ID, 'users', user.uid, 'profile', 'info'));
-                            if (p.exists()) {
-                                userData = p.data();
-                                if (userData.role === 'teacher') {
-                                    switchView('teacher-panel');
-                                    listenToTeacherSessions(user.uid);
-                                    updateNav(userData.name, userData.name[0]);
-                                } else {
-                                    document.getElementById('std-nav-name').innerText = userData.name;
-                                    document.getElementById('std-nav-id').innerText = `MATRÍCULA: ${userData.id}`;
-                                    switchView('student-panel');
-                                }
-                            } else { switchView('home'); }
+                            try {
+                                const p = await getDoc(doc(db, 'artifacts', APP_ID, 'users', user.uid, 'profile', 'info'));
+                                if (p.exists()) {
+                                    userData = p.data();
+                                    if (userData.role === 'teacher') {
+                                        switchView('teacher-panel');
+                                        listenToTeacherSessions(user.uid);
+                                        updateNav(userData.name, userData.name[0]);
+                                    } else {
+                                        document.getElementById('std-nav-name').innerText = userData.name;
+                                        document.getElementById('std-nav-id').innerText = `MATRÍCULA: ${userData.id}`;
+                                        switchView('student-panel');
+                                    }
+                                } else { switchView('home'); }
+                            } catch(e) { switchView('home'); }
                         }
                     } else { switchView('home'); }
-                    
                     window.forceUnlock();
                 });
-            } catch (err) {
-                console.error("Firebase Init Error:", err);
-                window.forceUnlock();
-                switchView('home');
+            } catch (err) { 
+                window.forceUnlock(); 
+                switchView('home'); 
             }
         }
 
         function updateNav(name, initial) {
-            document.getElementById('nav-name').innerText = name;
-            document.getElementById('nav-initials').innerText = initial;
+            const elName = document.getElementById('nav-name');
+            const elInit = document.getElementById('nav-initials');
+            if(elName) elName.innerText = name;
+            if(elInit) elInit.innerText = initial;
         }
 
         window.switchView = (id) => {
             const sections = document.querySelectorAll('.view-section');
-            sections.forEach(s => { s.classList.remove('active'); s.style.display = 'none'; });
+            sections.forEach(s => { 
+                s.classList.remove('active'); 
+                s.style.display = 'none'; 
+            });
             const target = document.getElementById('view-' + id);
             if (target) { 
                 target.style.display = 'flex'; 
-                setTimeout(() => target.classList.add('active'), 10); 
+                // Delay para animación suave en mobile
+                setTimeout(() => target.classList.add('active'), 50);
             }
         };
 
         window.handleAuth = async () => {
             const email = document.getElementById('authEmail').value.trim();
             const pass = document.getElementById('authPass').value;
-            if (!email || pass.length < 6) return alert("Verifica correo y contraseña (mínimo 6 caracteres)");
+            const btn = document.getElementById('btn-auth-confirm');
             
+            if (!email || pass.length < 6) return alert("Completa los datos correctamente.");
+            
+            btn.disabled = true;
+            btn.innerText = "ACCEDIENDO...";
+
             try {
                 if (window.authMode === 'register') {
                     const name = document.getElementById('authName').value.toUpperCase().trim();
@@ -314,24 +354,35 @@
                 } else {
                     await signInWithEmailAndPassword(auth, email, pass);
                 }
-            } catch (e) { alert("Error: " + e.message); }
+            } catch (e) { 
+                if(e.code === 'auth/operation-not-allowed') {
+                    alert("ERROR: Debes activar 'Email/Password' en la consola de Firebase.");
+                } else {
+                    alert("Error: " + e.message); 
+                }
+            } finally {
+                btn.disabled = false;
+                btn.innerText = "CONFIRMAR ACCESO";
+            }
         };
 
         function listenToTeacherSessions(uid) {
             onSnapshot(collection(db, 'artifacts', APP_ID, 'users', uid, 'sessions'), (snap) => {
                 const list = document.getElementById('sessions-list');
+                if(!list) return;
                 list.innerHTML = snap.docs.map(d => {
                     const s = d.data();
                     const count = s.attendees ? s.attendees.length : 0;
-                    return `<div class="bg-white p-5 rounded-2xl shadow-sm flex justify-between items-center border border-slate-100">
-                        <div>
-                            <p class="text-[7px] font-black text-slate-300 uppercase tracking-widest">${s.level} • ${s.grade}</p>
-                            <h4 class="font-black text-ceutBlue text-xs uppercase">${s.course}</h4>
-                            <p class="text-[9px] text-ceutGold font-bold">${count} Alumnos</p>
+                    return `
+                    <div class="bg-white p-6 rounded-[2rem] shadow-sm flex justify-between items-center border border-slate-100">
+                        <div class="flex-1">
+                            <p class="text-[7px] font-black text-slate-300 uppercase tracking-widest mb-1">${s.level} • ${s.grade}</p>
+                            <h4 class="font-black text-[#1e40af] text-xs uppercase leading-tight mb-1">${s.course}</h4>
+                            <p class="text-[9px] text-[#d4af37] font-bold">${count} Alumnos en lista</p>
                         </div>
                         <div class="flex gap-2">
-                            <button onclick="showQR('${s.code}')" class="bg-ceutBlue text-white text-[8px] font-black px-4 py-2 rounded-lg">QR</button>
-                            <button onclick="deleteSession('${d.id}', '${s.code}')" class="p-2 text-slate-200">✕</button>
+                            <button onclick="showQR('${s.code}')" class="bg-[#1e40af] text-white text-[9px] font-black px-5 py-3 rounded-xl shadow-md">QR</button>
+                            <button onclick="deleteSession('${d.id}', '${s.code}')" class="p-3 text-slate-200">✕</button>
                         </div>
                     </div>`;
                 }).join('');
@@ -339,17 +390,27 @@
         }
 
         window.saveClass = async () => {
-            const c = document.getElementById('sCourse').value.toUpperCase().trim(), g = document.getElementById('sGrade').value.toUpperCase().trim(), l = document.getElementById('sLevel').value;
-            if(!c || !g) return alert("Faltan datos");
+            const c = document.getElementById('sCourse').value.toUpperCase().trim();
+            const g = document.getElementById('sGrade').value.toUpperCase().trim();
+            const l = document.getElementById('sLevel').value;
+            if(!c || !g) return alert("Faltan campos");
+            
             const code = Math.floor(100000 + Math.random() * 900000).toString();
-            const docRef = await addDoc(collection(db, 'artifacts', APP_ID, 'users', currentUser.uid, 'sessions'), { level: l, course: c, grade: g, code, attendees: [], timestamp: Date.now() });
-            await setDoc(doc(db, 'artifacts', APP_ID, 'public_codes', code), { teacherId: currentUser.uid, sessionId: docRef.id });
-            document.getElementById('sCourse').value = ""; document.getElementById('sGrade').value = "";
-            showQR(code);
+            try {
+                const docRef = await addDoc(collection(db, 'artifacts', APP_ID, 'users', currentUser.uid, 'sessions'), { 
+                    level: l, course: c, grade: g, code, attendees: [], timestamp: Date.now() 
+                });
+                await setDoc(doc(db, 'artifacts', APP_ID, 'public_codes', code), { 
+                    teacherId: currentUser.uid, sessionId: docRef.id 
+                });
+                document.getElementById('sCourse').value = ""; 
+                document.getElementById('sGrade').value = "";
+                showQR(code);
+            } catch(e) { alert("Error al conectar con la nube."); }
         };
 
         window.deleteSession = async (id, code) => {
-            if(confirm("¿Eliminar clase?")) {
+            if(confirm("¿Eliminar este registro de asistencia?")) {
                 await deleteDoc(doc(db, 'artifacts', APP_ID, 'users', currentUser.uid, 'sessions', id));
                 await deleteDoc(doc(db, 'artifacts', APP_ID, 'public_codes', code));
             }
@@ -361,23 +422,36 @@
                 if(codeSnap.exists()) {
                     const { teacherId, sessionId } = codeSnap.data();
                     const sSnap = await getDoc(doc(db, 'artifacts', APP_ID, 'users', teacherId, 'sessions', sessionId));
-                    window.detSess = { ref: doc(db, 'artifacts', APP_ID, 'users', teacherId, 'sessions', sessionId), data: sSnap.data() };
+                    window.detSess = { 
+                        ref: doc(db, 'artifacts', APP_ID, 'users', teacherId, 'sessions', sessionId), 
+                        data: sSnap.data() 
+                    };
                     document.getElementById('det-course').innerText = sSnap.data().course;
                     document.getElementById('class-detected-info').classList.remove('hidden');
                     document.getElementById('btn-register-attendance').disabled = false;
-                    document.getElementById('btn-register-attendance').className = "w-full bg-white text-ceutBlue p-5 rounded-2xl font-black text-[9px] tracking-widest uppercase shadow-xl";
-                } else { alert("Código no válido"); el.value = ""; }
+                    document.getElementById('btn-register-attendance').className = "w-full bg-white text-[#1e40af] p-6 rounded-2xl font-black text-[10px] tracking-widest uppercase shadow-2xl";
+                } else { 
+                    alert("Código de aula no encontrado."); 
+                    el.value = ""; 
+                }
             }
         };
 
         window.studentRegister = async () => {
             try {
                 const att = window.detSess.data.attendees || [];
-                if(att.some(a => a.id === userData.id)) return alert("Ya registrado");
-                await updateDoc(window.detSess.ref, { attendees: [...att, { name: userData.name, id: userData.id, time: new Date().toLocaleTimeString() }] });
-                alert("¡ASISTENCIA REGISTRADA!"); 
+                if(att.some(a => a.id === userData.id)) return alert("Tu asistencia ya fue registrada anteriormente.");
+                
+                await updateDoc(window.detSess.ref, { 
+                    attendees: [...att, { 
+                        name: userData.name, 
+                        id: userData.id, 
+                        time: new Date().toLocaleTimeString('es-MX', { hour12: true }) 
+                    }] 
+                });
+                alert("¡ASISTENCIA REGISTRADA EXITOSAMENTE!"); 
                 location.reload();
-            } catch(e) { alert("Error al registrar"); }
+            } catch(e) { alert("Error en el registro."); }
         };
 
         window.logout = () => signOut(auth).then(() => location.reload());
@@ -386,26 +460,43 @@
             window.userRole = role; 
             switchView('auth'); 
             window.toggleAuthMode('login');
-            document.getElementById('auth-title').innerText = role === 'admin' ? 'ADMIN' : (role === 'teacher' ? 'DOCENTE' : 'ALUMNO');
+            document.getElementById('auth-title').innerText = role === 'admin' ? 'MODO CONTROL' : role.toUpperCase();
         };
 
         window.toggleAuthMode = (mode) => { 
             window.authMode = mode; 
             const isReg = mode === 'register';
             document.getElementById('reg-fields').classList.toggle('hidden', !isReg);
-            document.getElementById('btn-mode-login').className = !isReg ? "flex-1 py-3 rounded-xl font-bold text-[9px] uppercase bg-white shadow-sm" : "flex-1 py-3 rounded-xl font-bold text-[9px] uppercase text-slate-400";
-            document.getElementById('btn-mode-register').className = isReg ? "flex-1 py-3 rounded-xl font-bold text-[9px] uppercase bg-white shadow-sm" : "flex-1 py-3 rounded-xl font-bold text-[9px] uppercase text-slate-400";
+            
+            const loginBtn = document.getElementById('btn-mode-login');
+            const regBtn = document.getElementById('btn-mode-register');
+            
+            if(!isReg) {
+                loginBtn.className = "flex-1 py-3.5 rounded-xl font-bold text-[10px] uppercase bg-white shadow-sm";
+                regBtn.className = "flex-1 py-3.5 rounded-xl font-bold text-[10px] uppercase text-slate-400";
+            } else {
+                regBtn.className = "flex-1 py-3.5 rounded-xl font-bold text-[10px] uppercase bg-white shadow-sm";
+                loginBtn.className = "flex-1 py-3.5 rounded-xl font-bold text-[10px] uppercase text-slate-400";
+            }
         };
 
         window.showQR = (code) => { 
             document.getElementById('modal-code').innerText = code; 
             document.getElementById('qrcode-box').innerHTML = ""; 
-            new QRCode(document.getElementById('qrcode-box'), { text: code, width: 200, height: 200 }); 
+            new QRCode(document.getElementById('qrcode-box'), { 
+                text: code, 
+                width: 220, 
+                height: 220,
+                colorDark: "#0f172a",
+                colorLight: "#ffffff",
+                correctLevel: QRCode.CorrectLevel.H
+            }); 
             document.getElementById('qr-modal').classList.remove('hidden'); 
         };
+        
         window.closeQR = () => document.getElementById('qr-modal').classList.add('hidden');
 
-        // Ejecutar inicio
+        // Kickstart
         init();
     </script>
 </body>
