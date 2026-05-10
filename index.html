@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>CEUT | CLOUD SEGURIDAD</title>
+    <title>CEUT | CLOUD V18</title>
     
     <style>
         :root { 
@@ -62,8 +62,8 @@
         .qr-container { background: white; padding: 25px; border-radius: 35px; box-shadow: 0 20px 50px rgba(0,0,0,0.3); }
 
         .nav-tabs { display: flex; background: #e2e8f0; padding: 4px; border-radius: 16px; margin-bottom: 20px; }
-        .nav-tab { flex: 1; text-align: center; padding: 10px; font-size: 10px; font-weight: 800; text-transform: uppercase; border-radius: 12px; cursor: pointer; color: #64748b; }
-        .nav-tab.active { background: white; color: var(--ceut-blue); }
+        .nav-tab { flex: 1; text-align: center; padding: 12px; font-size: 10px; font-weight: 800; text-transform: uppercase; border-radius: 12px; cursor: pointer; color: #64748b; transition: 0.2s; }
+        .nav-tab.active { background: white; color: var(--ceut-blue); box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); }
 
         #error-toast {
             position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
@@ -76,9 +76,14 @@
 
         @keyframes slideUp { from { bottom: -50px; opacity: 0; } to { bottom: 20px; opacity: 1; } }
 
+        /* Admin-specific styles */
+        .admin-mode-switch { background: rgba(255,255,255,0.05); padding: 5px; border-radius: 14px; display: inline-flex; gap: 5px; border: 1px solid rgba(255,255,255,0.1); }
+        .mode-btn { padding: 8px 15px; border-radius: 10px; font-[8px] font-black uppercase text-white/40; cursor: pointer; transition: 0.3s; }
+        .mode-btn.active { background: var(--ceut-gold); color: var(--ceut-dark); }
+
         @media print {
             .no-print { display: none !important; }
-            #modal-list { position: relative !important; display: block !important; }
+            #modal-list { position: relative !important; display: block !important; height: auto !important; overflow: visible !important; }
         }
     </style>
 
@@ -98,7 +103,7 @@
             <div class="absolute inset-0 border-4 border-white/5 rounded-full"></div>
             <div class="absolute inset-0 border-4 border-t-[#d4af37] rounded-full animate-spin"></div>
         </div>
-        <p id="loading-text" class="text-[9px] font-black tracking-[0.4em] text-white/40 uppercase">Sincronizando con CEUT Cloud...</p>
+        <p id="loading-text" class="text-[9px] font-black tracking-[0.4em] text-white/40 uppercase">Iniciando Servidores CEUT...</p>
     </div>
 
     <div id="app-container">
@@ -111,7 +116,7 @@
                 <div class="space-y-4">
                     <button onclick="window.setRole('admin')" class="w-full bg-slate-900 p-5 rounded-[2rem] shadow-xl flex items-center gap-4 border border-slate-700">
                         <div class="w-12 h-12 bg-white/10 rounded-2xl flex items-center justify-center text-xl">🔒</div>
-                        <div class="text-left text-white"><p class="text-[10px] font-black uppercase">Administración</p><p class="text-[8px] opacity-40">ACCESO EXCLUSIVO</p></div>
+                        <div class="text-left text-white"><p class="text-[10px] font-black uppercase">Administración</p><p class="text-[8px] opacity-40">SUPERVISIÓN Y CLASES</p></div>
                     </button>
                     <button onclick="window.setRole('teacher')" class="w-full bg-white p-5 rounded-[2rem] shadow-xl shadow-slate-200 flex items-center gap-4 border border-slate-100">
                         <div class="w-12 h-12 bg-blue-50 rounded-2xl flex items-center justify-center text-xl">👨‍🏫</div>
@@ -149,30 +154,48 @@
             </div>
         </section>
 
-        <!-- PANEL ADMINISTRADOR -->
+        <!-- PANEL ADMINISTRADOR (MODO DUAL) -->
         <section id="view-admin-panel" class="view-section bg-[#0f172a]">
-            <nav class="p-6 flex justify-between items-center border-b border-white/10">
-                <div class="flex items-center gap-3">
-                    <div class="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></div>
-                    <span class="text-white text-[10px] font-black uppercase tracking-widest">Supervisión Central</span>
+            <nav class="p-6 flex flex-col gap-4 border-b border-white/10">
+                <div class="flex justify-between items-center">
+                    <div class="flex items-center gap-3">
+                        <div class="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></div>
+                        <span class="text-white text-[10px] font-black uppercase tracking-widest">Panel Central</span>
+                    </div>
+                    <button onclick="window.logout()" class="text-white/40 text-[9px] font-bold">SALIR</button>
                 </div>
-                <button onclick="window.logout()" class="text-white/40 text-[9px] font-bold">CERRAR SESIÓN</button>
+                <div class="admin-mode-switch mx-auto">
+                    <div id="mode-supervision" class="mode-btn active" onclick="window.setAdminMode('supervision')">Supervisión</div>
+                    <div id="mode-teaching" class="mode-btn" onclick="window.setAdminMode('teaching')">Modo Maestro</div>
+                </div>
             </nav>
-            <div class="p-6 overflow-y-auto">
+
+            <div id="admin-supervision-view" class="p-6 overflow-y-auto">
                 <h3 class="text-white font-black text-2xl uppercase mb-6">Control <span class="text-[#d4af37]">Global</span></h3>
                 
                 <div class="grid grid-cols-2 gap-4 mb-8">
                     <div class="bg-white/5 p-4 rounded-2xl border border-white/5">
-                        <p class="text-white/40 text-[8px] font-black uppercase">Clases en Nube</p>
+                        <p class="text-white/40 text-[8px] font-black uppercase">Clases Totales</p>
                         <p id="stat-classes" class="text-white text-2xl font-black">0</p>
                     </div>
                     <div class="bg-white/5 p-4 rounded-2xl border border-white/5">
-                        <p class="text-white/40 text-[8px] font-black uppercase">Total Asistencias</p>
+                        <p class="text-white/40 text-[8px] font-black uppercase">Asistencias Hoy</p>
                         <p id="stat-students" class="text-white text-2xl font-black">0</p>
                     </div>
                 </div>
 
                 <div id="admin-global-list" class="space-y-4 pb-20"></div>
+            </div>
+
+            <div id="admin-teaching-view" class="hidden p-6 overflow-y-auto">
+                <h3 class="text-white font-black text-2xl uppercase mb-6">Mis <span class="text-[#d4af37]">Clases</span></h3>
+                <div class="bg-white/5 p-6 rounded-[2rem] border border-white/10 mb-8">
+                    <p class="text-white/40 text-[9px] font-black uppercase mb-4 tracking-widest">Nueva Sesión</p>
+                    <input type="text" id="adminCourse" placeholder="MATERIA" class="input-ceut bg-slate-900 border-white/10 text-white mb-4">
+                    <input type="text" id="adminGrade" placeholder="GRUPO" class="input-ceut bg-slate-900 border-white/10 text-white mb-4">
+                    <button id="btn-admin-create" class="btn-gold">Iniciar Mi Clase</button>
+                </div>
+                <div id="admin-personal-list" class="space-y-4 pb-20"></div>
             </div>
         </section>
 
@@ -184,8 +207,8 @@
             </nav>
             <div class="p-6 max-w-2xl mx-auto w-full">
                 <div class="nav-tabs">
-                    <div id="tab-register" class="nav-tab active">Nueva Clase</div>
-                    <div id="tab-history" class="nav-tab">Mis Clases</div>
+                    <div id="tab-register" class="nav-tab active" onclick="window.switchTeacherTab('register')">Nueva Clase</div>
+                    <div id="tab-history" class="nav-tab" onclick="window.switchTeacherTab('history')">Mis Clases</div>
                 </div>
                 <div id="module-register" class="space-y-6">
                     <div class="bg-white p-6 rounded-[2.5rem] shadow-sm border border-slate-200">
@@ -223,18 +246,20 @@
         </section>
     </div>
 
-    <!-- MODAL LISTA -->
+    <!-- MODAL LISTA INTEGRAL -->
     <div id="modal-list" class="fixed inset-0 bg-white z-[1000] hidden flex flex-col">
         <div class="bg-[#1e40af] p-8 text-white flex justify-between items-end no-print">
-            <div><h3 id="list-course" class="text-xl font-black uppercase">Materia</h3></div>
+            <div>
+                <p id="list-grade" class="text-[9px] font-black text-white/40 uppercase mb-1">Grupo ---</p>
+                <h3 id="list-course" class="text-xl font-black uppercase">Materia</h3>
+            </div>
             <button onclick="document.getElementById('modal-list').classList.add('hidden')" class="bg-white/10 w-12 h-12 rounded-2xl flex items-center justify-center">✕</button>
         </div>
         <div id="list-body" class="flex-1 p-6 overflow-y-auto space-y-3 bg-slate-50"></div>
-        <div class="p-6 border-t grid grid-cols-2 gap-3 no-print">
-            <button id="btn-print" class="bg-slate-800 text-white py-4 rounded-xl font-black uppercase text-[9px]">Imprimir</button>
-            <button id="btn-pdf" class="bg-red-600 text-white py-4 rounded-xl font-black uppercase text-[9px]">PDF</button>
-            <button id="btn-edit-session" class="bg-slate-200 text-slate-800 py-4 rounded-xl font-black uppercase text-[9px]">Editar</button>
-            <button id="btn-delete-session" class="bg-rose-100 text-rose-600 py-4 rounded-xl font-black uppercase text-[9px]">Borrar Todo</button>
+        <div class="p-6 border-t grid grid-cols-2 gap-3 no-print bg-white">
+            <button id="btn-print" class="bg-slate-800 text-white py-4 rounded-xl font-black uppercase text-[9px] flex items-center justify-center gap-2">🖨️ Imprimir</button>
+            <button id="btn-pdf" class="bg-rose-600 text-white py-4 rounded-xl font-black uppercase text-[9px] flex items-center justify-center gap-2">📄 Exportar PDF</button>
+            <button id="btn-delete-session" class="col-span-2 bg-rose-50 text-rose-600 py-4 rounded-xl font-black uppercase text-[9px] border border-rose-100">Eliminar Esta Sesión</button>
         </div>
     </div>
 
@@ -244,7 +269,8 @@
             <div id="qrcode"></div>
             <div class="qr-timer-bar"><div id="qr-progress"></div></div>
         </div>
-        <button onclick="clearInterval(qrInterval); document.getElementById('modal-qr').classList.add('hidden');" class="btn-primary max-w-xs bg-white text-blue-950">Finalizar Pase</button>
+        <h4 class="text-white font-black text-lg mb-2 uppercase" id="qr-label">Escanea para asistencia</h4>
+        <button onclick="clearInterval(qrInterval); document.getElementById('modal-qr').classList.add('hidden');" class="btn-primary max-w-xs bg-white text-blue-950 mt-4">Finalizar Pase</button>
     </div>
 
     <script type="module">
@@ -252,7 +278,7 @@
         import { getFirestore, collection, addDoc, onSnapshot, doc, updateDoc, setDoc, deleteDoc, getDoc, query, where, getDocs, collectionGroup } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
         import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
 
-        // Configuración Actualizada de Firebase
+        // CONFIGURACIÓN DE FIREBASE
         const firebaseConfig = {
             apiKey: "AIzaSyCefP6qEqaCMpo8ZpUiLpN4e_-E4ZNTp94",
             authDomain: "asistencias-ceut.firebaseapp.com",
@@ -283,52 +309,72 @@
             if(target) target.classList.add('active');
         };
 
-        window.switchView = switchView;
+        window.setAdminMode = (mode) => {
+            const supView = document.getElementById('admin-supervision-view');
+            const teachView = document.getElementById('admin-teaching-view');
+            const supBtn = document.getElementById('mode-supervision');
+            const teachBtn = document.getElementById('mode-teaching');
+
+            if(mode === 'supervision') {
+                supView.classList.remove('hidden'); teachView.classList.add('hidden');
+                supBtn.classList.add('active'); teachBtn.classList.remove('active');
+            } else {
+                supView.classList.add('hidden'); teachView.classList.remove('hidden');
+                supBtn.classList.remove('active'); teachBtn.classList.add('active');
+                loadAdminTeachingData();
+            }
+        };
+
+        window.switchTeacherTab = (tab) => {
+            const modReg = document.getElementById('module-register');
+            const modHis = document.getElementById('module-history');
+            const tReg = document.getElementById('tab-register');
+            const tHis = document.getElementById('tab-history');
+
+            if(tab === 'register') {
+                modReg.classList.remove('hidden'); modHis.classList.add('hidden');
+                tReg.classList.add('active'); tHis.classList.remove('active');
+            } else {
+                modReg.classList.add('hidden'); modHis.classList.remove('hidden');
+                tReg.classList.remove('active'); tHis.classList.add('active');
+            }
+        };
+
         window.setRole = (role) => {
             currentRole = role;
             const tabs = document.getElementById('auth-tabs-container');
             const authTitle = document.getElementById('auth-title');
+            const regInp = document.getElementById('reg-inputs');
             
             if(role === 'admin') {
                 tabs.style.display = 'none';
                 currentAuthMode = 'login';
-                document.getElementById('reg-inputs').classList.add('hidden');
-                authTitle.innerText = "Acceso Admin Central";
+                regInp.classList.add('hidden');
+                authTitle.innerText = "Acceso Administrativo";
                 document.getElementById('authEmail').value = ADMIN_EMAIL;
             } else {
                 tabs.style.display = 'flex';
-                authTitle.innerText = role === 'teacher' ? "Panel Docente" : "Panel Alumnos";
+                authTitle.innerText = role === 'teacher' ? "Portal Docente" : "Portal Estudiantil";
                 document.getElementById('authEmail').value = "";
+                regInp.classList.add('hidden');
             }
             switchView('auth');
         };
 
         const init = () => {
-            console.log("CEUT CLOUD: Iniciando Verificación...");
             onAuthStateChanged(auth, async (u) => {
                 if (u) {
                     user = u;
-                    const emailNorm = u.email.toLowerCase();
-                    
-                    if (emailNorm === ADMIN_EMAIL.toLowerCase()) {
-                        profile = { name: "Ing. Carlos Aguilar", role: "admin", email: emailNorm };
+                    if (u.email.toLowerCase() === ADMIN_EMAIL.toLowerCase()) {
+                        profile = { name: "Ing. Carlos Aguilar", role: "admin", email: u.email };
                         loadPanel();
                     } else {
-                        try {
-                            const profileSnap = await getDoc(doc(db, 'artifacts', APP_ID, 'users', u.uid, 'profile', 'info'));
-                            if (profileSnap.exists()) {
-                                profile = profileSnap.data();
-                                loadPanel();
-                            } else {
-                                console.warn("Perfil no encontrado en Firestore.");
-                                showToast("Error: No se encontró perfil de usuario.");
-                                await signOut(auth);
-                                switchView('home');
-                            }
-                        } catch(e) {
-                            console.error("Error Firestore:", e);
-                            showToast("Error de conexión a la base de datos.");
-                            await signOut(auth);
+                        const snap = await getDoc(doc(db, 'artifacts', APP_ID, 'users', u.uid, 'profile', 'info'));
+                        if (snap.exists()) {
+                            profile = snap.data();
+                            loadPanel();
+                        } else {
+                            await signOut(auth); switchView('home');
                         }
                     }
                 } else {
@@ -367,14 +413,35 @@
                 list.innerHTML = sessions.sort((a,b) => b.timestamp - a.timestamp).map(s => `
                     <div class="bg-white/5 p-5 rounded-2xl border border-white/5 flex justify-between items-center">
                         <div>
-                            <p class="text-[#d4af37] text-[10px] font-black uppercase">${s.course || 'Sin Materia'}</p>
-                            <p class="text-white/40 text-[8px] uppercase">GRUPO: ${s.grade || 'S/G'} | ${s.attendees?.length || 0} REGISTROS</p>
+                            <p class="text-[#d4af37] text-[10px] font-black uppercase">${s.course}</p>
+                            <p class="text-white/40 text-[8px] uppercase">G: ${s.grade} | ${s.attendees?.length} REG</p>
                         </div>
-                        <button onclick="window.openDetails('${encodeURIComponent(JSON.stringify(s))}')" class="bg-[#d4af37] px-4 py-2 rounded-lg text-slate-950 text-[9px] font-bold">VER</button>
+                        <button onclick="window.openDetails('${encodeURIComponent(JSON.stringify(s))}')" class="bg-[#d4af37] px-4 py-2 rounded-lg text-slate-950 text-[9px] font-bold">VER LISTA</button>
                     </div>
-                `).join('') || '<p class="text-white/20 text-center py-10 uppercase text-[9px]">No hay actividad hoy</p>';
-            }, (err) => {
-                console.error("Admin Snapshot Error:", err);
+                `).join('') || '<p class="text-white/20 text-center py-10 uppercase text-[9px]">Sin actividad global</p>';
+            });
+        };
+
+        const loadAdminTeachingData = () => {
+            const sessionsCol = collection(db, 'artifacts', APP_ID, 'users', user.uid, 'sessions');
+            onSnapshot(sessionsCol, (snap) => {
+                const list = document.getElementById('admin-personal-list');
+                list.innerHTML = snap.docs.sort((a,b) => b.data().timestamp - a.data().timestamp).map(d => {
+                    const s = d.data();
+                    const sJson = encodeURIComponent(JSON.stringify({...s, fullPath: d.ref.path, id: d.id}));
+                    return `
+                        <div class="bg-white/5 p-5 rounded-2xl border border-white/10 flex justify-between items-center">
+                            <div>
+                                <p class="text-white font-black text-sm uppercase">${s.course}</p>
+                                <p class="text-white/40 text-[9px] font-bold uppercase">${s.grade} • ${s.attendees.length} Alumnos</p>
+                            </div>
+                            <div class="flex gap-2">
+                                <button onclick="window.showQR('${s.classId}')" class="bg-white/10 p-2 rounded-lg text-white">QR</button>
+                                <button onclick="window.openDetails('${sJson}')" class="bg-white p-2 rounded-lg text-slate-900">VER</button>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
             });
         };
 
@@ -405,6 +472,7 @@
             currentSessionRef = doc(db, s.fullPath);
             
             document.getElementById('list-course').innerText = s.course;
+            document.getElementById('list-grade').innerText = "GRUPO: " + s.grade;
             const body = document.getElementById('list-body');
             body.innerHTML = s.attendees.map((a, i) => `
                 <div class="bg-white p-4 rounded-xl flex justify-between items-center shadow-sm border border-slate-100">
@@ -414,7 +482,7 @@
                     </div>
                     <button onclick="window.removeStudent(${i})" class="text-rose-500 font-bold px-2 no-print">✕</button>
                 </div>
-            `).join('') || '<p class="text-center text-slate-300 py-10 uppercase text-[10px] font-bold">Sin registros aún</p>';
+            `).join('') || '<p class="text-center text-slate-300 py-10 uppercase text-[10px] font-bold">Sin alumnos registrados</p>';
             
             document.getElementById('modal-list').classList.remove('hidden');
         };
@@ -425,6 +493,14 @@
             await updateDoc(currentSessionRef, { attendees: updated });
             currentSessionData.attendees = updated;
             window.openDetails(encodeURIComponent(JSON.stringify(currentSessionData)));
+        };
+
+        document.getElementById('btn-delete-session').onclick = async () => {
+            if(confirm("¿Estás seguro de eliminar esta sesión y todos sus registros?")) {
+                await deleteDoc(currentSessionRef);
+                document.getElementById('modal-list').classList.add('hidden');
+                showToast("Sesión eliminada con éxito.");
+            }
         };
 
         window.showQR = (cid) => {
@@ -468,27 +544,23 @@
                         await updateDoc(sRef, { attendees: updated });
                         document.getElementById('status-confirm').classList.add('hidden');
                         document.getElementById('status-success').classList.remove('hidden');
+                        setTimeout(() => window.location.href = window.location.pathname, 2000);
                     }
                 };
             }
         };
 
+        // ACCIÓN BOTÓN AUTH
         document.getElementById('btn-auth-submit').onclick = async () => {
             const btn = document.getElementById('btn-auth-submit');
             const email = document.getElementById('authEmail').value.trim();
             const pass = document.getElementById('authPass').value;
             
-            if(!email || !pass) return showToast("Faltan datos de acceso.");
-            
-            btn.disabled = true;
-            btn.classList.add('loading');
-
+            btn.disabled = true; btn.classList.add('loading');
             try {
                 if(currentAuthMode === 'register') {
                     const name = document.getElementById('authName').value.toUpperCase();
                     const id = document.getElementById('authId').value.toUpperCase();
-                    if(!name || !id) throw new Error("Faltan datos de registro.");
-                    
                     const res = await createUserWithEmailAndPassword(auth, email, pass);
                     await setDoc(doc(db, 'artifacts', APP_ID, 'users', res.user.uid, 'profile', 'info'), {
                         name, id, email, role: currentRole, createdAt: Date.now()
@@ -497,22 +569,29 @@
                     await signInWithEmailAndPassword(auth, email, pass);
                 }
             } catch(e) { 
-                console.error("Auth Failure:", e.code);
-                let msg = "Error en el acceso.";
-                if(e.code === 'auth/invalid-credential') msg = "Credenciales inválidas.";
-                if(e.code === 'auth/network-request-failed') msg = "Sin conexión a Internet.";
-                showToast(msg);
-                btn.disabled = false;
-                btn.classList.remove('loading');
+                showToast("Error: Verifique sus credenciales.");
+                btn.disabled = false; btn.classList.remove('loading');
             }
         };
 
+        // ACCIÓN CREAR SESIÓN (DOCENTE)
         document.getElementById('btn-create-session').onclick = async () => {
             const course = document.getElementById('sCourse').value.toUpperCase();
             const grade = document.getElementById('sGrade').value.toUpperCase();
             const cid = document.getElementById('sClassId').value;
             if(!course || !grade) return showToast("Complete materia y grupo.");
-            
+            await addDoc(collection(db, 'artifacts', APP_ID, 'users', user.uid, 'sessions'), {
+                course, grade, classId: cid, timestamp: Date.now(), attendees: []
+            });
+            window.showQR(cid);
+        };
+
+        // ACCIÓN CREAR SESIÓN (ADMIN)
+        document.getElementById('btn-admin-create').onclick = async () => {
+            const course = document.getElementById('adminCourse').value.toUpperCase();
+            const grade = document.getElementById('adminGrade').value.toUpperCase();
+            const cid = "CL-" + Math.random().toString(36).substr(2, 5).toUpperCase();
+            if(!course || !grade) return showToast("Faltan datos de materia.");
             await addDoc(collection(db, 'artifacts', APP_ID, 'users', user.uid, 'sessions'), {
                 course, grade, classId: cid, timestamp: Date.now(), attendees: []
             });
@@ -522,13 +601,17 @@
         document.getElementById('btn-pdf').onclick = () => {
             const { jsPDF } = window.jspdf;
             const docPdf = new jsPDF();
-            docPdf.text(`CEUT | LISTA: ${currentSessionData.course}`, 14, 20);
+            docPdf.setFontSize(18);
+            docPdf.text(`CEUT CLOUD | LISTA DE ASISTENCIA`, 14, 20);
+            docPdf.setFontSize(10);
+            docPdf.text(`MATERIA: ${currentSessionData.course} | GRUPO: ${currentSessionData.grade}`, 14, 28);
             docPdf.autoTable({
-                startY: 30,
-                head: [['Nombre', 'Matrícula', 'Hora']],
-                body: currentSessionData.attendees.map(a => [a.name, a.id, a.time])
+                startY: 35,
+                head: [['Nombre Completo', 'ID/Matrícula', 'Hora de Entrada']],
+                body: currentSessionData.attendees.map(a => [a.name, a.id, a.time]),
+                headStyles: { fillColor: [30, 64, 175] }
             });
-            docPdf.save(`Lista_${currentSessionData.course}.pdf`);
+            docPdf.save(`Lista_${currentSessionData.course}_${currentSessionData.grade}.pdf`);
         };
 
         document.getElementById('btn-print').onclick = () => window.print();
