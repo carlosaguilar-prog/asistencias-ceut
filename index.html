@@ -62,7 +62,6 @@
             text-align: center; width: 90%; max-width: 400px;
         }
 
-        /* Estilos Impresión */
         @media print {
             .no-print { display: none !important; }
             #modal-list { position: relative !important; display: block !important; }
@@ -79,12 +78,13 @@
 
     <div id="error-toast"></div>
 
+    <!-- Pantalla de carga -->
     <div id="loading-overlay" class="fixed inset-0 bg-[#0f172a] z-[9999] flex flex-col items-center justify-center">
         <div class="relative w-20 h-20 mb-6">
             <div class="absolute inset-0 border-4 border-white/5 rounded-full"></div>
             <div class="absolute inset-0 border-4 border-t-[#d4af37] rounded-full animate-spin"></div>
         </div>
-        <p class="text-[9px] font-black tracking-[0.4em] text-white/40 uppercase">Sincronizando Seguridad...</p>
+        <p id="loading-text" class="text-[9px] font-black tracking-[0.4em] text-white/40 uppercase">Sincronizando Seguridad...</p>
     </div>
 
     <div id="app-container">
@@ -95,15 +95,15 @@
                 <h1 class="text-4xl font-extrabold tracking-tighter mb-1 text-slate-900">CEUT <span class="text-[#d4af37]">CLOUD</span></h1>
                 <p class="text-[9px] tracking-[0.4em] text-slate-400 font-bold uppercase mb-12">Portal de Asistencia Institucional</p>
                 <div class="space-y-4">
-                    <button id="btn-home-admin" class="w-full bg-slate-900 p-5 rounded-[2rem] shadow-xl flex items-center gap-4 border border-slate-700">
+                    <button onclick="window.setRole('admin')" class="w-full bg-slate-900 p-5 rounded-[2rem] shadow-xl flex items-center gap-4 border border-slate-700">
                         <div class="w-12 h-12 bg-white/10 rounded-2xl flex items-center justify-center text-xl">🔒</div>
                         <div class="text-left text-white"><p class="text-[10px] font-black uppercase">Administración</p><p class="text-[8px] opacity-40">HERRAMIENTAS DE CONTROL</p></div>
                     </button>
-                    <button id="btn-home-teacher" class="w-full bg-white p-5 rounded-[2rem] shadow-xl shadow-slate-200 flex items-center gap-4 border border-slate-100">
+                    <button onclick="window.setRole('teacher')" class="w-full bg-white p-5 rounded-[2rem] shadow-xl shadow-slate-200 flex items-center gap-4 border border-slate-100">
                         <div class="w-12 h-12 bg-blue-50 rounded-2xl flex items-center justify-center text-xl">👨‍🏫</div>
                         <div class="text-left text-slate-800"><p class="text-[10px] font-black uppercase">Cuerpo Docente</p><p class="text-[8px] opacity-40">GESTIÓN DE CLASES</p></div>
                     </button>
-                    <button id="btn-home-student" class="w-full bg-[#1e40af] p-5 rounded-[2rem] shadow-xl shadow-blue-200 flex items-center gap-4">
+                    <button onclick="window.setRole('student')" class="w-full bg-[#1e40af] p-5 rounded-[2rem] shadow-xl shadow-blue-200 flex items-center gap-4">
                         <div class="w-12 h-12 bg-white/10 rounded-2xl flex items-center justify-center text-xl">🎓</div>
                         <div class="text-left text-white"><p class="text-[10px] font-black uppercase">Comunidad Estudiantil</p><p class="text-[8px] opacity-40">ACCESO RÁPIDO</p></div>
                     </button>
@@ -114,7 +114,7 @@
         <!-- VISTA AUTH -->
         <section id="view-auth" class="view-section p-8 bg-slate-50 items-center justify-center">
             <div class="w-full max-w-sm">
-                <button id="btn-auth-back" class="mb-8 text-[10px] font-black text-slate-400 uppercase">← Regresar</button>
+                <button onclick="window.switchView('home')" class="mb-8 text-[10px] font-black text-slate-400 uppercase">← Regresar</button>
                 <h2 id="auth-title" class="text-3xl font-black text-slate-900 mb-8 uppercase tracking-tighter">Acceso</h2>
                 <div class="flex bg-slate-200 p-1 rounded-2xl mb-6">
                     <button id="auth-tab-login" class="flex-1 py-3 text-[10px] font-black uppercase rounded-xl bg-white text-blue-700">Entrar</button>
@@ -132,38 +132,30 @@
             </div>
         </section>
 
-        <!-- PANEL ADMINISTRADOR (GLOBAL) -->
+        <!-- PANEL ADMINISTRADOR -->
         <section id="view-admin-panel" class="view-section bg-[#0f172a]">
             <nav class="p-6 flex justify-between items-center border-b border-white/10">
                 <div class="flex items-center gap-3">
                     <div class="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></div>
                     <span class="text-white text-[10px] font-black uppercase tracking-widest">Panel Central de Supervisión</span>
                 </div>
-                <button id="btn-logout-admin" class="text-white/40 text-[9px] font-bold">CERRAR SESIÓN</button>
+                <button onclick="window.logout()" class="text-white/40 text-[9px] font-bold">CERRAR SESIÓN</button>
             </nav>
             <div class="p-6 overflow-y-auto">
-                <h3 class="text-white font-black text-2xl uppercase mb-6">Herramientas de <span class="text-[#d4af37]">Control Global</span></h3>
+                <h3 class="text-white font-black text-2xl uppercase mb-6">Control <span class="text-[#d4af37]">Global</span></h3>
                 
-                <!-- Estadísticas Administrativas -->
-                <div id="admin-stats" class="grid grid-cols-2 gap-4 mb-8">
+                <div class="grid grid-cols-2 gap-4 mb-8">
                     <div class="bg-white/5 p-4 rounded-2xl border border-white/5">
-                        <p class="text-white/40 text-[8px] font-black uppercase">Clases en Nube</p>
+                        <p class="text-white/40 text-[8px] font-black uppercase">Clases Activas</p>
                         <p id="stat-classes" class="text-white text-2xl font-black">0</p>
                     </div>
                     <div class="bg-white/5 p-4 rounded-2xl border border-white/5">
-                        <p class="text-white/40 text-[8px] font-black uppercase">Registros Totales</p>
+                        <p class="text-white/40 text-[8px] font-black uppercase">Total Asistencias</p>
                         <p id="stat-students" class="text-white text-2xl font-black">0</p>
                     </div>
                 </div>
 
-                <!-- Lista de Sesiones Globales -->
-                <div class="flex items-center justify-between mb-4">
-                    <p class="text-white/40 text-[10px] font-black uppercase tracking-widest">Actividad Reciente</p>
-                    <button onclick="window.location.reload()" class="text-[#d4af37] text-[9px] font-bold">ACTUALIZAR</button>
-                </div>
-                <div id="admin-global-list" class="space-y-4 pb-20">
-                    <p class="text-white/20 text-center py-10 text-[10px] font-bold">Cargando datos de maestros...</p>
-                </div>
+                <div id="admin-global-list" class="space-y-4 pb-20"></div>
             </div>
         </section>
 
@@ -171,7 +163,7 @@
         <section id="view-teacher-panel" class="view-section bg-[#f1f5f9]">
             <nav class="bg-[#1e40af] p-6 text-white flex justify-between items-center">
                 <span id="doc-name" class="text-sm font-black uppercase">Docente</span>
-                <button id="btn-logout-teacher" class="text-[9px] font-black bg-white/10 px-3 py-2 rounded-lg tracking-widest">SALIR</button>
+                <button onclick="window.logout()" class="text-[9px] font-black bg-white/10 px-3 py-2 rounded-lg tracking-widest">SALIR</button>
             </nav>
             <div class="p-6 max-w-2xl mx-auto w-full">
                 <div class="nav-tabs">
@@ -180,13 +172,12 @@
                 </div>
                 <div id="module-register" class="space-y-6">
                     <div class="bg-white p-6 rounded-[2.5rem] shadow-sm border border-slate-200">
-                        <label class="text-[10px] font-black text-slate-400 uppercase mb-2 block">Datos de la Sesión</label>
                         <input type="text" id="sCourse" placeholder="MATERIA (EJ. PSICOLOGÍA)" class="input-ceut uppercase mb-4">
                         <div class="grid grid-cols-2 gap-4 mb-4">
                             <input type="text" id="sGrade" placeholder="GRUPO (EJ. 502)" class="input-ceut uppercase">
-                            <input type="text" id="sClassId" class="input-ceut bg-slate-50 font-mono" readonly title="ID generado">
+                            <input type="text" id="sClassId" class="input-ceut bg-slate-50 font-mono" readonly>
                         </div>
-                        <button id="btn-create-session" class="btn-primary">Iniciar Pase de Lista QR</button>
+                        <button id="btn-create-session" class="btn-primary">Iniciar Clase QR</button>
                     </div>
                 </div>
                 <div id="module-history" class="hidden"><div id="teacher-sessions-list"></div></div>
@@ -196,57 +187,37 @@
         <!-- PANEL ALUMNO -->
         <section id="view-student-panel" class="view-section items-center justify-center p-8 bg-[#1e40af]">
             <div class="w-full max-w-sm bg-white/5 backdrop-blur-xl border border-white/10 p-8 rounded-[3rem] text-center">
-                <img src="https://lh3.googleusercontent.com/d/17NobXQ3JbRnLGejZe4Mn2x-Jl45F4rPm" class="w-16 mx-auto mb-6 opacity-80 grayscale brightness-200">
                 <h2 id="std-name" class="text-2xl font-black text-white uppercase mb-1">Alumno</h2>
                 <p id="std-id" class="text-[#d4af37] text-[10px] font-black uppercase mb-8">ID: ---</p>
-                <div id="attendance-status" class="space-y-4">
-                    <div id="status-waiting" class="animate-pulse flex flex-col items-center">
-                        <div class="w-12 h-12 bg-white/10 rounded-full mb-4"></div>
-                        <p class="text-white/40 text-[9px] font-bold uppercase tracking-[0.3em]">Escanea el QR del Docente...</p>
+                <div id="attendance-status">
+                    <div id="status-waiting" class="animate-pulse">
+                        <p class="text-white/40 text-[9px] font-bold uppercase tracking-[0.3em]">Esperando escaneo QR...</p>
                     </div>
                     <div id="status-confirm" class="hidden">
-                        <div class="bg-white rounded-3xl p-6 text-left border-l-8 border-[#d4af37]">
-                            <p class="text-[9px] font-black text-slate-400 uppercase mb-1">Clase Detectada</p>
-                            <h3 id="confirm-course" class="text-[#1e40af] font-black text-xl uppercase leading-tight mb-1">Cargando...</h3>
-                            <p id="confirm-grade" class="text-slate-500 font-bold text-[10px] uppercase">Grupo ---</p>
+                        <div class="bg-white rounded-3xl p-6 text-left mb-6">
+                            <h3 id="confirm-course" class="text-[#1e40af] font-black text-xl uppercase">---</h3>
                         </div>
-                        <button id="btn-confirm-attendance" class="btn-gold mt-6 shadow-xl shadow-black/20">CONFIRMAR MI ASISTENCIA</button>
+                        <button id="btn-confirm-attendance" class="btn-gold">Confirmar Mi Asistencia</button>
                     </div>
-                    <div id="status-success" class="hidden">
-                        <div class="w-20 h-20 bg-emerald-500 rounded-full flex items-center justify-center text-white text-3xl mx-auto mb-4">✓</div>
-                        <p class="text-emerald-400 font-black text-sm uppercase">Asistencia Exitosa</p>
-                        <p id="success-time" class="text-white/40 text-[9px] mt-2 font-bold uppercase tracking-widest">---</p>
-                    </div>
+                    <div id="status-success" class="hidden text-emerald-400 font-black uppercase">¡Asistencia Registrada!</div>
                 </div>
-                <button id="btn-logout-student" class="mt-12 text-white/20 text-[9px] font-black uppercase">Cerrar Sesión</button>
+                <button onclick="window.logout()" class="mt-12 text-white/20 text-[9px] font-black uppercase">Cerrar Sesión</button>
             </div>
         </section>
     </div>
 
-    <!-- MODAL DE LISTA Y EDICIÓN -->
+    <!-- MODAL LISTA -->
     <div id="modal-list" class="fixed inset-0 bg-white z-[1000] hidden flex flex-col">
         <div class="bg-[#1e40af] p-8 text-white flex justify-between items-end no-print">
-            <div>
-                <p class="text-[10px] font-black opacity-50 uppercase mb-1">Reporte Detallado y Edición</p>
-                <h3 id="list-course" class="text-xl font-black uppercase tracking-tight">Materia</h3>
-            </div>
-            <button id="btn-close-list" class="bg-white/10 w-12 h-12 rounded-2xl flex items-center justify-center font-bold">✕</button>
+            <div><h3 id="list-course" class="text-xl font-black uppercase">Materia</h3></div>
+            <button onclick="document.getElementById('modal-list').classList.add('hidden')" class="bg-white/10 w-12 h-12 rounded-2xl flex items-center justify-center">✕</button>
         </div>
-        
-        <!-- Header de impresión (solo visible al imprimir) -->
-        <div class="hidden print:block p-10 border-b-4 border-[#1e40af]">
-            <h1 class="text-3xl font-black uppercase">Reporte de Asistencia CEUT</h1>
-            <p id="print-info" class="text-slate-500 font-bold uppercase mt-2"></p>
-        </div>
-
         <div id="list-body" class="flex-1 p-6 overflow-y-auto space-y-3 bg-slate-50"></div>
-        
-        <!-- Herramientas Administrativas dentro del Modal -->
-        <div class="p-6 border-t border-slate-100 grid grid-cols-2 gap-3 no-print">
-            <button id="btn-edit-session" class="bg-slate-800 text-white py-4 rounded-xl font-black uppercase text-[9px]">Editar Sesión</button>
-            <button id="btn-print" class="bg-slate-200 text-slate-800 py-4 rounded-xl font-black uppercase text-[9px]">Imprimir Lista</button>
-            <button id="btn-pdf" class="bg-red-600 text-white py-4 rounded-xl font-black uppercase text-[9px]">Descargar PDF</button>
-            <button id="btn-delete-session" class="bg-rose-100 text-rose-600 py-4 rounded-xl font-black uppercase text-[9px]">Eliminar Todo</button>
+        <div class="p-6 border-t grid grid-cols-2 gap-3 no-print">
+            <button id="btn-print" class="bg-slate-800 text-white py-4 rounded-xl font-black uppercase text-[9px]">Imprimir</button>
+            <button id="btn-pdf" class="bg-red-600 text-white py-4 rounded-xl font-black uppercase text-[9px]">PDF</button>
+            <button id="btn-edit-session" class="bg-slate-200 text-slate-800 py-4 rounded-xl font-black uppercase text-[9px]">Editar</button>
+            <button id="btn-delete-session" class="bg-rose-100 text-rose-600 py-4 rounded-xl font-black uppercase text-[9px]">Borrar Todo</button>
         </div>
     </div>
 
@@ -255,28 +226,24 @@
         <div class="qr-container mb-8">
             <div id="qrcode"></div>
             <div class="qr-timer-bar"><div id="qr-progress"></div></div>
-            <p class="text-[8px] font-black text-slate-300 uppercase mt-4 text-center tracking-widest">Seguridad Dinámica Activa</p>
         </div>
-        <button id="btn-close-qr" class="btn-primary max-w-xs bg-white text-blue-950">Finalizar Pase de Lista</button>
+        <button onclick="clearInterval(qrInterval); document.getElementById('modal-qr').classList.add('hidden');" class="btn-primary max-w-xs bg-white text-blue-950">Finalizar Pase</button>
     </div>
 
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
-        import { getFirestore, collection, addDoc, onSnapshot, doc, updateDoc, setDoc, deleteDoc, getDoc, query, where, getDocs, collectionGroup } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
-        import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-auth.js";
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getFirestore, collection, addDoc, onSnapshot, doc, updateDoc, setDoc, deleteDoc, getDoc, query, where, getDocs, collectionGroup } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, signOut, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
 
-        const firebaseConfig = {
-            apiKey: "AIzaSyCefP6qEqaCMpo8ZpUiLpN4e_-E4ZNTp94",
-            authDomain: "asistencias-ceut.firebaseapp.com",
-            projectId: "asistencias-ceut",
-            appId: "1:130615246146:web:6ae2c17c828fb28a809cdb"
-        };
-
-        const APP_ID = "ceut_cloud_v14";
+        const firebaseConfig = JSON.parse('{"apiKey":"AIzaSyCefP6qEqaCMpo8ZpUiLpN4e_-E4ZNTp94","authDomain":"asistencias-ceut.firebaseapp.com","projectId":"asistencias-ceut","appId":"1:130615246146:web:6ae2c17c828fb28a809cdb"}');
+        const APP_ID = typeof __app_id !== 'undefined' ? __app_id : 'ceut_cloud_v14';
         const ADMIN_LIST = ["deptopsicopedagogico@ceut.edu.mx", "carlos.aguilar@ceut.edu.mx"];
         
-        let db, auth, user, profile, qrInterval, currentSessionRef = null, currentSessionData = null;
-        let currentAuthMode = 'login', currentTargetRole = 'student';
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        let user, profile, qrInterval, currentSessionRef, currentSessionData, currentRole = 'student', currentAuthMode = 'login';
 
         const showToast = (msg) => {
             const t = document.getElementById('error-toast');
@@ -284,91 +251,90 @@
             setTimeout(() => t.style.display = 'none', 5000);
         };
 
-        const init = async () => {
-            try {
-                const app = initializeApp(firebaseConfig);
-                db = getFirestore(app);
-                auth = getAuth(app);
-                onAuthStateChanged(auth, async (u) => {
-                    if(u) {
-                        user = u;
-                        const snap = await getDoc(doc(db, 'artifacts', APP_ID, 'users', u.uid, 'profile', 'info'));
-                        if (snap.exists()) {
-                            profile = snap.data();
-                            setupDashboard();
-                        } else { 
-                            showToast("Perfil no encontrado. Por favor, crea una cuenta de nuevo.");
-                            await signOut(auth); 
-                            switchView('home'); 
-                        }
-                    } else { switchView('home'); }
-                    hideLoader();
-                });
-            } catch (err) { hideLoader(); }
-        };
-
-        const hideLoader = () => {
-            document.getElementById('loading-overlay').style.display = 'none';
-            document.getElementById('app-container').style.opacity = '1';
-        };
-
         const switchView = (id) => {
             document.querySelectorAll('.view-section').forEach(v => v.classList.remove('active'));
             document.getElementById('view-' + id).classList.add('active');
         };
 
-        const setupDashboard = () => {
-            if(ADMIN_LIST.includes(user.email)) {
+        window.switchView = switchView;
+        window.setRole = (role) => {
+            currentRole = role;
+            document.getElementById('auth-title').innerText = role === 'admin' ? "Seguridad" : (role === 'teacher' ? "Docentes" : "Alumnos");
+            switchView('auth');
+        };
+
+        const init = async () => {
+            onAuthStateChanged(auth, async (u) => {
+                if (u) {
+                    user = u;
+                    const profileSnap = await getDoc(doc(db, 'artifacts', APP_ID, 'users', u.uid, 'profile', 'info'));
+                    if (profileSnap.exists()) {
+                        profile = profileSnap.data();
+                        loadPanel();
+                    } else {
+                        // Si no hay perfil, cerramos sesión para evitar errores
+                        await signOut(auth);
+                        switchView('home');
+                    }
+                } else {
+                    switchView('home');
+                }
+                document.getElementById('loading-overlay').style.display = 'none';
+                document.getElementById('app-container').style.opacity = '1';
+            });
+        };
+
+        const loadPanel = () => {
+            if (ADMIN_LIST.includes(user.email)) {
                 switchView('admin-panel');
-                listenGlobalSessions();
-                return;
-            }
-            if(profile.role === 'teacher') {
+                loadAdminData();
+            } else if (profile.role === 'teacher') {
                 switchView('teacher-panel');
                 document.getElementById('doc-name').innerText = profile.name;
                 document.getElementById('sClassId').value = "CL-" + Math.random().toString(36).substr(2, 5).toUpperCase();
-                listenTeacherSessions();
+                loadTeacherData();
             } else {
                 switchView('student-panel');
                 document.getElementById('std-name').innerText = profile.name;
                 document.getElementById('std-id').innerText = `ID: ${profile.id}`;
-                checkAutoAttendance();
+                checkQR();
             }
         };
 
-        const listenGlobalSessions = () => {
+        const loadAdminData = () => {
+            // Rule 1 & 2: Simple query inside public data or using collectionGroup if security rules allow
             onSnapshot(collectionGroup(db, 'sessions'), (snap) => {
                 const list = document.getElementById('admin-global-list');
-                const sessions = snap.docs.map(d => ({...d.data(), id: d.id, fullPath: d.ref.path}));
+                const sessions = snap.docs.map(d => ({...d.data(), fullPath: d.ref.path, id: d.id}));
                 document.getElementById('stat-classes').innerText = sessions.length;
                 document.getElementById('stat-students').innerText = sessions.reduce((acc, s) => acc + s.attendees.length, 0);
+                
                 list.innerHTML = sessions.sort((a,b) => b.timestamp - a.timestamp).map(s => `
                     <div class="bg-white/5 p-5 rounded-2xl border border-white/5 flex justify-between items-center">
                         <div>
                             <p class="text-[#d4af37] text-[10px] font-black uppercase">${s.course}</p>
-                            <p class="text-white/40 text-[8px] uppercase">G: ${s.grade} • Alumnos: ${s.attendees.length}</p>
+                            <p class="text-white/40 text-[8px] uppercase">GRUPO: ${s.grade} | ${s.attendees.length} ALUMNOS</p>
                         </div>
-                        <div class="flex gap-2">
-                            <button onclick="window.appAdminOpen('${encodeURIComponent(JSON.stringify(s))}')" class="bg-[#d4af37] px-4 py-2 rounded-lg text-slate-950 text-[9px] font-bold uppercase">Administrar</button>
-                        </div>
+                        <button onclick="window.openDetails('${encodeURIComponent(JSON.stringify(s))}')" class="bg-[#d4af37] px-4 py-2 rounded-lg text-slate-950 text-[9px] font-bold">VER</button>
                     </div>
                 `).join('');
-            });
+            }, (err) => showToast("Error de acceso a datos globales"));
         };
 
-        const listenTeacherSessions = () => {
-            onSnapshot(collection(db, 'artifacts', APP_ID, 'users', user.uid, 'sessions'), (snap) => {
+        const loadTeacherData = () => {
+            const sessionsCol = collection(db, 'artifacts', APP_ID, 'users', user.uid, 'sessions');
+            onSnapshot(sessionsCol, (snap) => {
                 const list = document.getElementById('teacher-sessions-list');
                 list.innerHTML = snap.docs.sort((a,b) => b.data().timestamp - a.data().timestamp).map(d => {
                     const s = d.data();
-                    const obj = {...s, id: d.id, fullPath: d.ref.path};
+                    const sJson = encodeURIComponent(JSON.stringify({...s, fullPath: d.ref.path, id: d.id}));
                     return `
                         <div class="card-ceut">
-                            <h4 class="font-black uppercase text-slate-800 text-sm mb-1">${s.course}</h4>
-                            <p class="text-[9px] font-black text-slate-400 uppercase mb-4 tracking-widest">GRUPO ${s.grade} • ID: ${s.classId}</p>
+                            <h4 class="font-black uppercase text-slate-800 text-sm">${s.course}</h4>
+                            <p class="text-[9px] font-black text-slate-400 uppercase mb-4">GRUPO ${s.grade}</p>
                             <div class="flex gap-2">
-                                <button onclick="window.appShowQR('${s.classId}')" class="flex-1 bg-slate-100 py-3 rounded-xl text-[9px] font-black uppercase">QR</button>
-                                <button onclick="window.appAdminOpen('${encodeURIComponent(JSON.stringify(obj))}')" class="flex-[2] bg-blue-600 py-3 rounded-xl text-[9px] font-black text-white uppercase">Lista (${s.attendees.length})</button>
+                                <button onclick="window.showQR('${s.classId}')" class="bg-slate-100 p-3 rounded-xl text-[9px] font-black uppercase">QR</button>
+                                <button onclick="window.openDetails('${sJson}')" class="bg-blue-600 p-3 flex-1 rounded-xl text-white text-[9px] font-black uppercase">Lista (${s.attendees.length})</button>
                             </div>
                         </div>
                     `;
@@ -376,171 +342,143 @@
             });
         };
 
-        window.appAdminOpen = async (encodedData) => {
-            const s = JSON.parse(decodeURIComponent(encodedData));
-            currentSessionRef = doc(db, s.fullPath);
+        window.openDetails = (encoded) => {
+            const s = JSON.parse(decodeURIComponent(encoded));
             currentSessionData = s;
+            currentSessionRef = doc(db, s.fullPath);
             
             document.getElementById('list-course').innerText = s.course;
-            document.getElementById('print-info').innerText = `${s.course} | GRUPO: ${s.grade} | FECHA: ${new Date(s.timestamp).toLocaleDateString()}`;
-            
-            const renderList = () => {
-                document.getElementById('list-body').innerHTML = currentSessionData.attendees.map((a, idx) => `
-                    <div class="bg-white p-4 rounded-xl border border-slate-100 flex justify-between items-center shadow-sm">
-                        <div>
-                            <div class="text-[10px] font-black uppercase text-slate-800">${a.name}</div>
-                            <div class="text-[8px] text-slate-400 font-bold uppercase">${a.id} • ${a.time}</div>
-                        </div>
-                        <button onclick="window.appRemoveStudent(${idx})" class="w-8 h-8 bg-rose-50 text-rose-500 rounded-lg flex items-center justify-center text-xs font-bold no-print">✕</button>
+            const body = document.getElementById('list-body');
+            body.innerHTML = s.attendees.map((a, i) => `
+                <div class="bg-white p-4 rounded-xl flex justify-between items-center shadow-sm border border-slate-100">
+                    <div>
+                        <p class="text-[10px] font-black uppercase">${a.name}</p>
+                        <p class="text-[8px] text-slate-400 font-bold">${a.id} • ${a.time}</p>
                     </div>
-                `).join('') || '<p class="text-center text-slate-400 text-[10px] py-10 uppercase font-bold">Sin alumnos registrados</p>';
-            };
-
-            renderList();
+                    <button onclick="window.removeStudent(${i})" class="text-rose-500 font-bold px-2 no-print">✕</button>
+                </div>
+            `).join('') || '<p class="text-center text-slate-300 py-10 uppercase text-[10px] font-bold">Lista Vacía</p>';
+            
             document.getElementById('modal-list').classList.remove('hidden');
         };
 
-        window.appRemoveStudent = async (index) => {
-            if(!confirm("¿Eliminar a este alumno de la lista?")) return;
-            const newAttendees = [...currentSessionData.attendees];
-            newAttendees.splice(index, 1);
-            await updateDoc(currentSessionRef, { attendees: newAttendees });
-            currentSessionData.attendees = newAttendees;
-            showToast("Alumno eliminado");
-            appAdminOpen(encodeURIComponent(JSON.stringify(currentSessionData)));
+        window.removeStudent = async (index) => {
+            if(!confirm("¿Remover alumno?")) return;
+            const updated = [...currentSessionData.attendees];
+            updated.splice(index, 1);
+            await updateDoc(currentSessionRef, { attendees: updated });
+            currentSessionData.attendees = updated;
+            window.openDetails(encodeURIComponent(JSON.stringify(currentSessionData)));
         };
 
-        document.getElementById('btn-edit-session').onclick = async () => {
-            const nCourse = prompt("Nuevo nombre de la materia:", currentSessionData.course);
-            const nGrade = prompt("Nuevo grupo:", currentSessionData.grade);
-            if(nCourse && nGrade) {
-                await updateDoc(currentSessionRef, { course: nCourse.toUpperCase(), grade: nGrade.toUpperCase() });
-                currentSessionData.course = nCourse.toUpperCase();
-                currentSessionData.grade = nGrade.toUpperCase();
-                document.getElementById('list-course').innerText = currentSessionData.course;
-                showToast("Información actualizada");
+        window.showQR = (cid) => {
+            const qrBox = document.getElementById('qrcode');
+            qrBox.innerHTML = "";
+            document.getElementById('modal-qr').classList.remove('hidden');
+            const update = () => {
+                qrBox.innerHTML = "";
+                const tk = Math.floor(Date.now() / 10000);
+                const url = `${window.location.origin}${window.location.pathname}?cid=${cid}&tk=${tk}`;
+                new QRCode(qrBox, { text: url, width: 220, height: 220 });
+            };
+            update();
+            if(qrInterval) clearInterval(qrInterval);
+            qrInterval = setInterval(update, 10000);
+        };
+
+        const checkQR = async () => {
+            const params = new URLSearchParams(window.location.search);
+            const cid = params.get('cid'), tk = params.get('tk');
+            if(!cid || !tk) return;
+            
+            // Verificación simple de token (10 segundos ventana)
+            if(Math.abs(Math.floor(Date.now() / 10000) - parseInt(tk)) > 3) {
+                showToast("QR Expirado"); return;
+            }
+
+            const q = query(collectionGroup(db, 'sessions'), where("classId", "==", cid));
+            const snap = await getDocs(q);
+            if(!snap.empty) {
+                const sRef = snap.docs[0].ref;
+                const sData = snap.docs[0].data();
+                document.getElementById('confirm-course').innerText = sData.course;
+                document.getElementById('status-waiting').classList.add('hidden');
+                document.getElementById('status-confirm').classList.remove('hidden');
+                
+                document.getElementById('btn-confirm-attendance').onclick = async () => {
+                    if(sData.attendees.some(a => a.id === profile.id)) {
+                        showToast("Ya estás registrado");
+                    } else {
+                        const updated = [...sData.attendees, { name: profile.name, id: profile.id, time: new Date().toLocaleTimeString() }];
+                        await updateDoc(sRef, { attendees: updated });
+                        document.getElementById('status-confirm').classList.add('hidden');
+                        document.getElementById('status-success').classList.remove('hidden');
+                    }
+                };
             }
         };
 
-        document.getElementById('btn-delete-session').onclick = async () => {
-            if(!confirm("¿ELIMINAR ESTA CLASE PERMANENTEMENTE? Esta acción no se puede deshacer.")) return;
-            await deleteDoc(currentSessionRef);
-            document.getElementById('modal-list').classList.add('hidden');
-            showToast("Sesión eliminada del sistema");
+        document.getElementById('btn-auth-submit').onclick = async () => {
+            const email = document.getElementById('authEmail').value.trim();
+            const pass = document.getElementById('authPass').value;
+            if(!email || !pass) return showToast("Faltan datos");
+
+            try {
+                if(currentAuthMode === 'register') {
+                    const name = document.getElementById('authName').value.toUpperCase();
+                    const id = document.getElementById('authId').value.toUpperCase();
+                    const res = await createUserWithEmailAndPassword(auth, email, pass);
+                    await setDoc(doc(db, 'artifacts', APP_ID, 'users', res.user.uid, 'profile', 'info'), {
+                        name, id, email, role: currentRole
+                    });
+                } else {
+                    await signInWithEmailAndPassword(auth, email, pass);
+                }
+            } catch(e) { showToast(e.message); }
+        };
+
+        document.getElementById('btn-create-session').onclick = async () => {
+            const course = document.getElementById('sCourse').value.toUpperCase();
+            const grade = document.getElementById('sGrade').value.toUpperCase();
+            const cid = document.getElementById('sClassId').value;
+            if(!course || !grade) return showToast("Llena los campos");
+            
+            await addDoc(collection(db, 'artifacts', APP_ID, 'users', user.uid, 'sessions'), {
+                course, grade, classId: cid, timestamp: Date.now(), attendees: []
+            });
+            window.showQR(cid);
+        };
+
+        document.getElementById('btn-pdf').onclick = () => {
+            const { jsPDF } = window.jspdf;
+            const docPdf = new jsPDF();
+            docPdf.text(`LISTA: ${currentSessionData.course}`, 10, 10);
+            docPdf.autoTable({
+                head: [['Nombre', 'ID', 'Hora']],
+                body: currentSessionData.attendees.map(a => [a.name, a.id, a.time])
+            });
+            docPdf.save("Asistencia.pdf");
         };
 
         document.getElementById('btn-print').onclick = () => window.print();
 
-        document.getElementById('btn-pdf').onclick = () => {
-            const { jsPDF } = window.jspdf;
-            const pdf = new jsPDF();
-            pdf.setFillColor(30, 64, 175); pdf.rect(0, 0, 210, 40, 'F');
-            pdf.setTextColor(255, 255, 255); pdf.setFontSize(22); pdf.text("CEUT CLOUD - REPORTE", 15, 25);
-            pdf.setTextColor(40, 40, 40); pdf.setFontSize(10);
-            pdf.text(`MATERIA: ${currentSessionData.course} | GRUPO: ${currentSessionData.grade}`, 15, 50);
-            pdf.text(`FECHA: ${new Date(currentSessionData.timestamp).toLocaleDateString()}`, 15, 55);
-            pdf.autoTable({ 
-                head: [['Alumno', 'Matrícula', 'Hora']], 
-                body: currentSessionData.attendees.map(a => [a.name, a.id, a.time]), 
-                startY: 65, 
-                theme: 'striped', 
-                headStyles: { fillColor: [30, 64, 175] } 
-            });
-            pdf.save(`Asistencia_${currentSessionData.course}_${currentSessionData.grade}.pdf`);
-        };
+        window.logout = () => signOut(auth);
 
-        // --- Resto de lógica de Auth y QR ---
-        window.appShowQR = (cid) => {
-            const qrBox = document.getElementById('qrcode');
-            const progress = document.getElementById('qr-progress');
-            document.getElementById('modal-qr').classList.remove('hidden');
-            if(qrInterval) clearInterval(qrInterval);
-            const updateQR = () => {
-                qrBox.innerHTML = "";
-                const timeToken = Math.floor(Date.now() / 10000);
-                const secureUrl = `${window.location.href.split('?')[0]}?cid=${cid}&tk=${timeToken}`;
-                new QRCode(qrBox, { text: secureUrl, width: 220, height: 220, correctLevel: QRCode.CorrectLevel.H });
-                progress.style.transition = 'none'; progress.style.width = '100%';
-                setTimeout(() => { progress.style.transition = 'width 10s linear'; progress.style.width = '0%'; }, 50);
-            };
-            updateQR(); qrInterval = setInterval(updateQR, 10000);
-        };
-
-        const checkAutoAttendance = async () => {
-            const params = new URLSearchParams(window.location.search);
-            const cid = params.get('cid'), tk = params.get('tk'); 
-            if(!cid || !tk) return;
-            const currentToken = Math.floor(Date.now() / 10000);
-            if(Math.abs(currentToken - parseInt(tk)) > 2) { showToast("QR Expirado. Escanea de nuevo."); return; }
-            try {
-                const q = query(collectionGroup(db, 'sessions'), where("classId", "==", cid));
-                const snap = await getDocs(q);
-                if(!snap.empty) {
-                    const docRef = snap.docs[0], data = docRef.data();
-                    document.getElementById('confirm-course').innerText = data.course;
-                    document.getElementById('confirm-grade').innerText = `Grupo ${data.grade}`;
-                    document.getElementById('status-waiting').classList.add('hidden');
-                    document.getElementById('status-confirm').classList.remove('hidden');
-                    document.getElementById('btn-confirm-attendance').onclick = async () => {
-                        if(!data.attendees.find(a => a.id === profile.id)) {
-                            const updated = [...data.attendees, { name: profile.name, id: profile.id, time: new Date().toLocaleTimeString() }];
-                            await updateDoc(docRef.ref, { attendees: updated });
-                            document.getElementById('status-confirm').classList.add('hidden');
-                            document.getElementById('status-success').classList.remove('hidden');
-                            document.getElementById('success-time').innerText = `REGISTRADO: ${new Date().toLocaleTimeString()}`;
-                        } else {
-                            showToast("Ya estás registrado en esta clase");
-                        }
-                    };
-                }
-            } catch (e) { console.error(e); }
-        };
-
-        document.getElementById('btn-home-admin').onclick = () => { currentTargetRole = 'admin'; switchView('auth'); document.getElementById('auth-title').innerText = "Psicopedagogía"; };
-        document.getElementById('btn-home-teacher').onclick = () => { currentTargetRole = 'teacher'; switchView('auth'); document.getElementById('auth-title').innerText = "Docentes"; };
-        document.getElementById('btn-home-student').onclick = () => { currentTargetRole = 'student'; switchView('auth'); document.getElementById('auth-title').innerText = "Alumnos"; };
-        document.getElementById('btn-auth-back').onclick = () => switchView('home');
-
-        document.getElementById('btn-auth-submit').onclick = async () => {
-            const email = document.getElementById('authEmail').value.trim(), pass = document.getElementById('authPass').value;
-            if(!email || !pass) { showToast("Llena todos los campos"); return; }
-            try {
-                if(currentAuthMode === 'register') {
-                    const name = document.getElementById('authName').value.toUpperCase(), id = document.getElementById('authId').value.toUpperCase();
-                    if(!name || !id) { showToast("Completa nombre e ID"); return; }
-                    const res = await createUserWithEmailAndPassword(auth, email, pass);
-                    await setDoc(doc(db, 'artifacts', APP_ID, 'users', res.user.uid, 'profile', 'info'), { name, id, email, role: currentTargetRole });
-                } else { await signInWithEmailAndPassword(auth, email, pass); }
-            } catch(e) { showToast("Error: " + e.message); }
-        };
-
-        document.getElementById('btn-create-session').onclick = async () => {
-            const course = document.getElementById('sCourse').value.toUpperCase(), grade = document.getElementById('sGrade').value.toUpperCase(), cid = document.getElementById('sClassId').value;
-            if(!course || !grade) { showToast("Materia y Grupo requeridos"); return; }
-            await addDoc(collection(db, 'artifacts', APP_ID, 'users', user.uid, 'sessions'), { course, grade, classId: cid, timestamp: Date.now(), attendees: [] });
-            window.appShowQR(cid);
-        };
-
-        document.getElementById('btn-logout-admin').onclick = () => signOut(auth);
-        document.getElementById('btn-logout-teacher').onclick = () => signOut(auth);
-        document.getElementById('btn-logout-student').onclick = () => signOut(auth);
-        document.getElementById('btn-close-qr').onclick = () => { clearInterval(qrInterval); document.getElementById('modal-qr').classList.add('hidden'); };
-        document.getElementById('btn-close-list').onclick = () => document.getElementById('modal-list').classList.add('hidden');
-        
-        document.getElementById('auth-tab-login').onclick = () => { 
-            currentAuthMode = 'login'; 
+        document.getElementById('auth-tab-login').onclick = () => {
+            currentAuthMode = 'login';
             document.getElementById('reg-inputs').classList.add('hidden');
             document.getElementById('auth-tab-login').classList.add('bg-white', 'text-blue-700');
             document.getElementById('auth-tab-reg').classList.remove('bg-white', 'text-blue-700');
         };
-        document.getElementById('auth-tab-reg').onclick = () => { 
-            currentAuthMode = 'register'; 
+
+        document.getElementById('auth-tab-reg').onclick = () => {
+            currentAuthMode = 'register';
             document.getElementById('reg-inputs').classList.remove('hidden');
             document.getElementById('auth-tab-reg').classList.add('bg-white', 'text-blue-700');
             document.getElementById('auth-tab-login').classList.remove('bg-white', 'text-blue-700');
         };
 
-        window.onload = init;
+        init();
     </script>
 </body>
 </html>
