@@ -52,7 +52,7 @@
         }
 
         #master-access-trigger {
-            position: fixed; top: 25px; right: 25px; z-index: 9999;
+            position: fixed; bottom: 25px; right: 25px; z-index: 9999;
             width: 50px; height: 50px; background: #1e293b; border-radius: 16px; 
             display: flex; align-items: center; justify-content: center;
             border: 2px solid var(--accent-gold); 
@@ -91,11 +91,12 @@
         }
         .pdf-btn:hover { background: #fee2e2; }
         
-        /* Corrección para scrollbar en escritorio */
         ::-webkit-scrollbar { width: 8px; }
         ::-webkit-scrollbar-track { background: #f1f5f9; }
         ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
         ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+        .nav-sticky { position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
     </style>
 
     <script src="https://cdn.tailwindcss.com"></script>
@@ -138,7 +139,7 @@
         <!-- AUTH -->
         <section id="view-auth" class="view-section p-6 bg-slate-50 items-center justify-center">
             <div class="w-full max-w-sm">
-                <button onclick="switchView('home')" class="mb-8 text-[12px] font-bold text-slate-400 uppercase tracking-widest">← Inicio</button>
+                <button onclick="switchView('home')" class="mb-8 text-[12px] font-bold text-slate-400 uppercase tracking-widest">← Cancelar y Volver</button>
                 <h2 id="auth-title" class="text-3xl font-black text-[#1e40af] mb-6 uppercase tracking-tighter">Acceso</h2>
                 <div id="auth-mode-selector" class="flex bg-slate-200/50 p-1 rounded-2xl mb-6">
                     <button onclick="toggleAuthMode('login')" id="btn-mode-login" class="flex-1 py-4 rounded-xl font-bold text-[12px] uppercase bg-white shadow-sm text-[#1e40af]">Ingresar</button>
@@ -166,20 +167,20 @@
                     <p class="text-white/40 text-[10px] font-bold uppercase tracking-[0.2em]">Escanea el código QR de tu clase</p>
                     <div class="w-12 h-12 border-2 border-white/20 border-t-white rounded-full animate-spin mx-auto"></div>
                 </div>
-                <button onclick="logout()" class="mt-12 text-white/30 text-[10px] font-black uppercase underline">CERRAR SESIÓN</button>
+                <button onclick="logout()" class="mt-12 text-white/30 text-[10px] font-black uppercase underline">SALIR AL MENÚ PRINCIPAL</button>
             </div>
         </section>
 
         <!-- PANEL DOCENTE -->
         <section id="view-teacher-panel" class="view-section bg-slate-100">
-            <nav class="bg-[#1e40af] p-5 flex justify-between items-center text-white sticky top-0 z-50">
+            <nav class="bg-[#1e40af] p-5 flex justify-between items-center text-white nav-sticky">
                 <div class="flex items-center gap-3">
-                    <button onclick="switchView('home')" class="p-2 bg-white/10 rounded-lg">
+                    <button onclick="logout()" class="p-2 bg-white/10 rounded-lg hover:bg-white/20 transition-all">
                         <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
                     </button>
-                    <span id="nav-name" class="text-[12px] font-black uppercase">DOCENTE</span>
+                    <span id="nav-name" class="text-[12px] font-black uppercase tracking-tight">DOCENTE</span>
                 </div>
-                <button onclick="logout()" class="text-[10px] font-black bg-white/10 px-4 py-2 rounded-xl">CERRAR SESIÓN</button>
+                <button onclick="logout()" class="text-[10px] font-black bg-white/10 px-4 py-2 rounded-xl action-btn">CERRAR SESIÓN</button>
             </nav>
             <div class="p-6 space-y-6 max-w-2xl mx-auto w-full">
                 <div class="bg-white p-8 rounded-[2.5rem] shadow-sm border-2 border-slate-100">
@@ -199,14 +200,14 @@
 
         <!-- PANEL ADMIN -->
         <section id="view-admin-panel" class="view-section bg-slate-100">
-            <nav class="bg-slate-900 p-5 flex justify-between items-center text-white sticky top-0 z-50">
+            <nav class="bg-slate-900 p-5 flex justify-between items-center text-white nav-sticky">
                 <div class="flex items-center gap-3">
-                    <button onclick="switchView('home')" class="p-2 bg-white/10 rounded-lg hover:bg-white/20 transition-colors">
+                    <button onclick="logout()" title="Volver al Menú Principal" class="p-2 bg-white/10 rounded-lg hover:bg-white/20 transition-all">
                         <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
                     </button>
-                    <span class="font-black text-[12px]">CEUT MASTER</span>
+                    <span class="font-black text-[12px] tracking-tight">CEUT MASTER</span>
                 </div>
-                <button onclick="logout()" class="bg-red-600 text-[10px] font-black px-4 py-2 rounded-xl action-btn">CERRAR SESIÓN</button>
+                <button onclick="logout()" class="bg-red-600 text-[10px] font-black px-4 py-2 rounded-xl action-btn shadow-lg shadow-red-900/20">CERRAR SESIÓN</button>
             </nav>
             <div class="p-5 flex flex-col gap-4 max-w-2xl mx-auto w-full">
                 <div class="bg-[#1e40af] p-6 rounded-3xl text-white flex justify-between items-center shadow-lg">
@@ -221,7 +222,6 @@
         </section>
     </div>
 
-    <!-- MODAL QR -->
     <div id="qr-modal" class="fixed inset-0 bg-[#0f172a]/98 backdrop-blur-2xl z-[200] hidden flex flex-col items-center justify-center p-8">
         <div id="qrcode-box" class="p-8 bg-white rounded-[3rem] shadow-2xl mb-8 border-8 border-[#d4af37]"></div>
         <h4 id="modal-code" class="text-5xl md:text-7xl font-black text-white tracking-tighter mb-4">000000</h4>
@@ -247,17 +247,13 @@
         const ADMIN_EMAIL = "carlos.aguilar@ceut.edu.mx";
         let db, auth, currentUser, userData;
 
-        function getCodeFromURL() {
-            const params = new URLSearchParams(window.location.search);
-            return params.get('c');
-        }
-
         async function init() {
             const app = initializeApp(firebaseConfig);
             db = getFirestore(app);
             auth = getAuth(app);
 
-            const directCode = getCodeFromURL();
+            const params = new URLSearchParams(window.location.search);
+            const directCode = params.get('c');
 
             onAuthStateChanged(auth, async (user) => {
                 if (user) {
@@ -278,10 +274,7 @@
                             document.getElementById('std-nav-name').innerText = userData.name;
                             document.getElementById('std-nav-id').innerText = `ID: ${userData.id}`;
                             switchView('student-panel');
-
-                            if (directCode) {
-                                await autoRegister(directCode);
-                            }
+                            if (directCode) await autoRegister(directCode);
                         }
                     }
                 } else { 
@@ -293,160 +286,27 @@
             });
         }
 
-        window.exportSessionPDF = (sessionDataJson) => {
-            const s = JSON.parse(decodeURIComponent(sessionDataJson));
-            const { jsPDF } = window.jspdf;
-            const docPdf = new jsPDF();
-
-            docPdf.setFillColor(30, 64, 175); 
-            docPdf.rect(0, 0, 210, 40, 'F');
-            
-            docPdf.setTextColor(255, 255, 255);
-            docPdf.setFontSize(22);
-            docPdf.setFont("helvetica", "bold");
-            docPdf.text("REPORTE DE ASISTENCIA", 15, 25);
-            
-            docPdf.setFontSize(10);
-            docPdf.text(`CEUT CLOUD V10 - SISTEMA INSTITUCIONAL`, 15, 33);
-
-            docPdf.setTextColor(0, 0, 0);
-            docPdf.setFontSize(12);
-            docPdf.text(`MATERIA: ${s.course}`, 15, 55);
-            docPdf.text(`GRUPO: ${s.grade} (${s.level})`, 15, 62);
-            docPdf.text(`CÓDIGO DE ACCESO: ${s.code}`, 15, 69);
-            docPdf.text(`FECHA: ${new Date(s.timestamp).toLocaleDateString()}`, 150, 55);
-
-            const tableData = s.attendees.map((a, index) => [
-                index + 1,
-                a.id,
-                a.name,
-                a.time
-            ]);
-
-            docPdf.autoTable({
-                startY: 80,
-                head: [['#', 'MATRÍCULA', 'NOMBRE DEL ALUMNO', 'HORA REGISTRO']],
-                body: tableData,
-                theme: 'striped',
-                headStyles: { fillColor: [30, 64, 175], textColor: [255, 255, 255], fontStyle: 'bold' },
-                styles: { fontSize: 9, cellPadding: 4 },
-                columnStyles: {
-                    0: { cellWidth: 10 },
-                    1: { cellWidth: 30 },
-                    3: { cellWidth: 40 }
-                }
-            });
-
-            const fileName = `ASISTENCIA_${s.course.replace(/\s+/g, '_')}_${s.grade}.pdf`;
-            docPdf.save(fileName);
-        };
-
-        function listenToAllSessions() {
-            onSnapshot(collectionGroup(db, 'sessions'), (snap) => {
-                const list = document.getElementById('global-sessions-list');
-                const docs = snap.docs.sort((a, b) => b.data().timestamp - a.data().timestamp);
-                
-                list.innerHTML = docs.map(d => {
-                    const s = d.data();
-                    const sessionJson = encodeURIComponent(JSON.stringify(s));
-                    return `
-                        <div class="card-admin">
-                            <div class="flex justify-between items-start mb-2">
-                                <span class="badge badge-teacher">${s.level}</span>
-                                <div onclick="exportSessionPDF('${sessionJson}')" class="pdf-btn action-btn">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
-                                </div>
-                            </div>
-                            <h4 class="font-black text-[#1e40af] text-lg uppercase pr-10">${s.course}</h4>
-                            <div class="flex items-center gap-2 mt-1">
-                                <p class="text-[10px] text-slate-500 font-bold uppercase">GRUPO ${s.grade}</p>
-                                <span class="text-slate-300">•</span>
-                                <p class="text-[10px] text-[#d4af37] font-bold uppercase">CÓDIGO ${s.code}</p>
-                            </div>
-                            <div class="mt-4 p-3 bg-slate-50 rounded-xl border border-slate-100">
-                                <div class="flex justify-between items-center text-[9px] font-bold text-slate-500 uppercase mb-2">
-                                    <span>Alumnos Registrados</span>
-                                    <span class="text-[#1e40af] font-black">${s.attendees.length}</span>
-                                </div>
-                                <div class="flex -space-x-2 overflow-hidden">
-                                    ${s.attendees.slice(0, 5).map(() => `<div class="inline-block h-6 w-6 rounded-full ring-2 ring-white bg-slate-300"></div>`).join('')}
-                                    ${s.attendees.length > 5 ? `<div class="flex items-center justify-center h-6 w-6 rounded-full ring-2 ring-white bg-slate-200 text-[8px] font-bold text-slate-600">+${s.attendees.length - 5}</div>` : ''}
-                                </div>
-                            </div>
-                        </div>
-                    `;
-                }).join('');
-            });
-        }
-
-        async function autoRegister(code) {
-            const codeSnap = await getDoc(doc(db, 'artifacts', APP_ID, 'public_codes', code));
-            if(codeSnap.exists()) {
-                const { teacherId, sessionId } = codeSnap.data();
-                const sRef = doc(db, 'artifacts', APP_ID, 'users', teacherId, 'sessions', sessionId);
-                const sSnap = await getDoc(sRef);
-                
-                if(sSnap.exists()) {
-                    const data = sSnap.data();
-                    const att = data.attendees || [];
-                    if(!att.some(a => a.id === userData.id)) {
-                        await updateDoc(sRef, { 
-                            attendees: [...att, { name: userData.name, id: userData.id, time: new Date().toLocaleTimeString() }] 
-                        });
-                        
-                        document.getElementById('student-card').classList.add('success-anim');
-                        document.getElementById('status-area').innerHTML = `
-                            <div class="text-[#22c55e] text-5xl mb-4">✓</div>
-                            <h3 class="text-white font-black uppercase tracking-tighter">¡LISTO!</h3>
-                            <p class="text-white/70 text-[10px] font-bold uppercase mb-4">${data.course}</p>
-                            <p class="text-white/40 text-[9px] uppercase">Tu asistencia ha sido guardada</p>
-                        `;
-                    } else {
-                        document.getElementById('status-area').innerHTML = `
-                            <div class="text-[#d4af37] text-4xl mb-4">⚠️</div>
-                            <h3 class="text-white font-black uppercase">YA REGISTRADO</h3>
-                            <p class="text-white/50 text-[10px] uppercase mt-2">Ya estás en la lista de ${data.course}</p>
-                        `;
-                    }
-                }
-            }
-        }
-
-        window.saveClass = async () => {
-            const c = document.getElementById('sCourse').value.toUpperCase().trim();
-            const g = document.getElementById('sGrade').value.toUpperCase().trim();
-            const l = document.getElementById('sLevel').value;
-            if(!c || !g) return;
-            const code = Math.floor(100000 + Math.random() * 900000).toString();
-            const docRef = await addDoc(collection(db, 'artifacts', APP_ID, 'users', currentUser.uid, 'sessions'), { 
-                level: l, course: c, grade: g, code, attendees: [], timestamp: Date.now() 
-            });
-            await setDoc(doc(db, 'artifacts', APP_ID, 'public_codes', code), { teacherId: currentUser.uid, sessionId: docRef.id });
-            showQR(code, c);
-        };
-
-        window.showQR = (code, course) => { 
-            document.getElementById('modal-code').innerText = code; 
-            document.getElementById('modal-course-name').innerText = course;
-            document.getElementById('qrcode-box').innerHTML = ""; 
-            const directUrl = `${window.location.origin}${window.location.pathname}?c=${code}`;
-            new QRCode(document.getElementById('qrcode-box'), { 
-                text: directUrl, width: 220, height: 220, colorDark: "#0f172a", colorLight: "#ffffff"
-            }); 
-            document.getElementById('qr-modal').classList.remove('hidden'); 
-        };
-
         window.logout = async () => {
-            await signOut(auth);
-            currentUser = null;
-            userData = null;
-            // Limpiamos los inputs de auth para seguridad
-            document.getElementById('authEmail').value = "";
-            document.getElementById('authPass').value = "";
-            window.location.href = window.location.origin + window.location.pathname;
+            try {
+                await signOut(auth);
+                currentUser = null;
+                userData = null;
+                // Forzar limpieza de campos y volver al home real
+                document.getElementById('authEmail').value = "";
+                document.getElementById('authPass').value = "";
+                // Recargar para limpiar cualquier estado en memoria
+                window.location.href = window.location.origin + window.location.pathname;
+            } catch (err) {
+                console.error("Error logout:", err);
+            }
         };
         
         window.switchView = (id) => {
+            // Si el usuario intenta ir al home, nos aseguramos de que no haya sesión colgada
+            if(id === 'home' && currentUser) {
+                window.logout();
+                return;
+            }
             document.querySelectorAll('.view-section').forEach(s => s.classList.remove('active'));
             const el = document.getElementById('view-' + id);
             if(el) el.classList.add('active');
@@ -468,35 +328,62 @@
             switchView('auth'); 
         };
 
-        window.toggleAuthMode = (mode) => { 
-            window.authMode = mode; 
-            document.getElementById('reg-fields').classList.toggle('hidden', mode !== 'register');
-            document.getElementById('btn-mode-login').classList.toggle('bg-white', mode === 'login');
-            document.getElementById('btn-mode-login').classList.toggle('text-[#1e40af]', mode === 'login');
-            document.getElementById('btn-mode-register').classList.toggle('bg-white', mode === 'register');
-            document.getElementById('btn-mode-register').classList.toggle('text-[#1e40af]', mode === 'register');
-        };
-
         window.handleAuth = async () => {
             const email = document.getElementById('authEmail').value.trim();
             const pass = document.getElementById('authPass').value;
+            if(!email || !pass) return;
             try {
                 if (window.authMode === 'register') {
                     const name = document.getElementById('authName').value.toUpperCase().trim();
                     const id = document.getElementById('authId').value.toUpperCase().trim();
+                    if(!name || !id) return;
                     const res = await createUserWithEmailAndPassword(auth, email, pass);
                     await setDoc(doc(db, 'artifacts', APP_ID, 'users', res.user.uid, 'profile', 'info'), { name, email, id, role: window.userRole });
-                } else { await signInWithEmailAndPassword(auth, email, pass); }
-                
-                const pending = localStorage.getItem('pending_code');
-                if(pending) {
-                    window.location.search = `?c=${pending}`;
-                    localStorage.removeItem('pending_code');
+                } else { 
+                    await signInWithEmailAndPassword(auth, email, pass); 
                 }
-            } catch (e) { alert("ERROR DE ACCESO: Verifica tus credenciales."); }
+            } catch (e) { alert("ERROR: Credenciales incorrectas o usuario no registrado."); }
         };
 
-        window.closeQR = () => document.getElementById('qr-modal').classList.add('hidden');
+        window.exportSessionPDF = (sessionDataJson) => {
+            const s = JSON.parse(decodeURIComponent(sessionDataJson));
+            const { jsPDF } = window.jspdf;
+            const docPdf = new jsPDF();
+            docPdf.setFillColor(30, 64, 175); docPdf.rect(0, 0, 210, 40, 'F');
+            docPdf.setTextColor(255, 255, 255); docPdf.setFontSize(22); docPdf.text("REPORTE DE ASISTENCIA", 15, 25);
+            docPdf.setTextColor(0, 0, 0); docPdf.setFontSize(12);
+            docPdf.text(`MATERIA: ${s.course}`, 15, 55);
+            docPdf.text(`GRUPO: ${s.grade} (${s.level})`, 15, 62);
+            docPdf.text(`FECHA: ${new Date(s.timestamp).toLocaleDateString()}`, 150, 55);
+            const tableData = s.attendees.map((a, i) => [i + 1, a.id, a.name, a.time]);
+            docPdf.autoTable({ startY: 80, head: [['#', 'ID', 'NOMBRE', 'HORA']], body: tableData, theme: 'striped' });
+            docPdf.save(`ASISTENCIA_${s.course}.pdf`);
+        };
+
+        function listenToAllSessions() {
+            onSnapshot(collectionGroup(db, 'sessions'), (snap) => {
+                const list = document.getElementById('global-sessions-list');
+                const docs = snap.docs.sort((a, b) => b.data().timestamp - a.data().timestamp);
+                list.innerHTML = docs.map(d => {
+                    const s = d.data();
+                    const sessionJson = encodeURIComponent(JSON.stringify(s));
+                    return `<div class="card-admin">
+                        <div class="flex justify-between items-start">
+                            <span class="badge badge-teacher">${s.level}</span>
+                            <div onclick="exportSessionPDF('${sessionJson}')" class="pdf-btn action-btn"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg></div>
+                        </div>
+                        <h4 class="font-black text-[#1e40af] text-lg uppercase">${s.course}</h4>
+                        <p class="text-[10px] text-slate-500 font-bold">GRUPO ${s.grade} • CÓDIGO ${s.code}</p>
+                        <div class="mt-4 p-3 bg-slate-50 rounded-xl border flex justify-between items-center">
+                            <span class="text-[9px] font-bold text-slate-400 uppercase">Total: ${s.attendees.length} Alumnos</span>
+                            <div class="flex -space-x-2">
+                                ${s.attendees.slice(0,3).map(() => `<div class="h-5 w-5 rounded-full ring-2 ring-white bg-slate-300"></div>`).join('')}
+                            </div>
+                        </div>
+                    </div>`;
+                }).join('');
+            });
+        }
 
         function listenToTeacherSessions(uid) {
             onSnapshot(collection(db, 'artifacts', APP_ID, 'users', uid, 'sessions'), (snap) => {
@@ -509,16 +396,29 @@
                         <h4 class="font-black text-[#1e40af] text-lg uppercase">${s.course}</h4>
                         <p class="text-[10px] text-slate-500 font-bold uppercase">GRUPO ${s.grade} • ${s.attendees.length} Presentes</p>
                         <div class="grid grid-cols-2 gap-3 mt-4">
-                            <button onclick="showQR('${s.code}', '${s.course}')" class="bg-slate-100 text-[#1e40af] py-3 rounded-xl font-black text-[10px] uppercase hover:bg-slate-200 transition-colors">Ver QR</button>
-                            <button onclick="exportSessionPDF('${sessionJson}')" class="bg-red-50 text-red-600 py-3 rounded-xl font-black text-[10px] uppercase flex items-center justify-center gap-2 hover:bg-red-100 transition-colors">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
-                                PDF
-                            </button>
+                            <button onclick="showQR('${s.code}', '${s.course}')" class="bg-slate-100 text-[#1e40af] py-3 rounded-xl font-black text-[10px] uppercase">Ver QR</button>
+                            <button onclick="exportSessionPDF('${sessionJson}')" class="bg-red-50 text-red-600 py-3 rounded-xl font-black text-[10px] uppercase">Exportar</button>
                         </div>
                     </div>`;
                 }).join('');
             });
         }
+
+        window.toggleAuthMode = (mode) => { 
+            window.authMode = mode; 
+            document.getElementById('reg-fields').classList.toggle('hidden', mode !== 'register');
+            document.getElementById('btn-mode-login').classList.toggle('bg-white', mode === 'login');
+            document.getElementById('btn-mode-register').classList.toggle('bg-white', mode === 'register');
+        };
+
+        window.showQR = (code, course) => { 
+            document.getElementById('modal-code').innerText = code; 
+            document.getElementById('modal-course-name').innerText = course;
+            document.getElementById('qrcode-box').innerHTML = ""; 
+            new QRCode(document.getElementById('qrcode-box'), { text: `${window.location.origin}${window.location.pathname}?c=${code}`, width: 220, height: 220 }); 
+            document.getElementById('qr-modal').classList.remove('hidden'); 
+        };
+        window.closeQR = () => document.getElementById('qr-modal').classList.add('hidden');
 
         init();
     </script>
