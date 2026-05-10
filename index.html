@@ -36,8 +36,17 @@
             background: var(--ceut-blue); color: white; padding: 1.1rem; border-radius: 16px; font-weight: 800;
             font-size: 12px; text-transform: uppercase; letter-spacing: 0.1em;
             box-shadow: 0 10px 15px -3px rgba(30, 64, 175, 0.2); border: none; cursor: pointer; width: 100%;
+            position: relative; overflow: hidden;
         }
-        .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
+        .btn-primary:disabled { opacity: 0.7; cursor: not-allowed; }
+        
+        .loader-dots { display: none; justify-content: center; align-items: center; gap: 4px; }
+        .btn-primary.loading .btn-text { display: none; }
+        .btn-primary.loading .loader-dots { display: flex; }
+        .dot { width: 6px; height: 6px; background: white; border-radius: 50%; animation: bounce 0.6s infinite alternate; }
+        .dot:nth-child(2) { animation-delay: 0.2s; }
+        .dot:nth-child(3) { animation-delay: 0.4s; }
+        @keyframes bounce { to { transform: translateY(-4px); opacity: 0.3; } }
 
         .btn-gold {
             background: var(--ceut-gold); color: var(--ceut-dark); padding: 1.1rem; border-radius: 16px; font-weight: 800;
@@ -58,11 +67,14 @@
 
         #error-toast {
             position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
-            background: #ef4444; color: white; padding: 12px 24px; border-radius: 12px;
-            font-size: 10px; font-weight: 800; text-transform: uppercase; z-index: 10000;
-            display: none; box-shadow: 0 10px 20px rgba(239, 68, 68, 0.3);
+            background: #ef4444; color: white; padding: 14px 28px; border-radius: 14px;
+            font-size: 11px; font-weight: 800; text-transform: uppercase; z-index: 10000;
+            display: none; box-shadow: 0 15px 30px rgba(239, 68, 68, 0.4);
             text-align: center; width: 90%; max-width: 400px;
+            animation: slideUp 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
+
+        @keyframes slideUp { from { bottom: -50px; opacity: 0; } to { bottom: 20px; opacity: 1; } }
 
         @media print {
             .no-print { display: none !important; }
@@ -78,7 +90,7 @@
 </head>
 <body>
 
-    <div id="error-toast"></div>
+    <div id="error-toast">MENSAJE DE ERROR</div>
 
     <!-- Pantalla de carga -->
     <div id="loading-overlay" class="fixed inset-0 bg-[#0f172a] z-[9999] flex flex-col items-center justify-center">
@@ -86,7 +98,7 @@
             <div class="absolute inset-0 border-4 border-white/5 rounded-full"></div>
             <div class="absolute inset-0 border-4 border-t-[#d4af37] rounded-full animate-spin"></div>
         </div>
-        <p id="loading-text" class="text-[9px] font-black tracking-[0.4em] text-white/40 uppercase">Sincronizando Seguridad...</p>
+        <p id="loading-text" class="text-[9px] font-black tracking-[0.4em] text-white/40 uppercase">Sincronizando con CEUT Cloud...</p>
     </div>
 
     <div id="app-container">
@@ -129,7 +141,10 @@
                     </div>
                     <input type="email" id="authEmail" placeholder="Correo Institucional" class="input-ceut">
                     <input type="password" id="authPass" placeholder="Contraseña" class="input-ceut">
-                    <button id="btn-auth-submit" class="btn-primary mt-4">Continuar</button>
+                    <button id="btn-auth-submit" class="btn-primary mt-4">
+                        <span class="btn-text">Continuar Acceso</span>
+                        <div class="loader-dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+                    </button>
                 </div>
             </div>
         </section>
@@ -237,10 +252,17 @@
         import { getFirestore, collection, addDoc, onSnapshot, doc, updateDoc, setDoc, deleteDoc, getDoc, query, where, getDocs, collectionGroup } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
         import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
 
-        const firebaseConfig = JSON.parse('{"apiKey":"AIzaSyCefP6qEqaCMpo8ZpUiLpN4e_-E4ZNTp94","authDomain":"asistencias-ceut.firebaseapp.com","projectId":"asistencias-ceut","appId":"1:130615246146:web:6ae2c17c828fb28a809cdb"}');
-        const APP_ID = typeof __app_id !== 'undefined' ? __app_id : 'ceut_cloud_v14';
+        // Configuración Actualizada de Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyCefP6qEqaCMpo8ZpUiLpN4e_-E4ZNTp94",
+            authDomain: "asistencias-ceut.firebaseapp.com",
+            projectId: "asistencias-ceut",
+            storageBucket: "asistencias-ceut.firebasestorage.app",
+            messagingSenderId: "130615246146",
+            appId: "1:130615246146:web:6ae2c17c828fb28a809cdb"
+        };
         
-        // ADMINISTRADOR ÚNICO - HARDCODED
+        const APP_ID = typeof __app_id !== 'undefined' ? __app_id : 'ceut_cloud_v14';
         const ADMIN_EMAIL = "carlos.aguilar@ceut.edu.mx";
         
         const app = initializeApp(firebaseConfig);
@@ -282,12 +304,12 @@
         };
 
         const init = () => {
+            console.log("CEUT CLOUD: Iniciando Verificación...");
             onAuthStateChanged(auth, async (u) => {
                 if (u) {
                     user = u;
                     const emailNorm = u.email.toLowerCase();
                     
-                    // Lógica de Identificación
                     if (emailNorm === ADMIN_EMAIL.toLowerCase()) {
                         profile = { name: "Ing. Carlos Aguilar", role: "admin", email: emailNorm };
                         loadPanel();
@@ -298,13 +320,14 @@
                                 profile = profileSnap.data();
                                 loadPanel();
                             } else {
-                                // Usuario autenticado pero sin perfil en Firestore
-                                showToast("Perfil no encontrado. Contacte a soporte.");
+                                console.warn("Perfil no encontrado en Firestore.");
+                                showToast("Error: No se encontró perfil de usuario.");
                                 await signOut(auth);
                                 switchView('home');
                             }
                         } catch(e) {
-                            showToast("Error de sincronización con la base de datos.");
+                            console.error("Error Firestore:", e);
+                            showToast("Error de conexión a la base de datos.");
                             await signOut(auth);
                         }
                     }
@@ -350,7 +373,9 @@
                         <button onclick="window.openDetails('${encodeURIComponent(JSON.stringify(s))}')" class="bg-[#d4af37] px-4 py-2 rounded-lg text-slate-950 text-[9px] font-bold">VER</button>
                     </div>
                 `).join('') || '<p class="text-white/20 text-center py-10 uppercase text-[9px]">No hay actividad hoy</p>';
-            }, (err) => showToast("Error en Monitor Global. Reintente."));
+            }, (err) => {
+                console.error("Admin Snapshot Error:", err);
+            });
         };
 
         const loadTeacherData = () => {
@@ -422,8 +447,8 @@
             const cid = params.get('cid'), tk = params.get('tk');
             if(!cid || !tk) return;
             
-            if(Math.abs(Math.floor(Date.now() / 10000) - parseInt(tk)) > 3) {
-                showToast("QR Expirado. Escanee uno nuevo."); return;
+            if(Math.abs(Math.floor(Date.now() / 10000) - parseInt(tk)) > 6) {
+                showToast("QR Expirado. Escanee de nuevo."); return;
             }
 
             const q = query(collectionGroup(db, 'sessions'), where("classId", "==", cid));
@@ -437,7 +462,7 @@
                 
                 document.getElementById('btn-confirm-attendance').onclick = async () => {
                     if(sData.attendees.some(a => a.id === profile.id)) {
-                        showToast("Ya has sido registrado en esta clase.");
+                        showToast("Ya registrado en esta sesión.");
                     } else {
                         const updated = [...sData.attendees, { name: profile.name, id: profile.id, time: new Date().toLocaleTimeString() }];
                         await updateDoc(sRef, { attendees: updated });
@@ -453,15 +478,17 @@
             const email = document.getElementById('authEmail').value.trim();
             const pass = document.getElementById('authPass').value;
             
-            if(!email || !pass) return showToast("Faltan datos de acceso");
+            if(!email || !pass) return showToast("Faltan datos de acceso.");
+            
             btn.disabled = true;
+            btn.classList.add('loading');
 
             try {
                 if(currentAuthMode === 'register') {
                     const name = document.getElementById('authName').value.toUpperCase();
                     const id = document.getElementById('authId').value.toUpperCase();
-                    if(!name || !id) throw new Error("Faltan datos de registro");
-
+                    if(!name || !id) throw new Error("Faltan datos de registro.");
+                    
                     const res = await createUserWithEmailAndPassword(auth, email, pass);
                     await setDoc(doc(db, 'artifacts', APP_ID, 'users', res.user.uid, 'profile', 'info'), {
                         name, id, email, role: currentRole, createdAt: Date.now()
@@ -470,12 +497,13 @@
                     await signInWithEmailAndPassword(auth, email, pass);
                 }
             } catch(e) { 
-                let errorMsg = "Credenciales incorrectas.";
-                if(e.code === 'auth/email-already-in-use') errorMsg = "El correo ya está registrado.";
-                if(e.code === 'auth/weak-password') errorMsg = "La contraseña es muy débil.";
-                if(e.code === 'auth/user-not-found') errorMsg = "Usuario no registrado.";
-                showToast(errorMsg); 
+                console.error("Auth Failure:", e.code);
+                let msg = "Error en el acceso.";
+                if(e.code === 'auth/invalid-credential') msg = "Credenciales inválidas.";
+                if(e.code === 'auth/network-request-failed') msg = "Sin conexión a Internet.";
+                showToast(msg);
                 btn.disabled = false;
+                btn.classList.remove('loading');
             }
         };
 
@@ -483,7 +511,7 @@
             const course = document.getElementById('sCourse').value.toUpperCase();
             const grade = document.getElementById('sGrade').value.toUpperCase();
             const cid = document.getElementById('sClassId').value;
-            if(!course || !grade) return showToast("Indique materia y grupo.");
+            if(!course || !grade) return showToast("Complete materia y grupo.");
             
             await addDoc(collection(db, 'artifacts', APP_ID, 'users', user.uid, 'sessions'), {
                 course, grade, classId: cid, timestamp: Date.now(), attendees: []
@@ -494,20 +522,18 @@
         document.getElementById('btn-pdf').onclick = () => {
             const { jsPDF } = window.jspdf;
             const docPdf = new jsPDF();
-            docPdf.text(`CEUT | LISTA DE ASISTENCIA: ${currentSessionData.course}`, 14, 20);
-            docPdf.setFontSize(10);
-            docPdf.text(`Grupo: ${currentSessionData.grade} | Fecha: ${new Date(currentSessionData.timestamp).toLocaleDateString()}`, 14, 30);
+            docPdf.text(`CEUT | LISTA: ${currentSessionData.course}`, 14, 20);
             docPdf.autoTable({
-                startY: 40,
-                head: [['Nombre', 'ID / Matrícula', 'Hora de Registro']],
+                startY: 30,
+                head: [['Nombre', 'Matrícula', 'Hora']],
                 body: currentSessionData.attendees.map(a => [a.name, a.id, a.time])
             });
-            docPdf.save(`Asistencia_${currentSessionData.course}_${currentSessionData.grade}.pdf`);
+            docPdf.save(`Lista_${currentSessionData.course}.pdf`);
         };
 
         document.getElementById('btn-print').onclick = () => window.print();
 
-        window.logout = () => signOut(auth);
+        window.logout = () => signOut(auth).then(() => location.reload());
 
         document.getElementById('auth-tab-login').onclick = () => {
             currentAuthMode = 'login';
