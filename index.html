@@ -3,13 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>CEUT | QR DINÁMICO SEGURIDAD</title>
+    <title>CEUT | CLOUD SEGURIDAD</title>
     
     <style>
         :root { 
             --bg-slate: #f8fafc;
             --ceut-blue: #1e40af; 
             --ceut-gold: #d4af37; 
+            --ceut-dark: #0f172a;
         }
         
         * { -webkit-tap-highlight-color: transparent; box-sizing: border-box; }
@@ -25,29 +26,34 @@
         .view-section { display: none; width: 100%; min-height: 100vh; flex-direction: column; }
         .view-section.active { display: flex; }
 
-        /* Estilos de Inputs y Botones */
-        .label-ceut { font-size: 10px; font-weight: 800; color: #64748b; text-transform: uppercase; margin-bottom: 6px; display: block; letter-spacing: 0.05em; }
+        /* Inputs y Botones Estilo Institucional */
         .input-ceut {
             width: 100%; padding: 1rem 1.2rem; background-color: white; border: 2px solid #e2e8f0;
             border-radius: 14px; font-size: 14px; font-weight: 700; color: var(--ceut-blue); outline: none; transition: all 0.2s;
         }
+        .input-ceut:focus { border-color: var(--ceut-gold); }
+
         .btn-primary {
             background: var(--ceut-blue); color: white; padding: 1.1rem; border-radius: 16px; font-weight: 800;
             font-size: 12px; text-transform: uppercase; letter-spacing: 0.1em;
             box-shadow: 0 10px 15px -3px rgba(30, 64, 175, 0.2); border: none; cursor: pointer; width: 100%;
         }
+        .btn-gold {
+            background: var(--ceut-gold); color: var(--ceut-dark); padding: 1.1rem; border-radius: 16px; font-weight: 800;
+            font-size: 12px; text-transform: uppercase; letter-spacing: 0.1em; border: none; cursor: pointer; width: 100%;
+        }
 
-        /* QR Dinámico Styling */
+        /* QR y Timers */
         .qr-timer-bar { width: 100%; height: 4px; background: #e2e8f0; border-radius: 2px; margin-top: 15px; overflow: hidden; }
         #qr-progress { width: 100%; height: 100%; background: var(--ceut-gold); transition: width 1s linear; }
         
-        .session-card { background: white; border-radius: 24px; padding: 1.2rem; border: 1px solid #e2e8f0; margin-bottom: 1rem; }
+        .card-ceut { background: white; border-radius: 24px; padding: 1.2rem; border: 1px solid #e2e8f0; margin-bottom: 1rem; }
         
         #modal-qr { background: rgba(15, 23, 42, 0.98); backdrop-filter: blur(15px); }
-        .qr-container { background: white; padding: 25px; border-radius: 35px; box-shadow: 0 20px 50px rgba(0,0,0,0.3); position: relative; }
+        .qr-container { background: white; padding: 25px; border-radius: 35px; box-shadow: 0 20px 50px rgba(0,0,0,0.3); }
 
         .nav-tabs { display: flex; background: #e2e8f0; padding: 4px; border-radius: 16px; margin-bottom: 20px; }
-        .nav-tab { flex: 1; text-align: center; padding: 10px; font-size: 10px; font-weight: 800; text-transform: uppercase; border-radius: 12px; cursor: pointer; }
+        .nav-tab { flex: 1; text-align: center; padding: 10px; font-size: 10px; font-weight: 800; text-transform: uppercase; border-radius: 12px; cursor: pointer; color: #64748b; }
         .nav-tab.active { background: white; color: var(--ceut-blue); }
     </style>
 
@@ -59,13 +65,12 @@
 </head>
 <body>
 
-    <!-- Pantalla de Carga -->
     <div id="loading-overlay" class="fixed inset-0 bg-[#0f172a] z-[9999] flex flex-col items-center justify-center">
         <div class="relative w-20 h-20 mb-6">
             <div class="absolute inset-0 border-4 border-white/5 rounded-full"></div>
             <div class="absolute inset-0 border-4 border-t-[#d4af37] rounded-full animate-spin"></div>
         </div>
-        <p id="loading-text" class="text-[9px] font-black tracking-[0.4em] text-white/40 uppercase">Sincronizando Seguridad...</p>
+        <p class="text-[9px] font-black tracking-[0.4em] text-white/40 uppercase">Sincronizando Seguridad...</p>
     </div>
 
     <div id="app-container">
@@ -74,15 +79,20 @@
              <div class="max-w-xs w-full text-center">
                 <img src="https://lh3.googleusercontent.com/d/17NobXQ3JbRnLGejZe4Mn2x-Jl45F4rPm" class="w-24 mx-auto mb-8">
                 <h1 class="text-4xl font-extrabold tracking-tighter mb-1 text-slate-900">CEUT <span class="text-[#d4af37]">CLOUD</span></h1>
-                <p class="text-[9px] tracking-[0.4em] text-slate-400 font-bold uppercase mb-12">Seguridad QR Dinámica</p>
+                <p class="text-[9px] tracking-[0.4em] text-slate-400 font-bold uppercase mb-12">Portal de Asistencia Institucional</p>
                 <div class="space-y-4">
+                    <!-- ACCESO ADMIN CON ICONO DE CANDADO -->
+                    <button id="btn-home-admin" class="w-full bg-slate-900 p-5 rounded-[2rem] shadow-xl flex items-center gap-4 border border-slate-700">
+                        <div class="w-12 h-12 bg-white/10 rounded-2xl flex items-center justify-center text-xl">🔒</div>
+                        <div class="text-left text-white"><p class="text-[10px] font-black uppercase">Administración</p><p class="text-[8px] opacity-40">PSICOPEDAGOGÍA</p></div>
+                    </button>
                     <button id="btn-home-teacher" class="w-full bg-white p-5 rounded-[2rem] shadow-xl shadow-slate-200 flex items-center gap-4 border border-slate-100">
                         <div class="w-12 h-12 bg-blue-50 rounded-2xl flex items-center justify-center text-xl">👨‍🏫</div>
-                        <div class="text-left"><p class="text-xs font-black text-slate-800 uppercase">Docentes</p></div>
+                        <div class="text-left text-slate-800"><p class="text-[10px] font-black uppercase">Cuerpo Docente</p><p class="text-[8px] opacity-40">GESTIÓN DE CLASES</p></div>
                     </button>
                     <button id="btn-home-student" class="w-full bg-[#1e40af] p-5 rounded-[2rem] shadow-xl shadow-blue-200 flex items-center gap-4">
                         <div class="w-12 h-12 bg-white/10 rounded-2xl flex items-center justify-center text-xl">🎓</div>
-                        <div class="text-left"><p class="text-xs font-black text-white uppercase">Alumnos</p></div>
+                        <div class="text-left text-white"><p class="text-[10px] font-black uppercase">Comunidad Estudiantil</p><p class="text-[8px] opacity-40">ACCESO RÁPIDO</p></div>
                     </button>
                 </div>
              </div>
@@ -92,7 +102,7 @@
         <section id="view-auth" class="view-section p-8 bg-slate-50 items-center justify-center">
             <div class="w-full max-w-sm">
                 <button id="btn-auth-back" class="mb-8 text-[10px] font-black text-slate-400 uppercase">← Regresar</button>
-                <h2 class="text-3xl font-black text-slate-900 mb-8 uppercase tracking-tighter">Acceso</h2>
+                <h2 id="auth-title" class="text-3xl font-black text-slate-900 mb-8 uppercase tracking-tighter">Acceso</h2>
                 <div class="flex bg-slate-200 p-1 rounded-2xl mb-6">
                     <button id="auth-tab-login" class="flex-1 py-3 text-[10px] font-black uppercase rounded-xl bg-white text-blue-700">Login</button>
                     <button id="auth-tab-reg" class="flex-1 py-3 text-[10px] font-black uppercase rounded-xl text-slate-500">Registro</button>
@@ -104,8 +114,33 @@
                     </div>
                     <input type="email" id="authEmail" placeholder="Correo Institucional" class="input-ceut">
                     <input type="password" id="authPass" placeholder="Contraseña" class="input-ceut">
-                    <button id="btn-auth-submit" class="btn-primary mt-4">Entrar</button>
+                    <button id="btn-auth-submit" class="btn-primary mt-4">Entrar al Sistema</button>
                 </div>
+            </div>
+        </section>
+
+        <!-- PANEL ADMINISTRADOR (GLOBAL) -->
+        <section id="view-admin-panel" class="view-section bg-[#0f172a]">
+            <nav class="p-6 flex justify-between items-center border-b border-white/10">
+                <div class="flex items-center gap-3">
+                    <div class="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></div>
+                    <span class="text-white text-[10px] font-black uppercase tracking-widest">Panel Central de Supervisión</span>
+                </div>
+                <button id="btn-logout-admin" class="text-white/40 text-[9px] font-bold">CERRAR SESIÓN</button>
+            </nav>
+            <div class="p-6">
+                <h3 class="text-white font-black text-2xl uppercase mb-6">Monitoreo <span class="text-[#d4af37]">Global</span></h3>
+                <div id="admin-stats" class="grid grid-cols-2 gap-4 mb-8">
+                    <div class="bg-white/5 p-4 rounded-2xl border border-white/5">
+                        <p class="text-white/40 text-[8px] font-black uppercase">Clases Hoy</p>
+                        <p id="stat-classes" class="text-white text-2xl font-black">0</p>
+                    </div>
+                    <div class="bg-white/5 p-4 rounded-2xl border border-white/5">
+                        <p class="text-white/40 text-[8px] font-black uppercase">Total Alumnos</p>
+                        <p id="stat-students" class="text-white text-2xl font-black">0</p>
+                    </div>
+                </div>
+                <div id="admin-global-list" class="space-y-4"></div>
             </div>
         </section>
 
@@ -118,23 +153,17 @@
             <div class="p-6 max-w-2xl mx-auto w-full">
                 <div class="nav-tabs">
                     <div id="tab-register" class="nav-tab active">Nueva Clase</div>
-                    <div id="tab-history" class="nav-tab">Historial</div>
+                    <div id="tab-history" class="nav-tab">Mis Clases</div>
                 </div>
                 <div id="module-register" class="space-y-6">
                     <div class="bg-white p-6 rounded-[2.5rem] shadow-sm border border-slate-200">
-                        <label class="label-ceut">Materia</label>
-                        <input type="text" id="sCourse" placeholder="EJ. CÁLCULO" class="input-ceut uppercase mb-4">
+                        <label class="text-[10px] font-black text-slate-400 uppercase mb-2 block">Datos de la Sesión</label>
+                        <input type="text" id="sCourse" placeholder="MATERIA (EJ. PSICOLOGÍA)" class="input-ceut uppercase mb-4">
                         <div class="grid grid-cols-2 gap-4 mb-4">
-                            <div>
-                                <label class="label-ceut">Grupo</label>
-                                <input type="text" id="sGrade" placeholder="101" class="input-ceut uppercase">
-                            </div>
-                            <div>
-                                <label class="label-ceut">Código Fijo</label>
-                                <input type="text" id="sClassId" class="input-ceut bg-slate-50 font-mono" readonly>
-                            </div>
+                            <input type="text" id="sGrade" placeholder="GRUPO (EJ. 502)" class="input-ceut uppercase">
+                            <input type="text" id="sClassId" class="input-ceut bg-slate-50 font-mono" readonly>
                         </div>
-                        <button id="btn-create-session" class="btn-primary">Generar QR Dinámico</button>
+                        <button id="btn-create-session" class="btn-primary">Iniciar Pase de Lista QR</button>
                     </div>
                 </div>
                 <div id="module-history" class="hidden"><div id="teacher-sessions-list"></div></div>
@@ -144,30 +173,28 @@
         <!-- PANEL ALUMNO -->
         <section id="view-student-panel" class="view-section items-center justify-center p-8 bg-[#1e40af]">
             <div class="w-full max-w-sm bg-white/5 backdrop-blur-xl border border-white/10 p-8 rounded-[3rem] text-center">
+                <img src="https://lh3.googleusercontent.com/d/17NobXQ3JbRnLGejZe4Mn2x-Jl45F4rPm" class="w-16 mx-auto mb-6 opacity-80 grayscale brightness-200">
                 <h2 id="std-name" class="text-2xl font-black text-white uppercase mb-1">Alumno</h2>
                 <p id="std-id" class="text-[#d4af37] text-[10px] font-black uppercase mb-8">ID: ---</p>
                 
                 <div id="attendance-status" class="space-y-4">
-                    <!-- Estado Inicial -->
                     <div id="status-waiting" class="animate-pulse flex flex-col items-center">
                         <div class="w-12 h-12 bg-white/10 rounded-full mb-4"></div>
-                        <p class="text-white/40 text-[9px] font-bold uppercase tracking-[0.3em]">Esperando escaneo dinámico...</p>
+                        <p class="text-white/40 text-[9px] font-bold uppercase tracking-[0.3em]">Escanea el QR del Docente...</p>
                     </div>
 
-                    <!-- Confirmación de Clase Pre-cargada -->
                     <div id="status-confirm" class="hidden">
-                        <div class="bg-white rounded-3xl p-6 text-left border-l-4 border-[#d4af37]">
+                        <div class="bg-white rounded-3xl p-6 text-left border-l-8 border-[#d4af37]">
                             <p class="text-[9px] font-black text-slate-400 uppercase mb-1">Clase Detectada</p>
-                            <h3 id="confirm-course" class="text-slate-900 font-black text-lg uppercase leading-tight mb-1">Cargando...</h3>
+                            <h3 id="confirm-course" class="text-[#1e40af] font-black text-xl uppercase leading-tight mb-1">Cargando...</h3>
                             <p id="confirm-grade" class="text-slate-500 font-bold text-[10px] uppercase">Grupo ---</p>
                         </div>
-                        <button id="btn-confirm-attendance" class="w-full bg-[#d4af37] text-blue-950 p-5 rounded-2xl font-black text-xs uppercase mt-4 shadow-lg">Confirmar Asistencia</button>
+                        <button id="btn-confirm-attendance" class="btn-gold mt-6 shadow-xl shadow-black/20">CONFIRMAR MI ASISTENCIA</button>
                     </div>
 
-                    <!-- Éxito -->
                     <div id="status-success" class="hidden">
-                        <div class="w-16 h-16 bg-emerald-500 rounded-full flex items-center justify-center text-white text-2xl mx-auto mb-4">✓</div>
-                        <p class="text-emerald-400 font-black text-sm uppercase">¡Asistencia Registrada!</p>
+                        <div class="w-20 h-20 bg-emerald-500 rounded-full flex items-center justify-center text-white text-3xl mx-auto mb-4">✓</div>
+                        <p class="text-emerald-400 font-black text-sm uppercase">Asistencia Exitosa</p>
                         <p id="success-time" class="text-white/40 text-[9px] mt-2 font-bold uppercase tracking-widest">---</p>
                     </div>
                 </div>
@@ -177,28 +204,27 @@
         </section>
     </div>
 
-    <!-- MODAL QR DINÁMICO -->
+    <!-- MODALES Y UTILIDADES -->
     <div id="modal-qr" class="fixed inset-0 z-[1000] hidden flex flex-col items-center justify-center p-8">
         <div class="qr-container mb-8">
             <div id="qrcode"></div>
             <div class="qr-timer-bar"><div id="qr-progress"></div></div>
-            <p class="text-[8px] font-black text-slate-300 uppercase mt-4 text-center tracking-widest">Código de Seguridad Temporal</p>
+            <p class="text-[8px] font-black text-slate-300 uppercase mt-4 text-center tracking-widest">Seguridad Dinámica Activa</p>
         </div>
-        <button id="btn-close-qr" class="w-full max-w-xs bg-white text-blue-900 py-5 rounded-2xl font-black uppercase text-[10px]">Detener Pase de Lista</button>
+        <button id="btn-close-qr" class="btn-primary max-w-xs bg-white text-blue-950">Finalizar Pase de Lista</button>
     </div>
 
-    <!-- MODAL LISTA -->
     <div id="modal-list" class="fixed inset-0 bg-white z-[1000] hidden flex flex-col">
         <div class="bg-[#1e40af] p-8 text-white flex justify-between items-end">
             <div>
-                <p class="text-[10px] font-black opacity-50 uppercase mb-1">Registro de Asistencia</p>
+                <p class="text-[10px] font-black opacity-50 uppercase mb-1">Reporte Detallado</p>
                 <h3 id="list-course" class="text-xl font-black uppercase tracking-tight">Materia</h3>
             </div>
             <button id="btn-close-list" class="bg-white/10 w-12 h-12 rounded-2xl flex items-center justify-center font-bold">✕</button>
         </div>
         <div id="list-body" class="flex-1 p-6 overflow-y-auto space-y-3 bg-slate-50"></div>
-        <div class="p-6 border-t border-slate-100">
-            <button id="btn-pdf" class="w-full bg-red-600 text-white py-5 rounded-2xl font-black uppercase text-[10px] tracking-widest">Exportar Acta PDF</button>
+        <div class="p-6 border-t border-slate-100 flex gap-4">
+            <button id="btn-pdf" class="flex-1 bg-red-600 text-white py-5 rounded-2xl font-black uppercase text-[10px]">Descargar PDF</button>
         </div>
     </div>
 
@@ -215,18 +241,15 @@
         };
 
         const APP_ID = "ceut_cloud_v14";
-        let db, auth, user, profile;
-        let qrInterval;
-        let currentAuthMode = 'login';
-        let currentTargetRole = 'student';
+        const ADMIN_EMAIL = "deptopsicopedagogico@ceut.edu.mx";
+        let db, auth, user, profile, qrInterval;
+        let currentAuthMode = 'login', currentTargetRole = 'student';
 
-        // 1. INICIALIZACIÓN
         const init = async () => {
             try {
                 const app = initializeApp(firebaseConfig);
                 db = getFirestore(app);
                 auth = getAuth(app);
-
                 onAuthStateChanged(auth, async (u) => {
                     if(u) {
                         user = u;
@@ -252,11 +275,16 @@
         };
 
         const setupDashboard = () => {
+            if(user.email === ADMIN_EMAIL) {
+                switchView('admin-panel');
+                listenGlobalSessions();
+                return;
+            }
             if(profile.role === 'teacher') {
                 switchView('teacher-panel');
                 document.getElementById('doc-name').innerText = profile.name;
                 document.getElementById('sClassId').value = "CL-" + Math.random().toString(36).substr(2, 5).toUpperCase();
-                listenSessions();
+                listenTeacherSessions();
             } else {
                 switchView('student-panel');
                 document.getElementById('std-name').innerText = profile.name;
@@ -265,117 +293,36 @@
             }
         };
 
-        // 2. LÓGICA QR DINÁMICO (SEGURIDAD)
-        window.appShowQR = (cid) => {
-            const qrBox = document.getElementById('qrcode');
-            const progress = document.getElementById('qr-progress');
-            document.getElementById('modal-qr').classList.remove('hidden');
-            
-            if(qrInterval) clearInterval(qrInterval);
-
-            const updateQR = () => {
-                qrBox.innerHTML = "";
-                const timeToken = Math.floor(Date.now() / 10000);
-                const secureUrl = `${window.location.href.split('?')[0]}?cid=${cid}&tk=${timeToken}`;
-                
-                new QRCode(qrBox, { text: secureUrl, width: 220, height: 220, correctLevel: QRCode.CorrectLevel.H });
-                
-                progress.style.transition = 'none';
-                progress.style.width = '100%';
-                setTimeout(() => {
-                    progress.style.transition = 'width 10s linear';
-                    progress.style.width = '0%';
-                }, 50);
-            };
-
-            updateQR();
-            qrInterval = setInterval(updateQR, 10000);
-        };
-
-        // 3. LÓGICA DE ALUMNO MEJORADA (PRE-CARGA Y CONFIRMACIÓN)
-        const checkAutoAttendance = async () => {
-            const params = new URLSearchParams(window.location.search);
-            const cid = params.get('cid');
-            const tk = params.get('tk'); 
-            if(!cid || !tk) return;
-
-            // Mostrar estado de carga en el panel de alumno
-            const statusWaiting = document.getElementById('status-waiting');
-            const statusConfirm = document.getElementById('status-confirm');
-            const statusSuccess = document.getElementById('status-success');
-
-            // VALIDACIÓN: Si el token tiene más de 20 segundos de diferencia, rechazar de inmediato
-            const currentToken = Math.floor(Date.now() / 10000);
-            if(Math.abs(currentToken - parseInt(tk)) > 2) {
-                statusWaiting.innerHTML = `
-                    <div class="p-6 bg-red-500/20 border border-red-500/30 rounded-3xl">
-                        <p class="text-red-400 font-black text-[10px] uppercase mb-1">Código Expirado</p>
-                        <p class="text-white/40 text-[8px] leading-relaxed">El código QR ha cambiado. Escanea el código nuevo.</p>
+        const listenGlobalSessions = () => {
+            onSnapshot(collectionGroup(db, 'sessions'), (snap) => {
+                const list = document.getElementById('admin-global-list');
+                const sessions = snap.docs.map(d => ({...d.data(), id: d.id, ref: d.ref}));
+                document.getElementById('stat-classes').innerText = sessions.length;
+                document.getElementById('stat-students').innerText = sessions.reduce((acc, s) => acc + s.attendees.length, 0);
+                list.innerHTML = sessions.sort((a,b) => b.timestamp - a.timestamp).map(s => `
+                    <div class="bg-white/5 p-5 rounded-2xl border border-white/5 flex justify-between items-center">
+                        <div>
+                            <p class="text-[#d4af37] text-[10px] font-black uppercase">${s.course}</p>
+                            <p class="text-white/40 text-[8px] uppercase">Grupo: ${s.grade} • Alumnos: ${s.attendees.length}</p>
+                        </div>
+                        <button onclick="window.appOpenList('${JSON.stringify({...s, ref: null}).replace(/"/g, '&quot;')}')" class="bg-white/10 px-4 py-2 rounded-lg text-white text-[9px] font-bold uppercase">Ver</button>
                     </div>
-                `;
-                return;
-            }
-
-            try {
-                // Buscar la sesión activa en toda la base de datos
-                const q = query(collectionGroup(db, 'sessions'), where("classId", "==", cid));
-                const snap = await getDocs(q);
-                
-                if(!snap.empty) {
-                    const docRef = snap.docs[0];
-                    const data = docRef.data();
-
-                    // Pre-cargar datos en la UI de confirmación
-                    document.getElementById('confirm-course').innerText = data.course;
-                    document.getElementById('confirm-grade').innerText = `Grupo ${data.grade}`;
-                    
-                    statusWaiting.classList.add('hidden');
-                    statusConfirm.classList.remove('hidden');
-
-                    // Al hacer clic en el botón de confirmación
-                    document.getElementById('btn-confirm-attendance').onclick = async () => {
-                        const btn = document.getElementById('btn-confirm-attendance');
-                        btn.disabled = true;
-                        btn.innerText = "Registrando...";
-
-                        if(!data.attendees.find(a => a.id === profile.id)) {
-                            const updated = [...data.attendees, { name: profile.name, id: profile.id, time: new Date().toLocaleTimeString() }];
-                            await updateDoc(docRef.ref, { attendees: updated });
-                            
-                            statusConfirm.classList.add('hidden');
-                            statusSuccess.classList.remove('hidden');
-                            document.getElementById('success-time').innerText = `REGISTRADO A LAS ${new Date().toLocaleTimeString()}`;
-                        } else {
-                            alert("Ya estás registrado en esta clase.");
-                            statusConfirm.classList.add('hidden');
-                            statusSuccess.classList.remove('hidden');
-                            document.getElementById('success-time').innerText = "YA REGISTRADO";
-                        }
-                        // Limpiar URL para evitar registros accidentales al refrescar
-                        window.history.replaceState({}, '', window.location.pathname);
-                    };
-                } else {
-                    alert("No se encontró la sesión de clase.");
-                }
-            } catch (e) { console.error("Error cargando clase:", e); }
+                `).join('');
+            });
         };
 
-        // UI ACTIONS (DOCENTE)
-        const listenSessions = () => {
+        const listenTeacherSessions = () => {
             onSnapshot(collection(db, 'artifacts', APP_ID, 'users', user.uid, 'sessions'), (snap) => {
                 const list = document.getElementById('teacher-sessions-list');
-                const docs = snap.docs.sort((a,b) => b.data().timestamp - a.data().timestamp);
-                list.innerHTML = docs.map(d => {
+                list.innerHTML = snap.docs.sort((a,b) => b.data().timestamp - a.data().timestamp).map(d => {
                     const s = d.data();
-                    const sJson = JSON.stringify({...s, id: d.id}).replace(/"/g, '&quot;');
                     return `
-                        <div class="session-card">
+                        <div class="card-ceut">
                             <h4 class="font-black uppercase text-slate-800 text-sm mb-1">${s.course}</h4>
                             <p class="text-[9px] font-black text-slate-400 uppercase mb-4 tracking-widest">GRUPO ${s.grade} • ID: ${s.classId}</p>
                             <div class="flex gap-2">
                                 <button onclick="window.appShowQR('${s.classId}')" class="flex-1 bg-slate-100 py-3 rounded-xl text-[9px] font-black uppercase">QR</button>
-                                <button onclick="window.appOpenList('${sJson}')" class="flex-[2] bg-blue-600 py-3 rounded-xl text-[9px] font-black text-white uppercase tracking-widest">Lista (${s.attendees.length})</button>
-                                <button onclick="window.appDel('${d.id}')" class="p-3 bg-red-50 text-red-400 rounded-xl">🗑️</button>
+                                <button onclick="window.appOpenList('${JSON.stringify({...s, id: d.id}).replace(/"/g, '&quot;')}')" class="flex-[2] bg-blue-600 py-3 rounded-xl text-[9px] font-black text-white uppercase">Lista (${s.attendees.length})</button>
                             </div>
                         </div>
                     `;
@@ -383,100 +330,105 @@
             });
         };
 
-        window.appOpenList = (json) => {
-            const s = JSON.parse(json);
-            document.getElementById('list-course').innerText = s.course;
-            document.getElementById('list-body').innerHTML = s.attendees.length ? s.attendees.map(a => `
-                <div class="flex justify-between items-center bg-white p-5 rounded-2xl border border-slate-100 shadow-sm">
-                    <div>
-                        <p class="text-[10px] font-black uppercase text-slate-800">${a.name}</p>
-                        <p class="text-[8px] text-slate-400 font-bold uppercase mt-1">ID: ${a.id}</p>
-                    </div>
-                    <span class="text-[9px] text-blue-600 font-black bg-blue-50 px-3 py-1 rounded-lg">${a.time}</span>
-                </div>
-            `).join('') : '<p class="text-center py-10 text-slate-300 font-black uppercase text-[10px] tracking-widest">Sin alumnos registrados</p>';
-            document.getElementById('btn-pdf').onclick = () => exportPDF(s);
-            document.getElementById('modal-list').classList.remove('hidden');
+        window.appShowQR = (cid) => {
+            const qrBox = document.getElementById('qrcode');
+            const progress = document.getElementById('qr-progress');
+            document.getElementById('modal-qr').classList.remove('hidden');
+            if(qrInterval) clearInterval(qrInterval);
+            const updateQR = () => {
+                qrBox.innerHTML = "";
+                const timeToken = Math.floor(Date.now() / 10000);
+                const secureUrl = `${window.location.href.split('?')[0]}?cid=${cid}&tk=${timeToken}`;
+                new QRCode(qrBox, { text: secureUrl, width: 220, height: 220, correctLevel: QRCode.CorrectLevel.H });
+                progress.style.transition = 'none'; progress.style.width = '100%';
+                setTimeout(() => { progress.style.transition = 'width 10s linear'; progress.style.width = '0%'; }, 50);
+            };
+            updateQR(); qrInterval = setInterval(updateQR, 10000);
         };
 
-        window.appDel = async (id) => { if(confirm("¿Eliminar registro?")) await deleteDoc(doc(db, 'artifacts', APP_ID, 'users', user.uid, 'sessions', id)); };
+        const checkAutoAttendance = async () => {
+            const params = new URLSearchParams(window.location.search);
+            const cid = params.get('cid'), tk = params.get('tk'); 
+            if(!cid || !tk) return;
+            const currentToken = Math.floor(Date.now() / 10000);
+            if(Math.abs(currentToken - parseInt(tk)) > 2) return;
+            try {
+                const q = query(collectionGroup(db, 'sessions'), where("classId", "==", cid));
+                const snap = await getDocs(q);
+                if(!snap.empty) {
+                    const docRef = snap.docs[0], data = docRef.data();
+                    document.getElementById('confirm-course').innerText = data.course;
+                    document.getElementById('confirm-grade').innerText = `Grupo ${data.grade}`;
+                    document.getElementById('status-waiting').classList.add('hidden');
+                    document.getElementById('status-confirm').classList.remove('hidden');
+                    document.getElementById('btn-confirm-attendance').onclick = async () => {
+                        if(!data.attendees.find(a => a.id === profile.id)) {
+                            const updated = [...data.attendees, { name: profile.name, id: profile.id, time: new Date().toLocaleTimeString() }];
+                            await updateDoc(docRef.ref, { attendees: updated });
+                            document.getElementById('status-confirm').classList.add('hidden');
+                            document.getElementById('status-success').classList.remove('hidden');
+                            document.getElementById('success-time').innerText = `REGISTRADO: ${new Date().toLocaleTimeString()}`;
+                        }
+                    };
+                }
+            } catch (e) { console.error(e); }
+        };
 
         const exportPDF = (s) => {
             const { jsPDF } = window.jspdf;
             const pdf = new jsPDF();
-            pdf.setFontSize(18); pdf.text("CEUT CLOUD - ACTA DE ASISTENCIA", 10, 20);
-            pdf.setFontSize(10); pdf.text(`PROFESOR: ${profile.name}`, 10, 30);
-            pdf.text(`MATERIA: ${s.course} | GRUPO: ${s.grade}`, 10, 35);
-            pdf.text(`FECHA: ${new Date(s.timestamp).toLocaleDateString()}`, 10, 40);
-            pdf.autoTable({ head: [['Nombre del Alumno', 'Matrícula', 'Hora']], body: s.attendees.map(a => [a.name, a.id, a.time]), startY: 50, theme: 'striped', headStyles: { fillColor: [30, 64, 175] } });
-            pdf.save(`Lista_${s.course}_${s.grade}.pdf`);
+            pdf.setFillColor(30, 64, 175); pdf.rect(0, 0, 210, 40, 'F');
+            pdf.setTextColor(255, 255, 255); pdf.setFontSize(22); pdf.text("CEUT CLOUD - REPORTE", 15, 25);
+            pdf.setTextColor(40, 40, 40); pdf.setFontSize(10);
+            pdf.text(`MATERIA: ${s.course} | GRUPO: ${s.grade}`, 15, 50);
+            pdf.text(`FECHA: ${new Date(s.timestamp).toLocaleDateString()}`, 15, 55);
+            pdf.autoTable({ head: [['Alumno', 'ID', 'Hora']], body: s.attendees.map(a => [a.name, a.id, a.time]), startY: 65, theme: 'striped', headStyles: { fillColor: [30, 64, 175] } });
+            pdf.save(`Asistencia_${s.course}.pdf`);
         };
 
-        // HANDLERS BOTONES
-        document.getElementById('btn-home-teacher').onclick = () => { currentTargetRole = 'teacher'; switchView('auth'); };
-        document.getElementById('btn-home-student').onclick = () => { currentTargetRole = 'student'; switchView('auth'); };
+        window.appOpenList = (json) => {
+            const s = JSON.parse(json);
+            document.getElementById('list-course').innerText = s.course;
+            document.getElementById('list-body').innerHTML = s.attendees.map(a => `
+                <div class="bg-white p-4 rounded-xl border border-slate-100 flex justify-between items-center shadow-sm">
+                    <div class="text-[10px] font-black uppercase">${a.name}</div>
+                    <div class="text-[9px] text-blue-600 font-bold">${a.time}</div>
+                </div>
+            `).join('');
+            document.getElementById('btn-pdf').onclick = () => exportPDF(s);
+            document.getElementById('modal-list').classList.remove('hidden');
+        };
+
+        document.getElementById('btn-home-admin').onclick = () => { currentTargetRole = 'admin'; switchView('auth'); document.getElementById('auth-title').innerText = "Admin Depto"; };
+        document.getElementById('btn-home-teacher').onclick = () => { currentTargetRole = 'teacher'; switchView('auth'); document.getElementById('auth-title').innerText = "Docentes"; };
+        document.getElementById('btn-home-student').onclick = () => { currentTargetRole = 'student'; switchView('auth'); document.getElementById('auth-title').innerText = "Alumnos"; };
         document.getElementById('btn-auth-back').onclick = () => switchView('home');
-        
-        document.getElementById('auth-tab-login').onclick = () => {
-            currentAuthMode = 'login';
-            document.getElementById('reg-inputs').classList.add('hidden');
-            document.getElementById('auth-tab-login').classList.add('bg-white', 'text-blue-700');
-            document.getElementById('auth-tab-reg').classList.remove('bg-white', 'text-blue-700');
-        };
-
-        document.getElementById('auth-tab-reg').onclick = () => {
-            currentAuthMode = 'register';
-            document.getElementById('reg-inputs').classList.remove('hidden');
-            document.getElementById('auth-tab-reg').classList.add('bg-white', 'text-blue-700');
-            document.getElementById('auth-tab-login').classList.remove('bg-white', 'text-blue-700');
-        };
 
         document.getElementById('btn-auth-submit').onclick = async () => {
-            const email = document.getElementById('authEmail').value;
-            const pass = document.getElementById('authPass').value;
-            if(!email || !pass) return alert("Completa los campos");
+            const email = document.getElementById('authEmail').value, pass = document.getElementById('authPass').value;
             try {
                 if(currentAuthMode === 'register') {
-                    const name = document.getElementById('authName').value.toUpperCase();
-                    const id = document.getElementById('authId').value.toUpperCase();
-                    if(!name || !id) return alert("Faltan datos de registro");
+                    const name = document.getElementById('authName').value.toUpperCase(), id = document.getElementById('authId').value.toUpperCase();
                     const res = await createUserWithEmailAndPassword(auth, email, pass);
                     await setDoc(doc(db, 'artifacts', APP_ID, 'users', res.user.uid, 'profile', 'info'), { name, id, email, role: currentTargetRole });
                 } else { await signInWithEmailAndPassword(auth, email, pass); }
-            } catch(e) { alert("Error: " + e.message); }
+            } catch(e) { alert("Error de acceso: " + e.message); }
         };
 
         document.getElementById('btn-create-session').onclick = async () => {
-            const course = document.getElementById('sCourse').value.toUpperCase();
-            const grade = document.getElementById('sGrade').value.toUpperCase();
-            const cid = document.getElementById('sClassId').value;
-            if(!course || !grade) return alert("Datos de clase incompletos");
+            const course = document.getElementById('sCourse').value.toUpperCase(), grade = document.getElementById('sGrade').value.toUpperCase(), cid = document.getElementById('sClassId').value;
+            if(!course || !grade) return;
             await addDoc(collection(db, 'artifacts', APP_ID, 'users', user.uid, 'sessions'), { course, grade, classId: cid, timestamp: Date.now(), attendees: [] });
             window.appShowQR(cid);
         };
 
-        document.getElementById('btn-close-qr').onclick = () => {
-            if(qrInterval) clearInterval(qrInterval);
-            document.getElementById('modal-qr').classList.add('hidden');
-        };
-
-        document.getElementById('btn-close-list').onclick = () => document.getElementById('modal-list').classList.add('hidden');
+        document.getElementById('btn-logout-admin').onclick = () => signOut(auth);
         document.getElementById('btn-logout-teacher').onclick = () => signOut(auth);
         document.getElementById('btn-logout-student').onclick = () => signOut(auth);
-
-        document.getElementById('tab-register').onclick = () => {
-            document.getElementById('module-register').classList.remove('hidden');
-            document.getElementById('module-history').classList.add('hidden');
-            document.getElementById('tab-register').classList.add('active');
-            document.getElementById('tab-history').classList.remove('active');
-        };
-        
-        document.getElementById('tab-history').onclick = () => {
-            document.getElementById('module-register').classList.add('hidden');
-            document.getElementById('module-history').classList.remove('hidden');
-            document.getElementById('tab-register').classList.remove('active');
-            document.getElementById('tab-history').classList.add('active');
-        };
+        document.getElementById('btn-close-qr').onclick = () => { clearInterval(qrInterval); document.getElementById('modal-qr').classList.add('hidden'); };
+        document.getElementById('btn-close-list').onclick = () => document.getElementById('modal-list').classList.add('hidden');
+        document.getElementById('auth-tab-login').onclick = () => { currentAuthMode = 'login'; document.getElementById('reg-inputs').classList.add('hidden'); };
+        document.getElementById('auth-tab-reg').onclick = () => { currentAuthMode = 'register'; document.getElementById('reg-inputs').classList.remove('hidden'); };
 
         window.onload = init;
     </script>
