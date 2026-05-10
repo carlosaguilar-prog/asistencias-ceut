@@ -10,6 +10,7 @@
             --bg-deep: #0f172a; 
             --accent-gold: #d4af37; 
             --ceutBlue: #1e40af;
+            --ceutBlueLight: #dbeafe;
         }
         
         * { -webkit-tap-highlight-color: transparent; box-sizing: border-box; }
@@ -26,6 +27,25 @@
         .view-section { display: none; width: 100%; min-height: 100%; flex-direction: column; }
         .view-section.active { display: flex; }
 
+        .input-ceut {
+            width: 100%;
+            padding: 1.25rem;
+            background-color: white;
+            border: 2px solid #e2e8f0;
+            border-radius: 1rem;
+            font-size: 1.125rem;
+            font-weight: 800;
+            color: var(--ceutBlue);
+            text-transform: uppercase;
+            transition: all 0.3s ease;
+            outline: none;
+        }
+
+        .input-ceut:focus {
+            border-color: var(--ceutBlue);
+            box-shadow: 0 0 0 4px var(--ceutBlueLight);
+        }
+
         #master-access-trigger {
             position: fixed; top: 25px; right: 25px; z-index: 9999;
             width: 50px; height: 50px; background: #1e293b; border-radius: 16px; 
@@ -34,25 +54,35 @@
             cursor: pointer; transition: all 0.3s;
         }
 
-        .card-admin { background: white; border-radius: 1.5rem; padding: 1.5rem; color: #1e293b; margin-bottom: 1rem; border: 1px solid #e2e8f0; }
+        .card-admin { background: white; border-radius: 1.5rem; padding: 1.5rem; color: #1e293b; margin-bottom: 1rem; border: 1px solid #e2e8f0; position: relative; }
         .badge { padding: 4px 10px; border-radius: 6px; font-size: 10px; font-weight: 800; text-transform: uppercase; }
-        .badge-teacher { background: #dbeafe; color: #1e40af; }
+        .badge-teacher { background: var(--ceutBlueLight); color: var(--ceutBlue); }
         
         .action-btn { transition: all 0.2s; cursor: pointer; }
         .action-btn:active { transform: scale(0.95); }
 
-        /* Animación de escaneo exitoso */
         @keyframes success-pulse {
             0% { transform: scale(1); }
             50% { transform: scale(1.05); background: #22c55e; }
             100% { transform: scale(1); }
         }
         .success-anim { animation: success-pulse 0.6s ease-out; }
+
+        /* Botón de PDF flotante en cards */
+        .pdf-btn {
+            position: absolute; top: 1.5rem; right: 1.5rem;
+            background: #f1f5f9; color: #ef4444; padding: 8px; border-radius: 10px;
+            cursor: pointer; transition: all 0.2s;
+        }
+        .pdf-btn:hover { background: #fee2e2; }
     </style>
 
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;700;800&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <!-- Librerías para PDF -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
 </head>
 <body>
 
@@ -70,12 +100,12 @@
         <main id="view-home" class="view-section active items-center justify-center p-6 text-center">
             <div class="max-w-md w-full">
                 <img src="https://lh3.googleusercontent.com/d/17NobXQ3JbRnLGejZe4Mn2x-Jl45F4rPm" class="w-24 mx-auto mb-6">
-                <h1 class="text-4xl font-extrabold tracking-tighter mb-2">CEUT <span class="text-[#d4af37]">CLOUD</span></h1>
+                <h1 class="text-4xl font-extrabold tracking-tighter mb-2 text-white">CEUT <span class="text-[#d4af37]">CLOUD</span></h1>
                 <p class="text-[10px] tracking-[0.4em] text-white/40 font-bold uppercase mb-10">AUTO-REGISTRO QR</p>
                 <div class="space-y-5">
                     <button onclick="prepareAuth('teacher')" class="w-full glass p-6 rounded-3xl flex items-center gap-5 action-btn">
                         <div class="w-16 h-16 bg-[#d4af37] rounded-2xl flex items-center justify-center text-3xl">👨‍🏫</div>
-                        <div class="text-left"><p class="text-[14px] font-black uppercase">Docentes</p><p class="text-[10px] text-white/50">Gestionar Clases</p></div>
+                        <div class="text-left"><p class="text-[14px] font-black uppercase text-white">Docentes</p><p class="text-[10px] text-white/50">Gestionar Clases</p></div>
                     </button>
                     <button onclick="prepareAuth('student')" class="w-full bg-white p-6 rounded-3xl flex items-center gap-5 action-btn shadow-xl">
                         <div class="w-16 h-16 bg-[#1e40af] rounded-2xl flex items-center justify-center text-3xl text-white">🎓</div>
@@ -91,16 +121,16 @@
                 <button onclick="switchView('home')" class="mb-8 text-[12px] font-bold text-slate-400 uppercase tracking-widest">← Inicio</button>
                 <h2 id="auth-title" class="text-3xl font-black text-[#1e40af] mb-6 uppercase tracking-tighter">Acceso</h2>
                 <div id="auth-mode-selector" class="flex bg-slate-200/50 p-1 rounded-2xl mb-6">
-                    <button onclick="toggleAuthMode('login')" id="btn-mode-login" class="flex-1 py-4 rounded-xl font-bold text-[12px] uppercase bg-white shadow-sm">Ingresar</button>
+                    <button onclick="toggleAuthMode('login')" id="btn-mode-login" class="flex-1 py-4 rounded-xl font-bold text-[12px] uppercase bg-white shadow-sm text-[#1e40af]">Ingresar</button>
                     <button onclick="toggleAuthMode('register')" id="btn-mode-register" class="flex-1 py-4 rounded-xl font-bold text-[12px] uppercase text-slate-400">Registrar</button>
                 </div>
                 <div class="space-y-4">
                     <div id="reg-fields" class="hidden space-y-4">
-                        <input type="text" id="authName" placeholder="NOMBRE COMPLETO" class="w-full p-5 bg-white border-2 border-slate-200 rounded-2xl text-lg font-bold uppercase">
-                        <input type="text" id="authId" placeholder="MATRÍCULA / ID" class="w-full p-5 bg-white border-2 border-slate-200 rounded-2xl text-lg font-bold uppercase">
+                        <input type="text" id="authName" placeholder="NOMBRE COMPLETO" class="input-ceut">
+                        <input type="text" id="authId" placeholder="MATRÍCULA / ID" class="input-ceut">
                     </div>
-                    <input type="email" id="authEmail" placeholder="CORREO" class="w-full p-5 bg-white border-2 border-slate-200 rounded-2xl text-lg font-bold">
-                    <input type="password" id="authPass" placeholder="CONTRASEÑA" class="w-full p-5 bg-white border-2 border-slate-200 rounded-2xl text-lg font-bold">
+                    <input type="email" id="authEmail" placeholder="CORREO" class="input-ceut" style="text-transform: none;">
+                    <input type="password" id="authPass" placeholder="CONTRASEÑA" class="input-ceut" style="text-transform: none;">
                     <button onclick="handleAuth()" class="w-full bg-[#1e40af] text-white p-6 rounded-2xl font-black mt-4 uppercase text-[12px] tracking-widest shadow-xl action-btn">Confirmar Acceso</button>
                 </div>
             </div>
@@ -112,30 +142,15 @@
                 <div class="w-20 h-20 bg-white/10 rounded-3xl mx-auto mb-6 flex items-center justify-center text-4xl">🎓</div>
                 <h2 class="text-2xl font-black text-white uppercase mb-1" id="std-nav-name">ESTUDIANTE</h2>
                 <p class="text-[#d4af37] text-[10px] font-black uppercase tracking-widest mb-10" id="std-nav-id">MATRÍCULA: ---</p>
-                
                 <div id="status-area" class="space-y-6">
-                    <p class="text-white/40 text-[10px] font-bold uppercase tracking-[0.2em]">Listo para registrar</p>
-                    <input type="text" id="regCode" oninput="onCodeInput(this)" placeholder="CÓDIGO" class="w-full bg-white/10 border-4 border-white/20 p-6 text-center text-5xl font-black rounded-3xl outline-none text-white tracking-[0.2em]" maxlength="6">
-                    <div id="class-detected-info" class="hidden bg-[#d4af37]/20 p-6 rounded-2xl border-2 border-[#d4af37]/30 animate-pulse">
-                        <p id="det-course" class="text-[#d4af37] text-[12px] font-black uppercase"></p>
-                    </div>
-                    <button id="btn-register-attendance" onclick="studentRegister()" disabled class="w-full bg-white/10 text-white/20 p-6 rounded-2xl font-black text-[12px] uppercase">REGISTRAR ENTRADA</button>
+                    <p class="text-white/40 text-[10px] font-bold uppercase tracking-[0.2em]">Escanea el código QR de tu clase</p>
+                    <div class="w-12 h-12 border-2 border-white/20 border-t-white rounded-full animate-spin mx-auto"></div>
                 </div>
                 <button onclick="logout()" class="mt-12 text-white/30 text-[10px] font-black uppercase underline">CERRAR SESIÓN</button>
             </div>
         </section>
 
-        <!-- PANEL DOCENTE & ADMIN (REUTILIZADOS) -->
-        <section id="view-admin-panel" class="view-section bg-slate-100">
-            <nav class="bg-slate-900 p-5 flex justify-between items-center text-white sticky top-0 z-50">
-                <span class="font-black text-[12px]">CEUT MASTER</span>
-                <button onclick="logout()" class="bg-red-600 text-[10px] font-black px-4 py-2 rounded-xl">SALIR DEL SITIO</button>
-            </nav>
-            <div id="admin-content-sessions" class="p-5 space-y-4">
-                <div id="global-sessions-list" class="space-y-4"></div>
-            </div>
-        </section>
-
+        <!-- PANEL DOCENTE -->
         <section id="view-teacher-panel" class="view-section bg-slate-100">
             <nav class="bg-[#1e40af] p-5 flex justify-between items-center text-white sticky top-0 z-50">
                 <span id="nav-name" class="text-[12px] font-black uppercase">DOCENTE</span>
@@ -143,22 +158,40 @@
             </nav>
             <div class="p-6 space-y-6">
                 <div class="bg-white p-8 rounded-[2.5rem] shadow-sm border-2 border-slate-100">
-                    <input type="text" id="sCourse" placeholder="MATERIA" class="w-full p-5 bg-slate-50 rounded-2xl text-lg font-black border-2 border-slate-100 uppercase mb-4">
+                    <input type="text" id="sCourse" placeholder="MATERIA" class="input-ceut mb-4">
                     <div class="grid grid-cols-2 gap-4 mb-4">
-                        <input type="text" id="sGrade" placeholder="GRUPO" class="w-full p-5 bg-slate-50 rounded-2xl text-lg font-black border-2 border-slate-100 uppercase">
-                        <select id="sLevel" class="w-full p-5 bg-slate-50 rounded-2xl text-[12px] font-black">
+                        <input type="text" id="sGrade" placeholder="GRUPO" class="input-ceut">
+                        <select id="sLevel" class="input-ceut text-[12px] appearance-none" style="background-image: url('data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2F12000%2Fsvg%22%20width%3D%2224%22%20height%3D%2224%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%231e40af%22%20stroke-width%3D%223%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpolyline%20points%3D%226%209%2012%2015%2018%209%22%3E%3C%2Fpolyline%3E%3C%2Fsvg%3E'); background-repeat: no-repeat; background-position: right 1rem center; background-size: 1rem;">
                             <option value="LIC">LICENCIATURA</option>
                             <option value="BAC">BACHILLERATO</option>
                         </select>
                     </div>
-                    <button onclick="saveClass()" class="w-full bg-[#d4af37] text-[#1e40af] p-6 rounded-3xl font-black text-[12px] uppercase">ACTIVAR PASE DE LISTA</button>
+                    <button onclick="saveClass()" class="w-full bg-[#d4af37] text-[#1e40af] p-6 rounded-3xl font-black text-[12px] uppercase shadow-lg shadow-[#d4af37]/20">ACTIVAR PASE DE LISTA</button>
                 </div>
                 <div id="sessions-list" class="space-y-4 pb-20"></div>
             </div>
         </section>
+
+        <!-- PANEL ADMIN -->
+        <section id="view-admin-panel" class="view-section bg-slate-100">
+            <nav class="bg-slate-900 p-5 flex justify-between items-center text-white sticky top-0 z-50">
+                <span class="font-black text-[12px]">CEUT MASTER</span>
+                <button onclick="logout()" class="bg-red-600 text-[10px] font-black px-4 py-2 rounded-xl">SALIR DEL SITIO</button>
+            </nav>
+            <div class="p-5 flex flex-col gap-4">
+                <div class="bg-[#1e40af] p-6 rounded-3xl text-white flex justify-between items-center">
+                    <div>
+                        <p class="text-[10px] font-black uppercase opacity-60">Supervisión Global</p>
+                        <h2 class="text-2xl font-black tracking-tighter">HISTORIAL DE CLASES</h2>
+                    </div>
+                    <div class="w-12 h-12 bg-white/10 rounded-2xl flex items-center justify-center text-2xl">📊</div>
+                </div>
+                <div id="global-sessions-list" class="space-y-4 pb-20"></div>
+            </div>
+        </section>
     </div>
 
-    <!-- MODAL QR (URL DINÁMICA) -->
+    <!-- MODAL QR -->
     <div id="qr-modal" class="fixed inset-0 bg-[#0f172a]/98 backdrop-blur-2xl z-[200] hidden flex flex-col items-center justify-center p-8">
         <div id="qrcode-box" class="p-8 bg-white rounded-[3rem] shadow-2xl mb-8 border-8 border-[#d4af37]"></div>
         <h4 id="modal-code" class="text-7xl font-black text-white tracking-tighter mb-4">000000</h4>
@@ -169,7 +202,7 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
-        import { getFirestore, collection, addDoc, onSnapshot, doc, updateDoc, setDoc, deleteDoc, getDoc } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
+        import { getFirestore, collection, addDoc, onSnapshot, doc, updateDoc, setDoc, deleteDoc, getDoc, collectionGroup } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
         import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-auth.js";
 
         const firebaseConfig = {
@@ -184,10 +217,9 @@
         const ADMIN_EMAIL = "carlos.aguilar@ceut.edu.mx";
         let db, auth, currentUser, userData;
 
-        // --- DETECCIÓN DE DEEP LINK (CÓDIGO EN URL) ---
         function getCodeFromURL() {
             const params = new URLSearchParams(window.location.search);
-            return params.get('c'); // Ejemplo: ?c=123456
+            return params.get('c');
         }
 
         async function init() {
@@ -205,7 +237,7 @@
                     if (user.email === ADMIN_EMAIL) {
                         userData = { name: "CARLOS AGUILAR", role: "admin" };
                         switchView('admin-panel');
-                        initAdminMonitoring();
+                        listenToAllSessions();
                     } else if (p.exists()) {
                         userData = p.data();
                         if (userData.role === 'teacher') {
@@ -213,26 +245,119 @@
                             listenToTeacherSessions(user.uid);
                             document.getElementById('nav-name').innerText = userData.name;
                         } else {
-                            // Flujo Alumno
                             document.getElementById('std-nav-name').innerText = userData.name;
                             document.getElementById('std-nav-id').innerText = `ID: ${userData.id}`;
                             switchView('student-panel');
 
-                            // SI HAY CÓDIGO DIRECTO: REGISTRAR AUTOMÁTICAMENTE
                             if (directCode) {
-                                document.getElementById('loading-text').innerText = "REGISTRANDO ASISTENCIA...";
                                 await autoRegister(directCode);
+                            } else {
+                                document.getElementById('status-area').innerHTML = `
+                                    <p class="text-white/40 text-[10px] font-bold uppercase tracking-[0.2em]">Cámara no detectada</p>
+                                    <p class="text-white text-xs mt-2">Por favor escanea el código QR de la clase directamente desde tu cámara para entrar.</p>
+                                `;
                             }
                         }
                     }
                 } else { 
-                    // Si no hay sesión y hay código, guardar código para después de loguearse
                     if(directCode) localStorage.setItem('pending_code', directCode);
                     switchView('home'); 
                 }
                 document.getElementById('loading-overlay').style.display = 'none';
                 document.getElementById('app-container').style.opacity = '1';
             });
+        }
+
+        // --- EXPORTAR A PDF ---
+        window.exportSessionPDF = (sessionDataJson) => {
+            const s = JSON.parse(decodeURIComponent(sessionDataJson));
+            const { jsPDF } = window.jspdf;
+            const docPdf = new jsPDF();
+
+            // Estilos de encabezado
+            docPdf.setFillColor(30, 64, 175); // Azul CEUT
+            docPdf.rect(0, 0, 210, 40, 'F');
+            
+            docPdf.setTextColor(255, 255, 255);
+            docPdf.setFontSize(22);
+            docPdf.setFont("helvetica", "bold");
+            docPdf.text("REPORTE DE ASISTENCIA", 15, 25);
+            
+            docPdf.setFontSize(10);
+            docPdf.text(`CEUT CLOUD V10 - SISTEMA INSTITUCIONAL`, 15, 33);
+
+            // Información de la Clase
+            docPdf.setTextColor(0, 0, 0);
+            docPdf.setFontSize(12);
+            docPdf.text(`MATERIA: ${s.course}`, 15, 55);
+            docPdf.text(`GRUPO: ${s.grade} (${s.level})`, 15, 62);
+            docPdf.text(`CÓDIGO DE ACCESO: ${s.code}`, 15, 69);
+            docPdf.text(`FECHA: ${new Date(s.timestamp).toLocaleDateString()}`, 150, 55);
+
+            // Tabla de Alumnos
+            const tableData = s.attendees.map((a, index) => [
+                index + 1,
+                a.id,
+                a.name,
+                a.time
+            ]);
+
+            docPdf.autoTable({
+                startY: 80,
+                head: [['#', 'MATRÍCULA', 'NOMBRE DEL ALUMNO', 'HORA REGISTRO']],
+                body: tableData,
+                theme: 'striped',
+                headStyles: { fillColor: [30, 64, 175], textColor: [255, 255, 255], fontStyle: 'bold' },
+                styles: { fontSize: 9, cellPadding: 4 },
+                columnStyles: {
+                    0: { cellWidth: 10 },
+                    1: { cellWidth: 30 },
+                    3: { cellWidth: 40 }
+                }
+            });
+
+            const fileName = `ASISTENCIA_${s.course.replace(/\s+/g, '_')}_${s.grade}.pdf`;
+            docPdf.save(fileName);
+        };
+
+        // --- MONITOREO ADMIN ---
+        function listenToAllSessions() {
+            // Usamos collectionGroup para traer todas las sesiones de todos los profesores
+            onSnapshot(collectionGroup(db, 'sessions'), (snap) => {
+                const list = document.getElementById('global-sessions-list');
+                const docs = snap.docs.sort((a, b) => b.data().timestamp - a.data().timestamp);
+                
+                list.innerHTML = docs.map(d => {
+                    const s = d.data();
+                    const sessionJson = encodeURIComponent(JSON.stringify(s));
+                    return `
+                        <div class="card-admin shadow-sm">
+                            <div class="flex justify-between items-start mb-2">
+                                <span class="badge badge-teacher">${s.level}</span>
+                                <div onclick="exportSessionPDF('${sessionJson}')" class="pdf-btn action-btn">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                                </div>
+                            </div>
+                            <h4 class="font-black text-[#1e40af] text-lg uppercase pr-10">${s.course}</h4>
+                            <div class="flex items-center gap-2 mt-1">
+                                <p class="text-[10px] text-slate-400 font-bold uppercase">GRUPO ${s.grade}</p>
+                                <span class="text-slate-300">•</span>
+                                <p class="text-[10px] text-[#d4af37] font-bold uppercase">CÓDIGO ${s.code}</p>
+                            </div>
+                            <div class="mt-4 p-3 bg-slate-50 rounded-xl border border-slate-100">
+                                <div class="flex justify-between items-center text-[9px] font-bold text-slate-400 uppercase mb-2">
+                                    <span>Alumnos Registrados</span>
+                                    <span class="text-[#1e40af]">${s.attendees.length}</span>
+                                </div>
+                                <div class="flex -space-x-2 overflow-hidden">
+                                    ${s.attendees.slice(0, 5).map(() => `<div class="inline-block h-6 w-6 rounded-full ring-2 ring-white bg-slate-200"></div>`).join('')}
+                                    ${s.attendees.length > 5 ? `<div class="flex items-center justify-center h-6 w-6 rounded-full ring-2 ring-white bg-slate-100 text-[8px] font-bold">+${s.attendees.length - 5}</div>` : ''}
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            }, (err) => console.error("Error admin monitoring:", err));
         }
 
         async function autoRegister(code) {
@@ -250,17 +375,20 @@
                             attendees: [...att, { name: userData.name, id: userData.id, time: new Date().toLocaleTimeString() }] 
                         });
                         
-                        // Feedback visual exitoso
                         const card = document.getElementById('student-card');
                         card.classList.add('success-anim');
                         document.getElementById('status-area').innerHTML = `
                             <div class="text-[#22c55e] text-5xl mb-4">✓</div>
-                            <h3 class="text-white font-black uppercase">¡ASISTENCIA REGISTRADA!</h3>
-                            <p class="text-white/50 text-[10px] uppercase mt-2">${data.course}</p>
-                            <button onclick="window.location.search=''" class="mt-6 text-white/30 text-[10px] uppercase">Aceptar</button>
+                            <h3 class="text-white font-black uppercase tracking-tighter">¡LISTO!</h3>
+                            <p class="text-white/70 text-[10px] font-bold uppercase mb-4">${data.course}</p>
+                            <p class="text-white/40 text-[9px] uppercase">Tu asistencia ha sido guardada en la nube</p>
                         `;
                     } else {
-                        alert("YA ESTABAS REGISTRADO EN ESTA CLASE");
+                        document.getElementById('status-area').innerHTML = `
+                            <div class="text-[#d4af37] text-4xl mb-4">⚠️</div>
+                            <h3 class="text-white font-black uppercase">YA REGISTRADO</h3>
+                            <p class="text-white/50 text-[10px] uppercase mt-2">Ya estás en la lista de ${data.course}</p>
+                        `;
                     }
                 }
             }
@@ -283,26 +411,19 @@
             document.getElementById('modal-code').innerText = code; 
             document.getElementById('modal-course-name').innerText = course;
             document.getElementById('qrcode-box').innerHTML = ""; 
-            
-            // EL QR CONTIENE LA URL CON EL PARÁMETRO DE CÓDIGO
             const directUrl = `${window.location.origin}${window.location.pathname}?c=${code}`;
-            
             new QRCode(document.getElementById('qrcode-box'), { 
-                text: directUrl, 
-                width: 220, 
-                height: 220,
-                colorDark: "#0f172a",
-                colorLight: "#ffffff"
+                text: directUrl, width: 220, height: 220, colorDark: "#0f172a", colorLight: "#ffffff"
             }); 
             document.getElementById('qr-modal').classList.remove('hidden'); 
         };
 
-        // ... Resto de funciones (logout, handleAuth, etc) permanecen igual pero optimizadas ...
         window.logout = () => signOut(auth).then(() => window.location.href = window.location.origin + window.location.pathname);
         
         window.switchView = (id) => {
             document.querySelectorAll('.view-section').forEach(s => s.classList.remove('active'));
-            document.getElementById('view-' + id).classList.add('active');
+            const el = document.getElementById('view-' + id);
+            if(el) el.classList.add('active');
         };
 
         window.prepareAuth = (role) => { 
@@ -314,6 +435,10 @@
         window.toggleAuthMode = (mode) => { 
             window.authMode = mode; 
             document.getElementById('reg-fields').classList.toggle('hidden', mode !== 'register');
+            document.getElementById('btn-mode-login').classList.toggle('bg-white', mode === 'login');
+            document.getElementById('btn-mode-login').classList.toggle('text-[#1e40af]', mode === 'login');
+            document.getElementById('btn-mode-register').classList.toggle('bg-white', mode === 'register');
+            document.getElementById('btn-mode-register').classList.toggle('text-[#1e40af]', mode === 'register');
         };
 
         window.handleAuth = async () => {
@@ -327,28 +452,33 @@
                     await setDoc(doc(db, 'artifacts', APP_ID, 'users', res.user.uid, 'profile', 'info'), { name, email, id, role: window.userRole });
                 } else { await signInWithEmailAndPassword(auth, email, pass); }
                 
-                // Si había un código pendiente, se procesará al recargar tras auth
                 const pending = localStorage.getItem('pending_code');
                 if(pending) {
                     window.location.search = `?c=${pending}`;
                     localStorage.removeItem('pending_code');
                 }
-            } catch (e) { alert("ERROR"); }
+            } catch (e) { alert("ERROR DE ACCESO"); }
         };
 
         window.closeQR = () => document.getElementById('qr-modal').classList.add('hidden');
 
-        // Monitoreos básicos
         function listenToTeacherSessions(uid) {
             onSnapshot(collection(db, 'artifacts', APP_ID, 'users', uid, 'sessions'), (snap) => {
                 const list = document.getElementById('sessions-list');
                 list.innerHTML = snap.docs.map(d => {
                     const s = d.data();
-                    return `<div class="card-admin">
+                    const sessionJson = encodeURIComponent(JSON.stringify(s));
+                    return `<div class="card-admin shadow-sm">
                         <div class="flex justify-between items-center mb-2"><span class="badge badge-teacher">${s.level}</span><p class="text-[9px] font-bold text-slate-300">ID: ${s.code}</p></div>
                         <h4 class="font-black text-[#1e40af] text-lg uppercase">${s.course}</h4>
                         <p class="text-[10px] text-slate-400 font-bold uppercase">GRUPO ${s.grade} • ${s.attendees.length} Presentes</p>
-                        <button onclick="showQR('${s.code}', '${s.course}')" class="mt-4 w-full bg-slate-100 text-slate-600 py-3 rounded-xl font-black text-[10px] uppercase">Ver QR de Registro</button>
+                        <div class="grid grid-cols-2 gap-3 mt-4">
+                            <button onclick="showQR('${s.code}', '${s.course}')" class="bg-slate-100 text-[#1e40af] py-3 rounded-xl font-black text-[10px] uppercase">Ver QR</button>
+                            <button onclick="exportSessionPDF('${sessionJson}')" class="bg-red-50 text-red-600 py-3 rounded-xl font-black text-[10px] uppercase flex items-center justify-center gap-2">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                                PDF
+                            </button>
+                        </div>
                     </div>`;
                 }).join('');
             });
