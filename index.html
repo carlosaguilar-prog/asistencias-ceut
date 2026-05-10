@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>CEUT | GESTIÓN INTELIGENTE</title>
+    <title>CEUT | SISTEMA DUAL</title>
     
     <style>
         :root { 
@@ -37,28 +37,25 @@
             font-weight: 800;
             color: #1e40af !important;
             text-transform: uppercase;
-            transition: all 0.3s ease;
             outline: none;
         }
 
-        .input-ceut:focus { border-color: var(--ceutBlue); box-shadow: 0 0 0 4px var(--ceutBlueLight); }
-
+        /* Botón Maestro Flotante */
         #master-access-trigger {
             position: fixed; bottom: 25px; right: 25px; z-index: 9999;
             width: 50px; height: 50px; background: #1e293b; border-radius: 16px; 
             display: flex; align-items: center; justify-content: center;
-            border: 2px solid var(--accent-gold); 
-            cursor: pointer; transition: all 0.3s;
+            border: 2px solid var(--accent-gold); cursor: pointer;
         }
 
+        /* Tarjetas Estilo Admin */
         .card-admin { 
             background: white; 
             border-radius: 1.5rem; 
-            padding: 1.5rem; 
+            padding: 1.25rem; 
             color: #1e293b !important; 
             margin-bottom: 1rem; 
             border: 1px solid #e2e8f0; 
-            position: relative;
             box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
         }
 
@@ -66,13 +63,33 @@
         .badge-teacher { background: var(--ceutBlueLight); color: var(--ceutBlue); }
         
         .action-btn { transition: all 0.2s; cursor: pointer; display: flex; align-items: center; justify-content: center; }
-        .action-btn:active { transform: scale(0.95); }
+        .action-btn:active { transform: scale(0.9); }
 
-        .nav-sticky { position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .nav-sticky { position: sticky; top: 0; z-index: 100; }
         
         .tab-btn { flex: 1; padding: 12px; font-size: 10px; font-weight: 800; text-transform: uppercase; border-radius: 12px; transition: 0.3s; }
         .tab-btn.active { background: #1e40af; color: white; }
-        .tab-btn:not(.active) { color: #64748b; }
+        .tab-btn:not(.active) { color: #64748b; background: transparent; }
+
+        .icon-circle {
+            width: 36px; height: 36px; border-radius: 10px;
+            display: flex; align-items: center; justify-content: center;
+        }
+        
+        /* Switcher de Rol para Admin */
+        .role-switcher {
+            background: #1e293b;
+            padding: 4px;
+            border-radius: 14px;
+            display: flex;
+            gap: 4px;
+            margin: 10px 20px;
+        }
+        .role-option {
+            flex: 1; padding: 10px; font-size: 9px; font-weight: 800; border-radius: 10px; text-align: center;
+            text-transform: uppercase; cursor: pointer; transition: 0.3s; color: #64748b;
+        }
+        .role-option.active { background: var(--accent-gold); color: #0f172a; }
     </style>
 
     <script src="https://cdn.tailwindcss.com"></script>
@@ -89,7 +106,7 @@
 
     <div id="loading-overlay" class="fixed inset-0 bg-[#0f172a] z-[9999] flex flex-col items-center justify-center">
         <div class="w-12 h-12 border-4 border-white/10 border-t-[#d4af37] rounded-full animate-spin mb-4"></div>
-        <p class="text-[10px] font-bold tracking-[0.3em] opacity-40 uppercase">Cargando CEUT Cloud</p>
+        <p class="text-[10px] font-bold tracking-[0.3em] opacity-40 uppercase">CEUT Cloud Sync</p>
     </div>
 
     <div id="app-container">
@@ -102,11 +119,11 @@
                 <div class="space-y-5">
                     <button onclick="handleProtectedAccess('teacher')" class="w-full glass p-6 rounded-3xl flex items-center gap-5 action-btn border border-white/10">
                         <div class="w-16 h-16 bg-[#d4af37] rounded-2xl flex items-center justify-center text-3xl">👨‍🏫</div>
-                        <div class="text-left"><p class="text-[14px] font-black uppercase text-white">Docentes</p><p class="text-[10px] text-white/50">Gestionar Clases</p></div>
+                        <div class="text-left"><p class="text-[14px] font-black uppercase text-white">Docentes</p><p class="text-[10px] text-white/50">Panel de Clases</p></div>
                     </button>
                     <button onclick="handleProtectedAccess('student')" class="w-full bg-white p-6 rounded-3xl flex items-center gap-5 action-btn shadow-xl">
                         <div class="w-16 h-16 bg-[#1e40af] rounded-2xl flex items-center justify-center text-3xl text-white">🎓</div>
-                        <div class="text-left"><p class="text-[14px] font-black text-[#1e40af] uppercase">Alumnos</p><p class="text-[10px] text-slate-400">Acceso Estudiantil</p></div>
+                        <div class="text-left"><p class="text-[14px] font-black text-[#1e40af] uppercase">Alumnos</p><p class="text-[10px] text-slate-400">Pasar Asistencia</p></div>
                     </button>
                 </div>
             </div>
@@ -115,7 +132,7 @@
         <!-- AUTH -->
         <section id="view-auth" class="view-section p-6 bg-slate-50 items-center justify-center">
             <div class="w-full max-w-sm">
-                <button onclick="switchView('home')" class="mb-8 text-[12px] font-bold text-slate-400 uppercase tracking-widest">← Cancelar y Volver</button>
+                <button onclick="switchView('home')" class="mb-8 text-[12px] font-bold text-slate-400 uppercase tracking-widest">← Volver al Inicio</button>
                 <h2 id="auth-title" class="text-3xl font-black text-[#1e40af] mb-6 uppercase tracking-tighter">Acceso</h2>
                 <div id="auth-mode-selector" class="flex bg-slate-200/50 p-1 rounded-2xl mb-6">
                     <button onclick="toggleAuthMode('login')" id="btn-mode-login" class="flex-1 py-4 rounded-xl font-bold text-[12px] uppercase bg-white shadow-sm text-[#1e40af]">Ingresar</button>
@@ -128,8 +145,65 @@
                     </div>
                     <input type="email" id="authEmail" placeholder="CORREO" class="input-ceut" style="text-transform: none;">
                     <input type="password" id="authPass" placeholder="CONTRASEÑA" class="input-ceut" style="text-transform: none;">
-                    <button onclick="handleAuth()" class="w-full bg-[#1e40af] text-white p-6 rounded-2xl font-black mt-4 uppercase text-[12px] tracking-widest shadow-xl action-btn">Confirmar Acceso</button>
+                    <button onclick="handleAuth()" class="w-full bg-[#1e40af] text-white p-6 rounded-2xl font-black mt-4 uppercase text-[12px] tracking-widest shadow-xl action-btn">Entrar al Sistema</button>
                 </div>
+            </div>
+        </section>
+
+        <!-- PANEL UNIFICADO (DOCENTE & ADMIN) -->
+        <section id="view-unified-panel" class="view-section bg-slate-100">
+            <!-- Navbar Adaptativo -->
+            <nav id="nav-header" class="bg-[#1e40af] p-5 flex justify-between items-center text-white nav-sticky transition-colors duration-500">
+                <div class="flex items-center gap-3">
+                    <span id="display-user-name" class="text-[12px] font-black uppercase tracking-tight">Cargando...</span>
+                </div>
+                <button onclick="logout()" class="text-[10px] font-black bg-white/10 px-4 py-2 rounded-xl action-btn">CERRAR SESIÓN</button>
+            </nav>
+
+            <!-- Switcher de Modo (Solo para Admin) -->
+            <div id="admin-mode-toggle" class="hidden role-switcher">
+                <div id="opt-docente" onclick="switchAdminRole('teacher')" class="role-option active">Modo Docente</div>
+                <div id="opt-admin" onclick="switchAdminRole('admin')" class="role-option">Modo Administrador</div>
+            </div>
+
+            <!-- CONTENIDO DINÁMICO -->
+            <div id="panel-content" class="p-6 max-w-3xl mx-auto w-full pb-32">
+                
+                <!-- BLOQUE: VISTA DOCENTE (CREAR CLASES) -->
+                <div id="section-teacher" class="space-y-6">
+                    <div class="bg-white p-8 rounded-[2.5rem] shadow-sm border-2 border-slate-100">
+                        <h3 class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4 text-center">Nueva Sesión de Clase</h3>
+                        <input type="text" id="sCourse" placeholder="NOMBRE DE LA MATERIA" class="input-ceut mb-4">
+                        <div class="grid grid-cols-2 gap-4 mb-4">
+                            <input type="text" id="sGrade" placeholder="GRUPO" class="input-ceut">
+                            <select id="sLevel" class="input-ceut text-[12px]">
+                                <option value="LIC">LICENCIATURA</option>
+                                <option value="BAC">BACHILLERATO</option>
+                            </select>
+                        </div>
+                        <button onclick="saveClass()" class="w-full bg-[#d4af37] text-[#1e40af] p-6 rounded-3xl font-black text-[12px] uppercase shadow-lg shadow-[#d4af37]/20">ACTIVAR QR DE ASISTENCIA</button>
+                    </div>
+                    <div id="teacher-sessions-list" class="space-y-4">
+                        <p class="text-center text-slate-400 text-[10px] font-bold uppercase py-10">Cargando tus clases...</p>
+                    </div>
+                </div>
+
+                <!-- BLOQUE: VISTA ADMINISTRADOR (GLOBAL) -->
+                <div id="section-admin" class="hidden space-y-6">
+                    <div class="flex bg-slate-200/60 p-1 rounded-2xl mb-6 shadow-inner">
+                        <button id="tab-sessions" onclick="toggleAdminView('sessions')" class="tab-btn active">Control Global</button>
+                        <button id="tab-users" onclick="toggleAdminView('users')" class="tab-btn">Docentes</button>
+                    </div>
+                    
+                    <div id="admin-sessions-content" class="space-y-4">
+                        <div id="global-sessions-list" class="space-y-4"></div>
+                    </div>
+
+                    <div id="admin-users-content" class="hidden space-y-3">
+                        <div id="global-teachers-list" class="space-y-3"></div>
+                    </div>
+                </div>
+
             </div>
         </section>
 
@@ -137,75 +211,13 @@
         <section id="view-student-panel" class="view-section bg-[#1e40af] p-6 items-center justify-center">
             <div class="w-full max-w-sm glass p-10 rounded-[3rem] text-center border-2 border-white/10">
                 <div class="w-20 h-20 bg-white/10 rounded-3xl mx-auto mb-6 flex items-center justify-center text-4xl">🎓</div>
-                <h2 class="text-2xl font-black text-white uppercase mb-1" id="std-nav-name">ESTUDIANTE</h2>
+                <h2 class="text-2xl font-black text-white uppercase mb-1" id="std-nav-name">ALUMNO</h2>
                 <p class="text-[#d4af37] text-[10px] font-black uppercase tracking-widest mb-10" id="std-nav-id">ID: ---</p>
                 <div id="status-area" class="space-y-6 text-white">
-                    <p class="text-white/40 text-[10px] font-bold uppercase tracking-[0.2em]">Esperando escaneo QR...</p>
+                    <p class="text-white/40 text-[10px] font-bold uppercase tracking-[0.2em]">Escaneando código QR del aula...</p>
                     <div class="w-12 h-12 border-2 border-white/20 border-t-white rounded-full animate-spin mx-auto"></div>
                 </div>
-                <button onclick="logout()" class="mt-12 text-white/30 text-[10px] font-black uppercase underline">Regresar al Menú Principal</button>
-            </div>
-        </section>
-
-        <!-- PANEL DOCENTE -->
-        <section id="view-teacher-panel" class="view-section bg-slate-100">
-            <nav class="bg-[#1e40af] p-5 flex justify-between items-center text-white nav-sticky">
-                <div class="flex items-center gap-3">
-                    <button onclick="logout()" class="p-2 bg-white/10 rounded-lg hover:bg-white/20 transition-all">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-                    </button>
-                    <span id="nav-name" class="text-[12px] font-black uppercase tracking-tight">DOCENTE</span>
-                </div>
-                <button onclick="logout()" class="text-[10px] font-black bg-white/10 px-4 py-2 rounded-xl action-btn">CERRAR SESIÓN</button>
-            </nav>
-            <div class="p-6 space-y-6 max-w-2xl mx-auto w-full">
-                <div class="bg-white p-8 rounded-[2.5rem] shadow-sm border-2 border-slate-100">
-                    <input type="text" id="sCourse" placeholder="MATERIA" class="input-ceut mb-4">
-                    <div class="grid grid-cols-2 gap-4 mb-4">
-                        <input type="text" id="sGrade" placeholder="GRUPO" class="input-ceut">
-                        <select id="sLevel" class="input-ceut text-[12px]">
-                            <option value="LIC">LICENCIATURA</option>
-                            <option value="BAC">BACHILLERATO</option>
-                        </select>
-                    </div>
-                    <button onclick="saveClass()" class="w-full bg-[#d4af37] text-[#1e40af] p-6 rounded-3xl font-black text-[12px] uppercase shadow-lg shadow-[#d4af37]/20">ACTIVAR CLASE</button>
-                </div>
-                <div id="sessions-list" class="space-y-4 pb-20"></div>
-            </div>
-        </section>
-
-        <!-- PANEL ADMIN -->
-        <section id="view-admin-panel" class="view-section bg-slate-100">
-            <nav class="bg-slate-900 p-5 flex justify-between items-center text-white nav-sticky">
-                <div class="flex items-center gap-3">
-                    <button onclick="logout()" class="p-2 bg-white/10 rounded-lg hover:bg-white/20">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-                    </button>
-                    <span class="font-black text-[12px] tracking-tight">ADMINISTRACIÓN MAESTRA</span>
-                </div>
-                <button onclick="logout()" class="bg-red-600 text-[10px] font-black px-4 py-2 rounded-xl action-btn">SALIR</button>
-            </nav>
-
-            <div class="p-5 max-w-3xl mx-auto w-full">
-                <!-- Tabs de Navegación Admin -->
-                <div class="flex bg-slate-200/50 p-1 rounded-2xl mb-6 shadow-inner">
-                    <button id="tab-sessions" onclick="toggleAdminTab('sessions')" class="tab-btn active">Historial de Clases</button>
-                    <button id="tab-users" onclick="toggleAdminTab('users')" class="tab-btn">Personal Docente</button>
-                </div>
-
-                <!-- Contenido Historial -->
-                <div id="admin-content-sessions" class="space-y-4">
-                    <div id="global-sessions-list">
-                        <p class="text-slate-400 text-center py-20 text-[10px] font-bold uppercase tracking-widest">Sincronizando base de datos...</p>
-                    </div>
-                </div>
-
-                <!-- Contenido Usuarios -->
-                <div id="admin-content-users" class="hidden space-y-4">
-                    <div id="teachers-list">
-                        <p class="text-slate-400 text-center py-20 text-[10px] font-bold uppercase tracking-widest">Cargando directorio...</p>
-                    </div>
-                </div>
+                <button onclick="logout()" class="mt-12 text-white/30 text-[10px] font-black uppercase underline">Volver al Inicio</button>
             </div>
         </section>
     </div>
@@ -242,23 +254,23 @@
             onAuthStateChanged(auth, async (user) => {
                 if (user) {
                     currentUser = user;
-                    const p = await getDoc(doc(db, 'artifacts', APP_ID, 'users', user.uid, 'profile', 'info'));
+                    const profileSnap = await getDoc(doc(db, 'artifacts', APP_ID, 'users', user.uid, 'profile', 'info'));
                     
                     if (user.email === ADMIN_EMAIL) {
-                        userData = { name: "CARLOS AGUILAR", role: "admin" };
-                        switchView('admin-panel');
-                        listenToAllSessions();
-                        listenToTeachers();
-                    } else if (p.exists()) {
-                        userData = p.data();
+                        userData = { name: "CARLOS AGUILAR (ADMIN)", role: "admin" };
+                        setupAdminEnvironment();
+                    } else if (profileSnap.exists()) {
+                        userData = profileSnap.data();
                         if (userData.role === 'teacher') {
-                            switchView('teacher-panel');
+                            switchView('unified-panel');
+                            document.getElementById('display-user-name').innerText = userData.name;
                             listenToTeacherSessions(user.uid);
-                            document.getElementById('nav-name').innerText = userData.name;
                         } else {
+                            switchView('student-panel');
                             document.getElementById('std-nav-name').innerText = userData.name;
                             document.getElementById('std-nav-id').innerText = `ID: ${userData.id}`;
-                            switchView('student-panel');
+                            const urlParams = new URLSearchParams(window.location.search);
+                            if (urlParams.has('c')) registerAttendance(urlParams.get('c'));
                         }
                     }
                 } else { 
@@ -269,147 +281,156 @@
             });
         }
 
-        window.logout = async () => {
-            await signOut(auth);
-            currentUser = null;
-            userData = null;
-            window.location.href = window.location.origin + window.location.pathname;
-        };
-        
-        window.switchView = (id) => {
-            if(id === 'home' && currentUser) { window.logout(); return; }
-            document.querySelectorAll('.view-section').forEach(s => s.classList.remove('active'));
-            document.getElementById('view-' + id).classList.add('active');
+        // --- LÓGICA DE ADMIN DUAL ---
+
+        function setupAdminEnvironment() {
+            switchView('unified-panel');
+            document.getElementById('display-user-name').innerText = userData.name;
+            document.getElementById('admin-mode-toggle').classList.remove('hidden');
+            
+            // Iniciar ambas escuchas
+            listenToTeacherSessions(currentUser.uid);
+            listenToAllSessions();
+            listenToTeachers();
+            
+            // Por defecto empezar como docente
+            switchAdminRole('teacher');
+        }
+
+        window.switchAdminRole = (role) => {
+            const isDocente = role === 'teacher';
+            document.getElementById('section-teacher').classList.toggle('hidden', !isDocente);
+            document.getElementById('section-admin').classList.toggle('hidden', isDocente);
+            
+            document.getElementById('opt-docente').classList.toggle('active', isDocente);
+            document.getElementById('opt-admin').classList.toggle('active', !isDocente);
+            
+            // Cambiar color de Navbar para distinguir
+            const nav = document.getElementById('nav-header');
+            nav.style.backgroundColor = isDocente ? "#1e40af" : "#0f172a";
         };
 
-        window.toggleAdminTab = (tab) => {
-            document.getElementById('admin-content-sessions').classList.toggle('hidden', tab !== 'sessions');
-            document.getElementById('admin-content-users').classList.toggle('hidden', tab !== 'users');
+        // --- VISTA ADMINISTRADOR GENERAL ---
+
+        function listenToAllSessions() {
+            onSnapshot(collectionGroup(db, 'sessions'), (snap) => {
+                const list = document.getElementById('global-sessions-list');
+                const sorted = snap.docs.sort((a, b) => b.data().timestamp - a.data().timestamp);
+                
+                list.innerHTML = sorted.map(d => renderCard(d, true)).join('');
+            });
+        }
+
+        function listenToTeachers() {
+            onSnapshot(collection(db, 'artifacts', APP_ID, 'users'), (snap) => {
+                const list = document.getElementById('global-teachers-list');
+                const users = [];
+                snap.forEach(d => users.push(d.data()));
+                list.innerHTML = users.map(u => `
+                    <div class="bg-white p-4 rounded-2xl flex items-center justify-between border border-slate-100 shadow-sm">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 bg-[#1e40af] text-white rounded-xl flex items-center justify-center font-black text-xs uppercase">${u.name?.[0] || 'D'}</div>
+                            <div>
+                                <p class="text-[11px] font-black text-slate-900 uppercase">${u.name}</p>
+                                <p class="text-[9px] text-slate-400 font-bold uppercase">${u.role}</p>
+                            </div>
+                        </div>
+                        <div class="text-[10px] font-black text-slate-300">ID: ${u.id || '---'}</div>
+                    </div>
+                `).join('');
+            });
+        }
+
+        window.toggleAdminView = (tab) => {
+            document.getElementById('admin-sessions-content').classList.toggle('hidden', tab !== 'sessions');
+            document.getElementById('admin-users-content').classList.toggle('hidden', tab !== 'users');
             document.getElementById('tab-sessions').classList.toggle('active', tab === 'sessions');
             document.getElementById('tab-users').classList.toggle('active', tab === 'users');
         };
 
-        // ADMIN: Escucha todas las sesiones (Historial Global)
-        function listenToAllSessions() {
-            onSnapshot(collectionGroup(db, 'sessions'), (snap) => {
-                const list = document.getElementById('global-sessions-list');
-                const docs = snap.docs.sort((a, b) => b.data().timestamp - a.data().timestamp);
-                
-                list.innerHTML = docs.length ? docs.map(d => {
-                    const s = d.data();
-                    const sessionJson = encodeURIComponent(JSON.stringify(s));
-                    const docPath = d.ref.path; // Guardamos ruta para eliminar
-                    
-                    return `<div class="card-admin">
-                        <div class="flex justify-between items-start mb-2">
-                            <div>
-                                <span class="badge badge-teacher">${s.level}</span>
-                                <p class="text-[9px] font-bold text-slate-400 mt-1 uppercase">${s.teacherName || 'Docente'}</p>
-                            </div>
-                            <div class="flex gap-2">
-                                <div onclick="showQR('${s.code}', '${s.course}')" class="w-8 h-8 bg-slate-100 text-slate-600 rounded-lg action-btn" title="Vista Previa QR">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h6v6"/><path d="M9 21H3v-6"/><path d="M21 3l-7 7"/><path d="M3 21l7-7"/></svg>
-                                </div>
-                                <div onclick="exportSessionPDF('${sessionJson}')" class="w-8 h-8 bg-red-50 text-red-500 rounded-lg action-btn" title="PDF">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
-                                </div>
-                                <div onclick="deleteEntry('${docPath}')" class="w-8 h-8 bg-slate-100 text-slate-400 rounded-lg action-btn hover:text-red-500" title="Eliminar">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>
-                                </div>
-                            </div>
-                        </div>
-                        <h4 class="font-black text-[#1e40af] text-lg uppercase leading-tight">${s.course}</h4>
-                        <p class="text-[10px] text-slate-500 font-bold uppercase">GRUPO ${s.grade} • ASISTENCIA: ${s.attendees.length}</p>
-                    </div>`;
-                }).join('') : '<p class="text-center text-slate-400 py-10">No hay clases registradas.</p>';
+        // --- VISTA DOCENTE ---
+
+        function listenToTeacherSessions(uid) {
+            onSnapshot(collection(db, 'artifacts', APP_ID, 'users', uid, 'sessions'), (snap) => {
+                const list = document.getElementById('teacher-sessions-list');
+                const sorted = snap.docs.sort((a, b) => b.data().timestamp - a.data().timestamp);
+                list.innerHTML = sorted.map(d => renderCard(d, false)).join('');
             });
         }
 
-        // ADMIN: Escucha lista de docentes
-        function listenToTeachers() {
-            onSnapshot(collection(db, 'artifacts', APP_ID, 'users'), (snap) => {
-                const list = document.getElementById('teachers-list');
-                const teachers = [];
-                // Por limitación de Firestore en este entorno, filtramos en memoria
-                snap.forEach(doc => {
-                    // Aquí iría la lógica de recuperar perfiles si no fueran colecciones anidadas
-                });
-                list.innerHTML = `<div class="p-6 bg-white rounded-3xl border border-slate-200 text-center">
-                    <p class="text-[10px] font-black text-[#1e40af] uppercase">Gestión de Personal Activa</p>
-                    <p class="text-[9px] text-slate-400 mt-2 uppercase">Todos los docentes registrados aparecen en el historial de clases superior con sus métricas.</p>
-                </div>`;
-            });
+        function renderCard(d, isGlobalView) {
+            const s = d.data();
+            const sData = encodeURIComponent(JSON.stringify(s));
+            const path = d.ref.path;
+            
+            return `
+            <div class="card-admin ${isGlobalView ? 'opacity-90' : 'border-l-4 border-l-[#d4af37] shadow-lg'}">
+                <div class="flex justify-between items-start mb-2">
+                    <div>
+                        <span class="badge badge-teacher">${s.level}</span>
+                        <p class="text-[9px] font-bold text-slate-400 uppercase mt-1">DOCENTE: ${s.teacherName || 'DOCENTE'}</p>
+                    </div>
+                    <p class="text-[9px] font-black text-[#1e40af] bg-blue-50 px-2 py-1 rounded">CÓDIGO: ${s.code}</p>
+                </div>
+                <h4 class="font-black text-slate-900 text-lg uppercase leading-tight mb-4">${s.course}</h4>
+                <div class="flex gap-2">
+                    <button onclick="showQR('${s.code}', '${s.course}')" class="flex-1 bg-slate-900 text-white py-3 rounded-xl font-black text-[9px] uppercase action-btn">QR</button>
+                    <button onclick="exportSessionPDF('${sData}')" class="flex-1 bg-red-600 text-white py-3 rounded-xl font-black text-[9px] uppercase action-btn">PDF</button>
+                    <button onclick="deleteEntry('${path}')" class="w-12 bg-slate-100 text-slate-400 rounded-xl flex items-center justify-center action-btn hover:text-red-600">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                    </button>
+                </div>
+                <div class="mt-4 pt-3 border-t border-slate-50 flex justify-between items-center">
+                    <p class="text-[8px] font-bold text-slate-300 uppercase">GRUPO: ${s.grade} • ${new Date(s.timestamp).toLocaleDateString()}</p>
+                    <p class="text-[9px] font-black text-[#1e40af]">PRESENTES: ${s.attendees?.length || 0}</p>
+                </div>
+            </div>`;
         }
 
-        window.deleteEntry = async (path) => {
-            if(confirm("¿Estás seguro de eliminar este registro permanentemente?")) {
-                await deleteDoc(doc(db, path));
-            }
-        };
+        // --- FUNCIONES CORE ---
 
         window.saveClass = async () => {
             const course = document.getElementById('sCourse').value.toUpperCase().trim();
             const grade = document.getElementById('sGrade').value.toUpperCase().trim();
             const level = document.getElementById('sLevel').value;
             if(!course || !grade) return;
+            
             const code = Math.floor(100000 + Math.random() * 900000).toString();
             await addDoc(collection(db, 'artifacts', APP_ID, 'users', currentUser.uid, 'sessions'), {
-                course, grade, level, code, teacherName: userData.name, timestamp: Date.now(), attendees: []
+                course, grade, level, code, 
+                teacherName: userData.name, 
+                timestamp: Date.now(), 
+                attendees: []
             });
+            
             document.getElementById('sCourse').value = "";
+            document.getElementById('sGrade').value = "";
             showQR(code, course);
         };
 
-        function listenToTeacherSessions(uid) {
-            onSnapshot(collection(db, 'artifacts', APP_ID, 'users', uid, 'sessions'), (snap) => {
-                const list = document.getElementById('sessions-list');
-                list.innerHTML = snap.docs.map(d => {
-                    const s = d.data();
-                    const sessionJson = encodeURIComponent(JSON.stringify(s));
-                    return `<div class="card-admin">
-                        <div class="flex justify-between items-center mb-2"><span class="badge badge-teacher">${s.level}</span><p class="text-[9px] font-bold text-slate-300">${s.code}</p></div>
-                        <h4 class="font-black text-[#1e40af] text-lg uppercase">${s.course}</h4>
-                        <div class="grid grid-cols-3 gap-2 mt-4">
-                            <button onclick="showQR('${s.code}', '${s.course}')" class="bg-slate-100 text-[#1e40af] py-3 rounded-xl font-black text-[9px] uppercase">QR</button>
-                            <button onclick="exportSessionPDF('${sessionJson}')" class="bg-red-50 text-red-600 py-3 rounded-xl font-black text-[9px] uppercase">PDF</button>
-                            <button onclick="deleteEntry('${d.ref.path}')" class="bg-slate-50 text-slate-400 py-3 rounded-xl font-black text-[9px] uppercase">Borr</button>
-                        </div>
-                    </div>`;
-                }).join('');
-            });
-        }
-
-        window.prepareAuth = (role) => { 
-            window.userRole = role; 
-            document.getElementById('authEmail').value = (role === 'admin') ? ADMIN_EMAIL : "";
-            switchView('auth'); 
-        };
-
-        window.handleAuth = async () => {
-            const email = document.getElementById('authEmail').value.trim();
-            const pass = document.getElementById('authPass').value;
-            try {
-                if (window.authMode === 'register') {
-                    const name = document.getElementById('authName').value.toUpperCase().trim();
-                    const id = document.getElementById('authId').value.toUpperCase().trim();
-                    const res = await createUserWithEmailAndPassword(auth, email, pass);
-                    await setDoc(doc(db, 'artifacts', APP_ID, 'users', res.user.uid, 'profile', 'info'), { name, email, id, role: window.userRole });
-                } else { await signInWithEmailAndPassword(auth, email, pass); }
-            } catch (e) { alert("Error de acceso."); }
+        window.deleteEntry = async (path) => {
+            if(confirm("¿Eliminar este registro de forma permanente?")) {
+                await deleteDoc(doc(db, path));
+            }
         };
 
         window.exportSessionPDF = (sessionDataJson) => {
             const s = JSON.parse(decodeURIComponent(sessionDataJson));
             const { jsPDF } = window.jspdf;
             const docPdf = new jsPDF();
-            docPdf.setFillColor(30, 64, 175); docPdf.rect(0, 0, 210, 30, 'F');
-            docPdf.setTextColor(255, 255, 255); docPdf.setFontSize(18); docPdf.text("REPORTE DE ASISTENCIA CEUT", 15, 20);
-            docPdf.setTextColor(0, 0, 0); docPdf.setFontSize(10);
-            docPdf.text(`MATERIA: ${s.course}`, 15, 45);
-            docPdf.text(`DOCENTE: ${s.teacherName || 'N/A'}`, 15, 52);
-            docPdf.text(`FECHA: ${new Date(s.timestamp).toLocaleDateString()}`, 150, 45);
-            const data = s.attendees.map((a, i) => [i + 1, a.id, a.name, a.time]);
-            docPdf.autoTable({ startY: 65, head: [['#', 'MATRÍCULA', 'ALUMNO', 'HORA']], body: data });
+            docPdf.setFillColor(30, 64, 175); docPdf.rect(0, 0, 210, 40, 'F');
+            docPdf.setTextColor(255, 255, 255);
+            docPdf.setFontSize(20); docPdf.text("CEUT | REPORTE DE ASISTENCIA", 15, 25);
+            docPdf.setTextColor(0, 0, 0); docPdf.setFontSize(11);
+            docPdf.text(`MATERIA: ${s.course}`, 15, 50);
+            docPdf.text(`DOCENTE: ${s.teacherName}`, 15, 57);
+            docPdf.text(`FECHA: ${new Date(s.timestamp).toLocaleDateString()}`, 15, 64);
+            docPdf.autoTable({
+                startY: 75,
+                head: [['#', 'MATRÍCULA', 'NOMBRE', 'HORA']],
+                body: (s.attendees || []).map((a, i) => [i + 1, a.id, a.name, a.time]),
+                headStyles: { fillColor: [30, 64, 175] }
+            });
             docPdf.save(`ASISTENCIA_${s.course}.pdf`);
         };
 
@@ -417,20 +438,75 @@
             document.getElementById('modal-code').innerText = code; 
             document.getElementById('modal-course-name').innerText = course;
             document.getElementById('qrcode-box').innerHTML = ""; 
-            new QRCode(document.getElementById('qrcode-box'), { text: `${window.location.origin}${window.location.pathname}?c=${code}`, width: 220, height: 220 }); 
+            new QRCode(document.getElementById('qrcode-box'), { 
+                text: `${window.location.origin}${window.location.pathname}?c=${code}`, 
+                width: 200, height: 200 
+            }); 
             document.getElementById('qr-modal').classList.remove('hidden'); 
         };
+
         window.closeQR = () => document.getElementById('qr-modal').classList.add('hidden');
+
+        window.logout = async () => {
+            await signOut(auth);
+            window.location.href = window.location.origin + window.location.pathname;
+        };
+
+        window.switchView = (id) => {
+            document.querySelectorAll('.view-section').forEach(s => s.classList.remove('active'));
+            document.getElementById('view-' + id).classList.add('active');
+        };
+
         window.toggleAuthMode = (mode) => { 
             window.authMode = mode; 
             document.getElementById('reg-fields').classList.toggle('hidden', mode !== 'register');
             document.getElementById('btn-mode-login').classList.toggle('bg-white', mode === 'login');
             document.getElementById('btn-mode-register').classList.toggle('bg-white', mode === 'register');
         };
+
+        window.prepareAuth = (role) => { 
+            window.userRole = role; 
+            window.authMode = 'login';
+            document.getElementById('authEmail').value = (role === 'admin') ? ADMIN_EMAIL : "";
+            switchView('auth'); 
+        };
+
+        window.handleAuth = async () => {
+            const email = document.getElementById('authEmail').value.trim();
+            const pass = document.getElementById('authPass').value;
+            if(!email || !pass) return;
+            try {
+                if (window.authMode === 'register') {
+                    const name = document.getElementById('authName').value.toUpperCase().trim();
+                    const id = document.getElementById('authId').value.toUpperCase().trim();
+                    const res = await createUserWithEmailAndPassword(auth, email, pass);
+                    await setDoc(doc(db, 'artifacts', APP_ID, 'users', res.user.uid, 'profile', 'info'), { name, email, id, role: window.userRole });
+                } else { 
+                    await signInWithEmailAndPassword(auth, email, pass); 
+                }
+            } catch (e) { alert("Error en credenciales."); }
+        };
+
         window.handleProtectedAccess = (role) => {
-            if (currentUser && userData && userData.role === role) switchView(`${role}-panel`);
+            if (currentUser && userData && userData.role === role) switchView('unified-panel');
             else prepareAuth(role);
         };
+
+        async function registerAttendance(code) {
+            if(!currentUser) return;
+            const sessionsSnap = await getDocs(collectionGroup(db, 'sessions'));
+            let targetSession = null;
+            sessionsSnap.forEach(d => { if(d.data().code === code) targetSession = d; });
+            if(targetSession) {
+                const s = targetSession.data();
+                const alreadyRegistered = s.attendees.some(a => a.id === userData.id);
+                if(!alreadyRegistered) {
+                    const newAttendees = [...s.attendees, { name: userData.name, id: userData.id, time: new Date().toLocaleTimeString() }];
+                    await updateDoc(targetSession.ref, { attendees: newAttendees });
+                    document.getElementById('status-area').innerHTML = `<p class="text-2xl font-black text-white uppercase">¡ASISTENCIA REGISTRADA!<br><span class="text-[#d4af37] text-sm">${s.course}</span></p>`;
+                }
+            }
+        }
 
         init();
     </script>
