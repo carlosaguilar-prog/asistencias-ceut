@@ -5,33 +5,29 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>CEUT | SISTEMA INTEGRAL V20</title>
     
+    <!-- Librerías Críticas -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+
     <style>
         :root { 
-            --bg-slate: #f8fafc;
             --ceut-blue: #1e40af; 
             --ceut-gold: #d4af37; 
-            --ceut-dark: #0f172a;
+            --bg-slate: #f8fafc;
         }
         
         * { -webkit-tap-highlight-color: transparent; box-sizing: border-box; outline: none; }
-        
-        body, html { 
-            margin: 0; padding: 0; 
-            background-color: var(--bg-slate); 
-            font-family: 'Plus Jakarta Sans', -apple-system, sans-serif;
-            color: #1e293b; width: 100%; height: 100%; overflow-x: hidden;
-        }
+        body, html { margin: 0; padding: 0; background-color: var(--bg-slate); font-family: 'Plus Jakarta Sans', sans-serif; color: #1e293b; height: 100%; overflow-x: hidden; }
 
-        #app-container { min-height: 100vh; width: 100%; display: flex; flex-direction: column; }
-        .view-section { display: none; width: 100%; min-height: 100vh; flex-direction: column; animation: fadeIn 0.4s ease-out; }
+        .view-section { display: none; width: 100%; min-height: 100vh; flex-direction: column; animation: fadeIn 0.3s ease-out; }
         .view-section.active { display: flex; }
-
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
         .input-ceut {
-            width: 100%; padding: 0.85rem; background-color: white; border: 2px solid #e2e8f0;
-            border-radius: 14px; font-size: 13px; font-weight: 600; color: var(--ceut-blue);
-            transition: all 0.2s;
+            width: 100%; padding: 0.85rem; border: 2px solid #e2e8f0; border-radius: 14px; 
+            font-size: 13px; font-weight: 600; transition: all 0.2s; background: white;
         }
         .input-ceut:focus { border-color: var(--ceut-blue); box-shadow: 0 0 0 4px rgba(30, 64, 175, 0.05); }
 
@@ -41,25 +37,12 @@
             transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 8px;
             box-shadow: 0 10px 15px -3px rgba(30, 64, 175, 0.2);
         }
-        .btn-primary:active { transform: scale(0.96); opacity: 0.9; }
-        .btn-primary:disabled { background: #94a3b8; cursor: not-allowed; }
-
-        /* Modal Informativo */
-        .modal-overlay { 
-            position: fixed; inset: 0; background: rgba(15, 23, 42, 0.95); 
-            backdrop-filter: blur(8px); z-index: 9999; display: flex; 
-            align-items: center; justify-content: center; padding: 20px; 
-        }
-        .modal-content { 
-            background: white; border-radius: 32px; width: 100%; max-width: 400px; 
-            padding: 2.5rem; position: relative; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5);
-        }
+        .btn-primary:active { transform: scale(0.96); }
 
         #error-toast {
             position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
             background: #0f172a; color: white; padding: 14px 28px; border-radius: 20px;
             font-size: 11px; font-weight: 700; z-index: 10000; display: none; text-align: center;
-            box-shadow: 0 20px 25px -5px rgba(0,0,0,0.3);
         }
 
         .loader {
@@ -68,36 +51,49 @@
         }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
-        #qrcode-box { background: white; padding: 15px; border-radius: 20px; display: inline-block; }
-        #qrcode-box img { margin: 0 auto; }
+        .admin-card { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); padding: 1.5rem; border-radius: 24px; }
     </style>
-
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-    <script src="https://unpkg.com/lucide@latest"></script>
 </head>
 <body>
 
-    <!-- MODAL DE BIENVENIDA -->
-    <div id="modal-welcome" class="modal-overlay">
-        <div class="modal-content">
+    <!-- VENTANA EMERGENTE: ESPECIFICACIONES DE PERFIL -->
+    <div id="modal-welcome" class="fixed inset-0 bg-slate-900/95 backdrop-blur-md z-[9999] flex items-center justify-center p-4">
+        <div class="bg-white rounded-[2.5rem] p-8 max-w-md w-full shadow-2xl overflow-y-auto max-h-[90vh]">
             <div class="text-center mb-6">
-                <img src="https://lh3.googleusercontent.com/d/17NobXQ3JbRnLGejZe4Mn2x-Jl45F4rPm" class="w-16 mx-auto mb-4" alt="CEUT">
-                <h2 class="text-xl font-black text-slate-900 tracking-tight">CEUT CLOUD V20</h2>
-                <p class="text-[9px] text-slate-400 font-bold uppercase tracking-widest mt-1">Gestión de Asistencia</p>
+                <img src="https://lh3.googleusercontent.com/d/17NobXQ3JbRnLGejZe4Mn2x-Jl45F4rPm" class="w-16 mx-auto mb-4">
+                <h2 class="text-xl font-black text-slate-900 uppercase tracking-tight">CEUT CLOUD V20</h2>
+                <p class="text-[9px] text-slate-400 font-bold tracking-widest mt-1">SISTEMA INTEGRAL DE ASISTENCIAS</p>
+                <div class="h-1 w-12 bg-[#d4af37] mx-auto mt-3 rounded-full"></div>
             </div>
+
             <div class="space-y-4 mb-8">
-                <div class="flex gap-3 items-start">
-                    <div class="bg-blue-50 p-2 rounded-lg">🛡️</div>
-                    <p class="text-[11px] text-slate-600 leading-relaxed"><b>Identidad:</b> Accede con tu cuenta institucional para sincronizar tus registros en la nube.</p>
+                <!-- Admin Specs -->
+                <div class="flex gap-4 p-4 rounded-2xl bg-slate-50 border border-slate-100">
+                    <span class="text-2xl">🛡️</span>
+                    <div class="text-left">
+                        <p class="text-[10px] font-black text-slate-900 uppercase">Perfil Administrador</p>
+                        <p class="text-[9px] text-slate-500 leading-tight mt-1">Acceso restringido para el Depto. Psicopedagógico. Auditoría de ingresos y monitoreo de la plataforma en tiempo real.</p>
+                    </div>
                 </div>
-                <div class="flex gap-3 items-start">
-                    <div class="bg-blue-50 p-2 rounded-lg">📸</div>
-                    <p class="text-[11px] text-slate-600 leading-relaxed"><b>QR Dinámico:</b> Los docentes generan códigos únicos por clase para evitar fraudes.</p>
+                <!-- Teacher Specs -->
+                <div class="flex gap-4 p-4 rounded-2xl bg-blue-50 border border-blue-100">
+                    <span class="text-2xl">👨‍🏫</span>
+                    <div class="text-left">
+                        <p class="text-[10px] font-black text-blue-900 uppercase">Perfil Docente</p>
+                        <p class="text-[9px] text-blue-700/70 leading-tight mt-1">Configuración de materias y grupos. Generación de códigos QR únicos por clase para asegurar la asistencia presencial.</p>
+                    </div>
+                </div>
+                <!-- Student Specs -->
+                <div class="flex gap-4 p-4 rounded-2xl bg-amber-50 border border-amber-100">
+                    <span class="text-2xl">🎓</span>
+                    <div class="text-left">
+                        <p class="text-[10px] font-black text-amber-900 uppercase">Perfil Estudiante</p>
+                        <p class="text-[9px] text-amber-700/70 leading-tight mt-1">Identificación mediante matrícula institucional. Escaneo de códigos QR del docente para registro automático en la nube.</p>
+                    </div>
                 </div>
             </div>
-            <button onclick="document.getElementById('modal-welcome').style.display='none'" class="btn-primary py-4">ENTRAR A LA PLATAFORMA</button>
+
+            <button onclick="document.getElementById('modal-welcome').style.display='none'" class="btn-primary py-4">ENTRAR AL PORTAL</button>
         </div>
     </div>
 
@@ -105,276 +101,336 @@
 
     <div id="app-container">
         
-        <!-- VISTA SELECCIÓN ROL (HOME) -->
-        <main id="view-home" class="view-section active items-center justify-center p-8 bg-slate-50">
+        <!-- PANTALLA DE SELECCIÓN (HOME) -->
+        <main id="view-home" class="view-section active items-center justify-center p-8">
              <div class="max-w-xs w-full text-center">
                 <img src="https://lh3.googleusercontent.com/d/17NobXQ3JbRnLGejZe4Mn2x-Jl45F4rPm" class="w-20 mx-auto mb-6">
-                <h1 class="text-3xl font-black text-slate-900 mb-1">CEUT <span class="text-[#d4af37]">CLOUD</span></h1>
-                <p class="text-[8px] tracking-[0.4em] text-slate-400 font-bold uppercase mb-12">Portal Universitario</p>
+                <h1 class="text-3xl font-black mb-1">CEUT <span class="text-[#d4af37]">CLOUD</span></h1>
+                <p class="text-[8px] tracking-[0.4em] text-slate-400 font-bold uppercase mb-12">Selecciona tu Rol</p>
                 
                 <div class="space-y-3">
-                    <button onclick="window.initFlow('admin')" class="w-full bg-slate-900 text-white p-5 rounded-2xl flex items-center gap-4 hover:bg-black transition-all">
-                        <span class="text-xl">🛡️</span>
-                        <div class="text-left"><p class="text-[9px] font-black uppercase">Administración</p><p class="text-[7px] opacity-40">SUPERVISIÓN GLOBAL</p></div>
-                    </button>
-                    <button onclick="window.initFlow('teacher')" class="w-full bg-white border border-slate-200 p-5 rounded-2xl flex items-center gap-4 hover:border-blue-300 transition-all">
-                        <span class="text-xl">👨‍🏫</span>
-                        <div class="text-left"><p class="text-[9px] font-black uppercase">Docentes</p><p class="text-[7px] opacity-40">PASES DE LISTA</p></div>
-                    </button>
-                    <button onclick="window.initFlow('student')" class="w-full bg-blue-700 text-white p-5 rounded-2xl flex items-center gap-4 hover:bg-blue-800 transition-all">
-                        <span class="text-xl">🎓</span>
-                        <div class="text-left"><p class="text-[9px] font-black uppercase">Comunidad Estudiantil</p><p class="text-[7px] opacity-40">ASISTENCIAS</p></div>
-                    </button>
+                    <button onclick="window.initFlow('admin')" class="btn-primary bg-slate-900">🛡️ ADMINISTRADOR</button>
+                    <button onclick="window.initFlow('teacher')" class="btn-primary bg-white !text-slate-800 border-2 border-slate-100 hover:border-slate-300 shadow-none">👨‍🏫 PERSONAL DOCENTE</button>
+                    <button onclick="window.initFlow('student')" class="btn-primary">🎓 COMUNIDAD ALUMNA</button>
                 </div>
              </div>
         </main>
 
-        <!-- VISTA AUTENTICACIÓN -->
+        <!-- FORMULARIO DE ACCESO UNIFICADO -->
         <section id="view-auth" class="view-section p-8 items-center justify-center">
             <div class="w-full max-w-sm">
                 <button onclick="window.switchView('home')" class="mb-8 text-[10px] font-black text-slate-400 uppercase flex items-center gap-2">
-                    <i data-lucide="arrow-left" class="w-3 h-3"></i> Volver
+                    <i data-lucide="chevron-left" class="w-4 h-4"></i> Volver
                 </button>
-                <h2 id="auth-title" class="text-2xl font-black text-slate-900 mb-2 uppercase">Iniciar Sesión</h2>
-                <p id="auth-tag" class="text-[10px] font-bold text-blue-600 mb-8 uppercase tracking-widest">Portal Oficial</p>
+                <h2 id="auth-title" class="text-2xl font-black mb-1 uppercase text-slate-900 tracking-tight">ACCESO</h2>
+                <p class="text-[9px] font-bold text-blue-600 mb-8 uppercase tracking-widest">Portal Oficial CEUT</p>
                 
                 <div class="space-y-4">
-                    <div id="register-only" class="space-y-4">
-                        <input type="text" id="authName" placeholder="NOMBRE COMPLETO" class="input-ceut uppercase">
-                        <input type="text" id="authId" placeholder="MATRÍCULA / ID" class="input-ceut uppercase">
+                    <div id="reg-fields" class="space-y-4 animate-fadeIn">
+                        <div>
+                            <label class="text-[9px] font-black text-slate-400 uppercase mb-1 ml-2 block">Nombre Completo</label>
+                            <input type="text" id="authName" placeholder="EJ. JUAN PÉREZ LÓPEZ" class="input-ceut uppercase">
+                        </div>
+                        <div>
+                            <label class="text-[9px] font-black text-slate-400 uppercase mb-1 ml-2 block">Matrícula / ID Institucional</label>
+                            <input type="text" id="authId" placeholder="EJ. 20240001" class="input-ceut uppercase">
+                        </div>
                     </div>
-                    <input type="email" id="authEmail" placeholder="correo@ceut.edu.mx" class="input-ceut">
-                    <input type="password" id="authPass" placeholder="CONTRASEÑA" class="input-ceut">
+                    <div>
+                        <label class="text-[9px] font-black text-slate-400 uppercase mb-1 ml-2 block">Correo Electrónico</label>
+                        <input type="email" id="authEmail" placeholder="correo@ceut.edu.mx" class="input-ceut">
+                    </div>
+                    <div>
+                        <label class="text-[9px] font-black text-slate-400 uppercase mb-1 ml-2 block">Contraseña</label>
+                        <input type="password" id="authPass" placeholder="••••••••" class="input-ceut">
+                    </div>
 
                     <button id="btn-submit-auth" class="btn-primary mt-4 py-4">
-                        <span id="btn-label">ACCEDER</span>
+                        <span id="btn-label">INGRESAR</span>
                         <div id="btn-spin" class="loader hidden"></div>
                     </button>
-                    
-                    <p class="text-[9px] text-center text-slate-400 font-bold mt-6 uppercase leading-relaxed">
-                        Para nuevos registros, completa todos los campos.<br>
-                        Si ya tienes cuenta, solo correo y contraseña.
+                    <p class="text-[9px] text-center text-slate-400 font-medium leading-relaxed px-4">
+                        * Si es tu primera vez, ingresa todos los datos para crear tu perfil institucional en la nube.
                     </p>
                 </div>
             </div>
         </section>
 
-        <!-- PANEL ESTUDIANTE -->
-        <section id="view-student-panel" class="view-section items-center justify-center p-8 bg-blue-900 text-white">
-            <div class="w-full max-w-sm text-center">
+        <!-- DASHBOARD: ESTUDIANTE -->
+        <section id="view-student" class="view-section items-center justify-center p-8 bg-blue-900 text-white">
+            <div class="text-center w-full max-w-sm">
                 <div class="w-20 h-20 bg-white/10 rounded-full flex items-center justify-center mx-auto mb-6">
-                    <i data-lucide="user" class="w-10 h-10 text-[#d4af37]"></i>
+                    <i data-lucide="user-check" class="text-[#d4af37] w-10 h-10"></i>
                 </div>
-                <h2 id="display-std-name" class="text-2xl font-black uppercase">...</h2>
-                <p id="display-std-id" class="text-[#d4af37] text-[11px] font-bold mt-2 opacity-70">ID: ---</p>
+                <h2 id="std-name" class="text-xl font-black uppercase tracking-tight">...</h2>
+                <p id="std-id" class="text-[#d4af37] text-[10px] font-bold mt-2 tracking-widest">MATRÍCULA: ---</p>
                 
-                <div class="mt-12 p-10 bg-white/5 rounded-[3rem] border border-white/10">
-                    <div class="animate-pulse mb-6">
-                        <i data-lucide="qr-code" class="w-12 h-12 mx-auto text-white/40"></i>
+                <div class="mt-12 p-12 bg-white/5 rounded-[3rem] border border-white/10 backdrop-blur-md">
+                    <div class="relative w-16 h-16 mx-auto mb-4">
+                        <i data-lucide="qr-code" class="w-16 h-16 text-white/20"></i>
+                        <div class="absolute inset-0 flex items-center justify-center animate-pulse">
+                            <i data-lucide="scan-line" class="w-10 h-10 text-white/60"></i>
+                        </div>
                     </div>
-                    <p class="text-xs font-bold leading-relaxed">ESPERANDO CÓDIGO DEL DOCENTE<br><span class="text-[9px] opacity-40 font-normal">MANTÉN ESTA PANTALLA ABIERTA</span></p>
+                    <p class="text-[10px] font-black animate-pulse uppercase tracking-[0.2em]">Escaneo Pendiente</p>
+                    <p class="text-[8px] text-white/40 mt-2 font-medium">MANTÉN TU APP ABIERTA FRENTE AL CÓDIGO DEL DOCENTE</p>
                 </div>
                 <button onclick="window.handleLogout()" class="mt-20 text-white/30 text-[10px] font-black uppercase hover:text-white transition-colors">Cerrar Sesión</button>
             </div>
         </section>
 
-        <!-- PANEL DOCENTE -->
-        <section id="view-teacher-panel" class="view-section p-8">
-            <header class="flex justify-between items-center mb-10">
+        <!-- DASHBOARD: DOCENTE -->
+        <section id="view-teacher" class="view-section p-8">
+            <div class="flex justify-between items-center mb-10">
                 <div>
-                    <h2 class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Docente</h2>
-                    <p id="display-prof-name" class="text-lg font-black text-slate-900 uppercase">...</p>
+                    <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest">Personal Docente</p>
+                    <h2 id="prof-name" class="text-lg font-black uppercase text-slate-900">...</h2>
                 </div>
-                <button onclick="window.handleLogout()" class="p-3 bg-white border border-slate-200 rounded-xl text-rose-500 hover:bg-rose-50 transition-all">
+                <button onclick="window.handleLogout()" class="w-10 h-10 bg-rose-50 text-rose-500 rounded-xl flex items-center justify-center hover:bg-rose-100">
                     <i data-lucide="log-out" class="w-5 h-5"></i>
                 </button>
-            </header>
+            </div>
             
             <div class="bg-white p-8 rounded-[2.5rem] shadow-sm border border-slate-100">
                 <h3 class="text-[11px] font-black text-slate-900 uppercase mb-6 flex items-center gap-2">
-                    <i data-lucide="plus-circle" class="w-4 h-4 text-blue-600"></i> Nueva Asistencia
+                    <i data-lucide="calendar-plus" class="w-4 h-4 text-blue-600"></i> Nuevo Pase de Lista
                 </h3>
                 <div class="space-y-4">
-                    <input type="text" id="classMateria" placeholder="MATERIA / ASIGNATURA" class="input-ceut uppercase">
-                    <input type="text" id="classGrupo" placeholder="GRUPO (EJ. 4-A)" class="input-ceut uppercase">
-                    <button onclick="window.generateQR()" class="btn-primary mt-2">GENERAR CÓDIGO QR</button>
+                    <input type="text" id="classMat" placeholder="NOMBRE DE LA MATERIA" class="input-ceut uppercase">
+                    <input type="text" id="classGru" placeholder="GRUPO (EJ. 5-B)" class="input-ceut uppercase">
+                    <button onclick="window.createQR()" class="btn-primary mt-2">HABILITAR CÓDIGO QR</button>
                 </div>
             </div>
 
-            <div id="qr-result" class="hidden mt-10 text-center">
-                <div class="bg-white p-8 rounded-[3rem] shadow-2xl inline-block border-2 border-slate-100">
-                    <div id="qrcode-box"></div>
-                    <p class="mt-6 text-[10px] font-black text-slate-900 uppercase">Proyectar en Pantalla</p>
+            <div id="qr-container" class="hidden mt-10 text-center scale-up animate-fadeIn">
+                <div class="inline-block p-10 bg-white rounded-[4rem] shadow-2xl border-8 border-slate-50">
+                    <div id="qrcode-box" class="mx-auto"></div>
+                    <div class="mt-6">
+                        <p class="text-[11px] font-black text-slate-900 uppercase tracking-[0.3em]">CÓDIGO ACTIVO</p>
+                        <p class="text-[9px] text-slate-400 mt-1 font-bold">SOLO PARA ESTA SESIÓN</p>
+                    </div>
                 </div>
-                <button onclick="location.reload()" class="block mx-auto mt-8 text-[10px] font-bold text-slate-400 hover:text-rose-500 uppercase">Finalizar Clase</button>
+                <button onclick="location.reload()" class="block mx-auto mt-8 text-[9px] font-black text-slate-300 hover:text-rose-500 uppercase">Finalizar Clase</button>
             </div>
         </section>
 
-        <!-- PANEL ADMINISTRADOR (SÓLO PSICOPEDAGOGÍA) -->
-        <section id="view-admin-panel" class="view-section p-8 bg-slate-900 text-white">
-            <h2 class="text-xl font-black mb-8">SUPERVISIÓN GLOBAL</h2>
-            <div class="bg-white/5 p-6 rounded-2xl border border-white/10">
-                <p class="text-xs opacity-50 mb-4">Esta sección es de solo lectura para monitoreo de actividad.</p>
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left text-[10px]">
-                        <thead class="border-b border-white/10">
-                            <tr>
-                                <th class="py-2">USUARIO</th>
-                                <th class="py-2">ROL</th>
-                                <th class="py-2">ÚLTIMO ACCESO</th>
-                            </tr>
-                        </thead>
-                        <tbody id="admin-table-body">
-                            <!-- Datos dinámicos aquí -->
-                        </tbody>
-                    </table>
+        <!-- DASHBOARD: ADMINISTRADOR -->
+        <section id="view-admin" class="view-section p-8 bg-slate-950 text-white">
+            <header class="flex justify-between items-center mb-10">
+                <div>
+                    <h2 class="text-xl font-black text-white tracking-tight uppercase">AUDITORÍA GLOBAL</h2>
+                    <p class="text-[9px] text-blue-400 font-bold uppercase tracking-widest">Panel Psicopedagógico</p>
+                </div>
+                <button onclick="window.handleLogout()" class="p-3 bg-white/10 rounded-xl text-white">
+                    <i data-lucide="log-out" class="w-5 h-5"></i>
+                </button>
+            </header>
+
+            <div class="space-y-6">
+                <div class="admin-card">
+                    <h3 class="text-[10px] font-black uppercase text-blue-400 mb-4">Últimos Registros en Nube</h3>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-[10px]">
+                            <thead class="border-b border-white/10 text-white/40">
+                                <tr>
+                                    <th class="py-3 px-2 font-black uppercase">USUARIO</th>
+                                    <th class="py-3 px-2 font-black uppercase">ROL</th>
+                                    <th class="py-3 px-2 font-black uppercase">ESTADO</th>
+                                </tr>
+                            </thead>
+                            <tbody id="admin-table-body">
+                                <tr>
+                                    <td colspan="3" class="py-10 text-center opacity-30 italic">CONECTANDO A FIRESTORE...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
-            <button onclick="window.handleLogout()" class="mt-12 btn-primary bg-white text-black">SALIR</button>
         </section>
 
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getFirestore, doc, setDoc, getDoc, collection, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-        import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, setDoc, getDoc, collection, onSnapshot, query } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, signOut, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
 
+        // CONFIGURACIÓN DE FIREBASE E INFRAESTRUCTURA
         const firebaseConfig = JSON.parse(__firebase_config);
         const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
         const db = getFirestore(app);
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'ceut_v20_main';
+        const auth = getAuth(app);
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'ceut_v20_final';
 
-        let sessionRole = 'student';
+        let selectedRole = 'student';
         lucide.createIcons();
 
-        // UTILS
-        const showToast = (m) => {
-            const t = document.getElementById('error-toast');
-            t.innerText = m; t.style.display = 'block';
-            setTimeout(() => t.style.display = 'none', 3500);
+        // HELPERS DE INTERFAZ
+        const showToast = (msg) => {
+            const toast = document.getElementById('error-toast');
+            toast.innerText = msg; toast.style.display = 'block';
+            setTimeout(() => toast.style.display = 'none', 3500);
         };
 
-        window.switchView = (v) => {
+        window.switchView = (viewId) => {
             document.querySelectorAll('.view-section').forEach(s => s.classList.remove('active'));
-            const target = document.getElementById('view-' + v);
-            if(target) target.classList.add('active');
+            document.getElementById('view-' + viewId).classList.add('active');
             lucide.createIcons();
         };
 
         window.initFlow = (role) => {
-            sessionRole = role;
-            document.getElementById('auth-title').innerText = "Acceso " + (role === 'student' ? 'Estudiante' : role === 'admin' ? 'Administrador' : 'Docente');
+            selectedRole = role;
+            document.getElementById('auth-title').innerText = "ACCESO " + role.toUpperCase();
             window.switchView('auth');
         };
 
-        // LÓGICA DE AUTHENTICACIÓN INTEGRADA
+        // ACCIÓN DE LOGIN Y REGISTRO (CON PERSISTENCIA)
         document.getElementById('btn-submit-auth').onclick = async () => {
             const email = document.getElementById('authEmail').value.trim();
             const pass = document.getElementById('authPass').value.trim();
             const name = document.getElementById('authName').value.trim().toUpperCase();
             const idNum = document.getElementById('authId').value.trim().toUpperCase();
 
-            if(!email || !pass) return showToast("⚠️ Falta Correo o Contraseña");
-            
-            document.getElementById('btn-spin').classList.remove('hidden');
+            if (!email || !pass) return showToast("⚠️ INGRESA CORREO Y CONTRASEÑA");
+
             document.getElementById('btn-label').classList.add('hidden');
+            document.getElementById('btn-spin').classList.remove('hidden');
 
             try {
-                // Paso 1: Intentar login
+                // Paso 1: Intentar inicio de sesión
                 await signInWithEmailAndPassword(auth, email, pass);
-            } catch (e) {
-                // Paso 2: Si falla, intentar registro (solo si hay nombre e ID)
-                if(name && idNum) {
+            } catch (err) {
+                // Paso 2: Si falla y hay datos de registro, crear usuario
+                if (name && idNum) {
                     try {
                         const res = await createUserWithEmailAndPassword(auth, email, pass);
-                        const profile = {
-                            name, id: idNum, email,
-                            role: sessionRole,
-                            uid: res.user.uid,
-                            created: Date.now()
+                        const profile = { 
+                            name, 
+                            id: idNum, 
+                            email, 
+                            role: selectedRole, 
+                            ts: Date.now(),
+                            status: 'ACTIVO'
                         };
-                        // Guardar en Firestore siguiendo Regla 1
+                        // Guardar perfil en Firestore siguiendo REGLA 1
                         await setDoc(doc(db, 'artifacts', appId, 'users', res.user.uid, 'profile', 'info'), profile);
-                        showToast("✅ Registro Exitoso");
-                    } catch (regErr) {
-                        showToast("❌ " + regErr.message);
+                        // También registrarlo en una lista pública para el admin
+                        await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'logs', res.user.uid), {
+                            name, role: selectedRole, email, ts: Date.now()
+                        });
+                        showToast("✅ CUENTA CREADA EN LA NUBE");
+                    } catch (regErr) { 
+                        showToast("❌ ERROR: " + regErr.message); 
                     }
                 } else {
-                    showToast("❌ Usuario no encontrado. Llena todos los campos para registrarte.");
+                    showToast("❌ USUARIO NO EXISTE. LLENA TODOS LOS CAMPOS PARA REGISTRARTE.");
                 }
             } finally {
-                document.getElementById('btn-spin').classList.add('hidden');
                 document.getElementById('btn-label').classList.remove('hidden');
+                document.getElementById('btn-spin').classList.add('hidden');
             }
         };
 
-        // MONITOR DE SESIÓN
+        // MONITOR DE ESTADO DE SESIÓN (PERSISTENCIA REAL)
         onAuthStateChanged(auth, async (user) => {
-            if(user) {
+            if (user) {
+                // Verificación de Admin Forzada por Correo
+                if (user.email === 'deptopsicopedagogico@ceut.edu.mx') {
+                    initAdminPanel();
+                    window.switchView('admin');
+                    return;
+                }
+
+                // Recuperar Perfil de Firestore
                 try {
                     const snap = await getDoc(doc(db, 'artifacts', appId, 'users', user.uid, 'profile', 'info'));
-                    if(snap.exists()) {
+                    if (snap.exists()) {
                         const data = snap.data();
-                        
-                        // Verificación Admin Forzada
-                        if(data.email === 'deptopsicopedagogico@ceut.edu.mx' || data.role === 'admin') {
-                            window.switchView('admin-panel');
-                            return;
-                        }
-
-                        if(data.role === 'student') {
-                            document.getElementById('display-std-name').innerText = data.name;
-                            document.getElementById('display-std-id').innerText = "ID: " + data.id;
-                            window.switchView('student-panel');
+                        if (data.role === 'student') {
+                            document.getElementById('std-name').innerText = data.name;
+                            document.getElementById('std-id').innerText = "MATRÍCULA: " + data.id;
+                            window.switchView('student');
+                        } else if (data.role === 'teacher') {
+                            document.getElementById('prof-name').innerText = data.name;
+                            window.switchView('teacher');
                         } else {
-                            document.getElementById('display-prof-name').innerText = data.name;
-                            window.switchView('teacher-panel');
+                            // Si el rol es admin por firestore
+                            initAdminPanel();
+                            window.switchView('admin');
                         }
-                    } else {
-                        // Perfil incompleto, forzar salida
-                        signOut(auth);
-                        window.switchView('home');
                     }
-                } catch(err) {
-                    showToast("Error de conexión con la nube");
-                }
+                } catch(e) { showToast("ERROR AL CARGAR PERFIL"); }
             } else {
                 window.switchView('home');
             }
         });
 
-        // FUNCIONALIDAD DOCENTE: QR
-        window.generateQR = () => {
-            const m = document.getElementById('classMateria').value.trim();
-            const g = document.getElementById('classGrupo').value.trim();
-            
-            if(!m || !g) return showToast("⚠️ Completa los datos de la clase");
+        // FUNCIONALIDAD DOCENTE: GENERAR QR
+        window.createQR = () => {
+            const m = document.getElementById('classMat').value.trim();
+            const g = document.getElementById('classGru').value.trim();
+            if (!m || !g) return showToast("⚠️ COMPLETA MATERIA Y GRUPO");
 
-            const payload = JSON.stringify({
+            const box = document.getElementById('qrcode-box');
+            box.innerHTML = "";
+            const payload = {
                 app: appId,
-                prof: document.getElementById('display-prof-name').innerText,
-                mat: m.toUpperCase(),
-                gru: g.toUpperCase(),
-                ts: Date.now()
-            });
+                m: m.toUpperCase(),
+                g: g.toUpperCase(),
+                p: document.getElementById('prof-name').innerText,
+                t: Date.now() // Token dinámico para evitar fraude
+            };
 
-            document.getElementById('qrcode-box').innerHTML = "";
-            new QRCode(document.getElementById('qrcode-box'), {
-                text: payload,
-                width: 220,
-                height: 220,
+            new QRCode(box, {
+                text: JSON.stringify(payload),
+                width: 220, height: 220,
                 colorDark : "#1e40af",
                 colorLight : "#ffffff",
                 correctLevel : QRCode.CorrectLevel.H
             });
+            document.getElementById('qr-container').classList.remove('hidden');
+            showToast("✅ CÓDIGO QR LISTO");
+        };
 
-            document.getElementById('qr-result').classList.remove('hidden');
-            showToast("✅ Pase de lista abierto");
+        // FUNCIONALIDAD ADMIN: MONITOR DE ACTIVIDAD
+        const initAdminPanel = () => {
+            const tableBody = document.getElementById('admin-table-body');
+            const q = collection(db, 'artifacts', appId, 'public', 'data', 'logs');
+            
+            onSnapshot(q, (snapshot) => {
+                tableBody.innerHTML = "";
+                if(snapshot.empty) {
+                    tableBody.innerHTML = '<tr><td colspan="3" class="py-10 text-center opacity-30 italic">SIN REGISTROS AÚN</td></tr>';
+                    return;
+                }
+                snapshot.forEach(doc => {
+                    const d = doc.data();
+                    const row = `
+                        <tr class="border-b border-white/5">
+                            <td class="py-4 px-2">
+                                <p class="font-bold text-white uppercase">${d.name}</p>
+                                <p class="text-[8px] opacity-40">${d.email}</p>
+                            </td>
+                            <td class="py-4 px-2 uppercase font-black text-blue-400">${d.role}</td>
+                            <td class="py-4 px-2">
+                                <span class="bg-emerald-500/10 text-emerald-500 px-2 py-1 rounded-full text-[8px] font-black">EN LÍNEA</span>
+                            </td>
+                        </tr>
+                    `;
+                    tableBody.innerHTML += row;
+                });
+            }, (err) => console.error("Error Admin Snapshot:", err));
         };
 
         window.handleLogout = () => signOut(auth);
+
+        // INICIALIZACIÓN DE ENTORNO
+        (async () => {
+            if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                await signInWithCustomToken(auth, __initial_auth_token).catch(() => {});
+            }
+        })();
 
     </script>
 </body>
