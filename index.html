@@ -28,23 +28,30 @@
             color: white;
             width: 100%;
             height: 100%;
-            overflow: hidden; /* Evita scroll doble */
+            overflow: hidden;
         }
 
-        /* Contenedor principal con scroll habilitado */
         #app-container {
             height: 100%;
             overflow-y: auto;
             -webkit-overflow-scrolling: touch;
             display: flex;
             flex-direction: column;
+            position: relative;
+            z-index: 10;
         }
 
         #loading-overlay {
-            position: fixed; inset: 0; 
+            position: fixed; 
+            inset: 0; 
             background: radial-gradient(circle at center, #1e293b 0%, #0f172a 100%);
-            z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center;
-            transition: opacity 0.5s ease;
+            z-index: 9999; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            justify-content: center;
+            transition: opacity 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+            pointer-events: none; /* Permite clicks a través mientras desvanece */
         }
 
         .view-section { 
@@ -52,7 +59,7 @@
             min-height: 100%; 
             width: 100%; 
             opacity: 0; 
-            transition: opacity 0.3s ease;
+            transition: opacity 0.4s ease;
             flex-direction: column;
         }
         .view-section.active { display: flex; opacity: 1; }
@@ -104,9 +111,11 @@
         window.onerror = function(msg, url, line) {
             const errDiv = document.getElementById('error-display');
             if(errDiv) {
-                errDiv.innerHTML = "SISTEMA: " + msg;
+                errDiv.innerHTML = "ERROR: " + msg;
                 errDiv.classList.remove('hidden');
             }
+            // Si hay error, intentamos quitar el loading de todos modos
+            setTimeout(() => { if(window.forceCloseLoading) window.forceCloseLoading(); }, 2000);
             return false;
         };
     </script>
@@ -118,7 +127,7 @@
             <div class="spinner"></div>
             <img src="https://lh3.googleusercontent.com/d/17NobXQ3JbRnLGejZe4Mn2x-Jl45F4rPm" class="absolute inset-0 w-8 m-auto opacity-50">
         </div>
-        <p class="text-[10px] tracking-[0.4em] text-white/40 font-bold uppercase animate-pulse">Cargando Sistema</p>
+        <p class="text-[10px] tracking-[0.4em] text-white/40 font-bold uppercase animate-pulse">Iniciando Cloud</p>
         <div id="error-display" class="mt-8 p-4 bg-red-500/20 border border-red-500/50 rounded-xl text-[10px] text-red-200 font-mono text-center hidden mx-6"></div>
     </div>
 
@@ -126,15 +135,15 @@
         
         <!-- VISTA: HOME -->
         <main id="view-home" class="view-section items-center justify-center p-6 max-device-width relative">
-            <!-- Acceso Administrador (Ahora más visible) -->
-            <button onclick="prepareAuth('admin')" class="absolute top-8 right-8 w-10 h-10 glass rounded-full flex items-center justify-center text-white/30 hover:text-ceutGold transition-colors">
-                <span class="text-lg">🔒</span>
+            <!-- Acceso Administrador -->
+            <button onclick="prepareAuth('admin')" class="absolute top-8 right-8 w-12 h-12 glass rounded-full flex items-center justify-center text-white/30 hover:text-ceutGold transition-all active:scale-90 z-20">
+                <span class="text-xl">🔒</span>
             </button>
 
             <div class="w-full text-center py-10">
                 <img src="https://lh3.googleusercontent.com/d/17NobXQ3JbRnLGejZe4Mn2x-Jl45F4rPm" class="w-24 mx-auto mb-10 drop-shadow-[0_10px_30px_rgba(212,175,55,0.3)]">
                 <h1 class="text-3xl font-extrabold tracking-tighter text-white mb-1 uppercase italic">CEUT <span class="text-ceutGold">CLOUD</span></h1>
-                <p class="text-[8px] tracking-[0.5em] text-white/30 font-black uppercase mb-12">Universal Web App v8.2</p>
+                <p class="text-[8px] tracking-[0.5em] text-white/30 font-black uppercase mb-12">Universal Web App v8.3</p>
                 
                 <div class="space-y-4">
                     <button onclick="prepareAuth('teacher')" class="w-full glass p-5 rounded-4xl flex items-center justify-between group active:opacity-70 transition-all">
@@ -271,13 +280,23 @@
         const ADMIN_EMAIL = "carlos.aguilar@ceut.edu.mx";
         let db, auth, currentUser, userData;
 
-        const forceCloseLoading = () => {
+        // Función robusta para cerrar el loading
+        window.forceCloseLoading = () => {
             const overlay = document.getElementById('loading-overlay');
             if(overlay) {
                 overlay.style.opacity = '0';
-                setTimeout(() => overlay.style.display = 'none', 500);
+                setTimeout(() => {
+                    overlay.style.display = 'none';
+                    overlay.style.zIndex = '-1';
+                }, 600);
             }
         };
+
+        // Time-out de seguridad: Si en 4 segundos no ha cargado, forzamos el cierre del overlay
+        const safetyTimer = setTimeout(() => {
+            console.warn("Carga lenta: Forzando visibilidad");
+            window.forceCloseLoading();
+        }, 4000);
 
         async function init() {
             try {
@@ -286,46 +305,64 @@
                 auth = getAuth(app);
 
                 onAuthStateChanged(auth, async (user) => {
+                    clearTimeout(safetyTimer); // Cancelamos el timer de seguridad si Firebase respondió
+                    
                     if (user) {
                         currentUser = user;
-                        // Caso especial: Admin
                         if(user.email === ADMIN_EMAIL) {
                             userData = { name: "ADMINISTRADOR", role: "admin" };
                             document.getElementById('nav-name').innerText = "ADMIN";
                             document.getElementById('nav-initials').innerText = "A";
-                            switchView('teacher-panel'); // Por ahora el admin usa el panel docente para ver todo
+                            switchView('teacher-panel');
                             listenToTeacherSessions(user.uid);
                         } else {
-                            const p = await getDoc(doc(db, 'artifacts', APP_ID, 'users', user.uid, 'profile', 'info'));
-                            if (p.exists()) {
-                                userData = p.data();
-                                if (userData.role === 'teacher') {
-                                    document.getElementById('nav-name').innerText = userData.name;
-                                    document.getElementById('nav-initials').innerText = userData.name[0];
-                                    switchView('teacher-panel');
-                                    listenToTeacherSessions(user.uid);
+                            try {
+                                const p = await getDoc(doc(db, 'artifacts', APP_ID, 'users', user.uid, 'profile', 'info'));
+                                if (p.exists()) {
+                                    userData = p.data();
+                                    if (userData.role === 'teacher') {
+                                        document.getElementById('nav-name').innerText = userData.name;
+                                        document.getElementById('nav-initials').innerText = userData.name[0];
+                                        switchView('teacher-panel');
+                                        listenToTeacherSessions(user.uid);
+                                    } else {
+                                        document.getElementById('std-nav-name').innerText = userData.name;
+                                        document.getElementById('std-nav-id').innerText = `MATRÍCULA: ${userData.id}`;
+                                        switchView('student-panel');
+                                    }
                                 } else {
-                                    document.getElementById('std-nav-name').innerText = userData.name;
-                                    document.getElementById('std-nav-id').innerText = `MATRÍCULA: ${userData.id}`;
-                                    switchView('student-panel');
+                                    // Si no hay perfil, lo mandamos al login
+                                    switchView('home');
                                 }
+                            } catch (e) {
+                                console.error("Error cargando perfil:", e);
+                                switchView('home');
                             }
                         }
                     } else { 
                         switchView('home'); 
                     }
-                    forceCloseLoading();
+                    window.forceCloseLoading();
                 });
             } catch (e) {
-                console.error(e);
-                forceCloseLoading();
+                console.error("Error crítico de inicialización:", e);
+                window.forceCloseLoading();
             }
         }
 
         window.switchView = (id) => {
-            document.querySelectorAll('.view-section').forEach(s => { s.classList.remove('active'); s.style.display = 'none'; });
+            const sections = document.querySelectorAll('.view-section');
+            sections.forEach(s => { 
+                s.classList.remove('active'); 
+                s.style.display = 'none'; 
+            });
+            
             const target = document.getElementById('view-' + id);
-            if (target) { target.style.display = 'flex'; setTimeout(() => target.classList.add('active'), 50); }
+            if (target) { 
+                target.style.display = 'flex'; 
+                // Pequeño delay para permitir que el display:flex se aplique antes de la opacidad
+                setTimeout(() => target.classList.add('active'), 50); 
+            }
         };
 
         window.handleAuth = async () => {
@@ -343,7 +380,9 @@
                 } else {
                     await signInWithEmailAndPassword(auth, email, pass);
                 }
-            } catch (e) { alert("Error de acceso: Revisa tus credenciales."); }
+            } catch (e) { 
+                alert("Error de acceso: Revisa tus credenciales o conexión."); 
+            }
         };
 
         function listenToTeacherSessions(uid) {
@@ -352,7 +391,7 @@
                 list.innerHTML = snap.docs.map(d => {
                     const s = d.data();
                     const attendeesCount = s.attendees ? s.attendees.length : 0;
-                    return `<div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 flex justify-between items-center">
+                    return `<div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 flex justify-between items-center animate-fade-in">
                         <div>
                             <p class="text-[7px] font-black text-slate-400 uppercase tracking-widest">${s.level} | ${s.grade} (${attendeesCount} Alumnos)</p>
                             <h4 class="font-black text-ceutBlue text-xs uppercase">${s.course}</h4>
@@ -404,7 +443,8 @@
                 const attendees = window.detSess.data.attendees || [];
                 if(attendees.some(a => a.id === userData.id)) throw new Error("Ya registrado.");
                 await updateDoc(window.detSess.ref, { attendees: [...attendees, { name: userData.name, id: userData.id, time: new Date().toLocaleTimeString() }] });
-                alert("ASISTENCIA REGISTRADA"); location.reload();
+                alert("ASISTENCIA REGISTRADA"); 
+                location.reload();
             } catch(e) { alert(e.message); }
         };
 
@@ -414,7 +454,6 @@
             window.userRole = role; 
             switchView('auth'); 
             window.toggleAuthMode('login');
-            // Personalizar títulos
             const titles = { 'teacher': 'Docentes', 'student': 'Alumnos', 'admin': 'Administración' };
             document.getElementById('auth-title').innerText = titles[role];
         };
@@ -435,7 +474,8 @@
         };
         window.closeQR = () => document.getElementById('qr-modal').classList.add('hidden');
 
-        init();
+        // Iniciamos cuando el DOM esté listo
+        window.onload = init;
     </script>
 </body>
 </html>
