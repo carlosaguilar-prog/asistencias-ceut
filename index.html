@@ -38,11 +38,13 @@
             box-shadow: 0 10px 15px -3px rgba(30, 64, 175, 0.2);
         }
         .btn-primary:active { transform: scale(0.96); }
+        .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
 
         #error-toast {
             position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
             background: #0f172a; color: white; padding: 14px 28px; border-radius: 20px;
             font-size: 11px; font-weight: 700; z-index: 10000; display: none; text-align: center;
+            box-shadow: 0 20px 25px -5px rgba(0,0,0,0.3);
         }
 
         .loader {
@@ -56,7 +58,7 @@
 </head>
 <body>
 
-    <!-- VENTANA EMERGENTE: ESPECIFICACIONES DE PERFIL -->
+    <!-- MODAL DE BIENVENIDA -->
     <div id="modal-welcome" class="fixed inset-0 bg-slate-900/95 backdrop-blur-md z-[9999] flex items-center justify-center p-4">
         <div class="bg-white rounded-[2.5rem] p-8 max-w-md w-full shadow-2xl overflow-y-auto max-h-[90vh]">
             <div class="text-center mb-6">
@@ -67,33 +69,30 @@
             </div>
 
             <div class="space-y-4 mb-8">
-                <!-- Admin Specs -->
                 <div class="flex gap-4 p-4 rounded-2xl bg-slate-50 border border-slate-100">
                     <span class="text-2xl">🛡️</span>
                     <div class="text-left">
-                        <p class="text-[10px] font-black text-slate-900 uppercase">Perfil Administrador</p>
-                        <p class="text-[9px] text-slate-500 leading-tight mt-1">Acceso restringido para el Depto. Psicopedagógico. Auditoría de ingresos y monitoreo de la plataforma en tiempo real.</p>
+                        <p class="text-[10px] font-black text-slate-900 uppercase">Admin: Carlos Aguilar</p>
+                        <p class="text-[9px] text-slate-500 leading-tight mt-1">Control maestro de la base de datos institucional.</p>
                     </div>
                 </div>
-                <!-- Teacher Specs -->
                 <div class="flex gap-4 p-4 rounded-2xl bg-blue-50 border border-blue-100">
                     <span class="text-2xl">👨‍🏫</span>
                     <div class="text-left">
                         <p class="text-[10px] font-black text-blue-900 uppercase">Perfil Docente</p>
-                        <p class="text-[9px] text-blue-700/70 leading-tight mt-1">Configuración de materias y grupos. Generación de códigos QR únicos por clase para asegurar la asistencia presencial.</p>
+                        <p class="text-[9px] text-blue-700/70 leading-tight mt-1">Generación de QR y gestión de pases de lista por grupo.</p>
                     </div>
                 </div>
-                <!-- Student Specs -->
                 <div class="flex gap-4 p-4 rounded-2xl bg-amber-50 border border-amber-100">
                     <span class="text-2xl">🎓</span>
                     <div class="text-left">
-                        <p class="text-[10px] font-black text-amber-900 uppercase">Perfil Estudiante</p>
-                        <p class="text-[9px] text-amber-700/70 leading-tight mt-1">Identificación mediante matrícula institucional. Escaneo de códigos QR del docente para registro automático en la nube.</p>
+                        <p class="text-[10px] font-black text-amber-900 uppercase">Perfil Alumno</p>
+                        <p class="text-[9px] text-amber-700/70 leading-tight mt-1">Registro inmediato mediante ID universitario.</p>
                     </div>
                 </div>
             </div>
 
-            <button onclick="document.getElementById('modal-welcome').style.display='none'" class="btn-primary py-4">ENTRAR AL PORTAL</button>
+            <button onclick="document.getElementById('modal-welcome').style.display='none'" class="btn-primary py-4">INICIAR PORTAL</button>
         </div>
     </div>
 
@@ -101,12 +100,12 @@
 
     <div id="app-container">
         
-        <!-- PANTALLA DE SELECCIÓN (HOME) -->
+        <!-- HOME -->
         <main id="view-home" class="view-section active items-center justify-center p-8">
              <div class="max-w-xs w-full text-center">
                 <img src="https://lh3.googleusercontent.com/d/17NobXQ3JbRnLGejZe4Mn2x-Jl45F4rPm" class="w-20 mx-auto mb-6">
-                <h1 class="text-3xl font-black mb-1">CEUT <span class="text-[#d4af37]">CLOUD</span></h1>
-                <p class="text-[8px] tracking-[0.4em] text-slate-400 font-bold uppercase mb-12">Selecciona tu Rol</p>
+                <h1 class="text-3xl font-black mb-1 text-slate-900">CEUT <span class="text-[#d4af37]">CLOUD</span></h1>
+                <p class="text-[8px] tracking-[0.4em] text-slate-400 font-bold uppercase mb-12">Portal de Servicios</p>
                 
                 <div class="space-y-3">
                     <button onclick="window.initFlow('admin')" class="btn-primary bg-slate-900">🛡️ ADMINISTRADOR</button>
@@ -116,29 +115,29 @@
              </div>
         </main>
 
-        <!-- FORMULARIO DE ACCESO UNIFICADO -->
+        <!-- AUTH -->
         <section id="view-auth" class="view-section p-8 items-center justify-center">
             <div class="w-full max-w-sm">
                 <button onclick="window.switchView('home')" class="mb-8 text-[10px] font-black text-slate-400 uppercase flex items-center gap-2">
                     <i data-lucide="chevron-left" class="w-4 h-4"></i> Volver
                 </button>
-                <h2 id="auth-title" class="text-2xl font-black mb-1 uppercase text-slate-900 tracking-tight">ACCESO</h2>
-                <p class="text-[9px] font-bold text-blue-600 mb-8 uppercase tracking-widest">Portal Oficial CEUT</p>
+                <h2 id="auth-title" class="text-2xl font-black mb-1 uppercase text-slate-900">ACCESO</h2>
+                <p class="text-[9px] font-bold text-blue-600 mb-8 uppercase tracking-widest">Identificación Cloud</p>
                 
                 <div class="space-y-4">
-                    <div id="reg-fields" class="space-y-4 animate-fadeIn">
+                    <div id="reg-fields" class="space-y-4">
                         <div>
                             <label class="text-[9px] font-black text-slate-400 uppercase mb-1 ml-2 block">Nombre Completo</label>
-                            <input type="text" id="authName" placeholder="EJ. JUAN PÉREZ LÓPEZ" class="input-ceut uppercase">
+                            <input type="text" id="authName" placeholder="EJ. CARLOS AGUILAR" class="input-ceut uppercase">
                         </div>
                         <div>
-                            <label class="text-[9px] font-black text-slate-400 uppercase mb-1 ml-2 block">Matrícula / ID Institucional</label>
-                            <input type="text" id="authId" placeholder="EJ. 20240001" class="input-ceut uppercase">
+                            <label class="text-[9px] font-black text-slate-400 uppercase mb-1 ml-2 block">Matrícula / ID</label>
+                            <input type="text" id="authId" placeholder="EJ. 123456" class="input-ceut uppercase">
                         </div>
                     </div>
                     <div>
-                        <label class="text-[9px] font-black text-slate-400 uppercase mb-1 ml-2 block">Correo Electrónico</label>
-                        <input type="email" id="authEmail" placeholder="correo@ceut.edu.mx" class="input-ceut">
+                        <label class="text-[9px] font-black text-slate-400 uppercase mb-1 ml-2 block">Correo Institucional</label>
+                        <input type="email" id="authEmail" placeholder="usuario@ceut.edu.mx" class="input-ceut">
                     </div>
                     <div>
                         <label class="text-[9px] font-black text-slate-400 uppercase mb-1 ml-2 block">Contraseña</label>
@@ -146,105 +145,76 @@
                     </div>
 
                     <button id="btn-submit-auth" class="btn-primary mt-4 py-4">
-                        <span id="btn-label">INGRESAR</span>
+                        <span id="btn-label">ACCEDER</span>
                         <div id="btn-spin" class="loader hidden"></div>
                     </button>
-                    <p class="text-[9px] text-center text-slate-400 font-medium leading-relaxed px-4">
-                        * Si es tu primera vez, ingresa todos los datos para crear tu perfil institucional en la nube.
-                    </p>
                 </div>
             </div>
         </section>
 
-        <!-- DASHBOARD: ESTUDIANTE -->
+        <!-- STUDENT -->
         <section id="view-student" class="view-section items-center justify-center p-8 bg-blue-900 text-white">
             <div class="text-center w-full max-w-sm">
                 <div class="w-20 h-20 bg-white/10 rounded-full flex items-center justify-center mx-auto mb-6">
                     <i data-lucide="user-check" class="text-[#d4af37] w-10 h-10"></i>
                 </div>
-                <h2 id="std-name" class="text-xl font-black uppercase tracking-tight">...</h2>
-                <p id="std-id" class="text-[#d4af37] text-[10px] font-bold mt-2 tracking-widest">MATRÍCULA: ---</p>
+                <h2 id="std-name" class="text-xl font-black uppercase tracking-tight text-white">...</h2>
+                <p id="std-id" class="text-[#d4af37] text-[10px] font-bold mt-2 uppercase tracking-widest">ID: ---</p>
                 
                 <div class="mt-12 p-12 bg-white/5 rounded-[3rem] border border-white/10 backdrop-blur-md">
-                    <div class="relative w-16 h-16 mx-auto mb-4">
-                        <i data-lucide="qr-code" class="w-16 h-16 text-white/20"></i>
-                        <div class="absolute inset-0 flex items-center justify-center animate-pulse">
-                            <i data-lucide="scan-line" class="w-10 h-10 text-white/60"></i>
-                        </div>
-                    </div>
-                    <p class="text-[10px] font-black animate-pulse uppercase tracking-[0.2em]">Escaneo Pendiente</p>
-                    <p class="text-[8px] text-white/40 mt-2 font-medium">MANTÉN TU APP ABIERTA FRENTE AL CÓDIGO DEL DOCENTE</p>
+                    <i data-lucide="scan" class="w-12 h-12 mx-auto mb-4 text-white/20 animate-pulse"></i>
+                    <p class="text-[10px] font-black uppercase tracking-widest animate-pulse">Listo para Registro</p>
                 </div>
-                <button onclick="window.handleLogout()" class="mt-20 text-white/30 text-[10px] font-black uppercase hover:text-white transition-colors">Cerrar Sesión</button>
+                <button onclick="window.handleLogout()" class="mt-20 text-white/30 text-[10px] font-black uppercase">Cerrar Sesión</button>
             </div>
         </section>
 
-        <!-- DASHBOARD: DOCENTE -->
+        <!-- TEACHER -->
         <section id="view-teacher" class="view-section p-8">
-            <div class="flex justify-between items-center mb-10">
+            <header class="flex justify-between items-center mb-10">
                 <div>
-                    <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest">Personal Docente</p>
+                    <p class="text-[9px] font-black text-slate-400 uppercase">Docente</p>
                     <h2 id="prof-name" class="text-lg font-black uppercase text-slate-900">...</h2>
                 </div>
-                <button onclick="window.handleLogout()" class="w-10 h-10 bg-rose-50 text-rose-500 rounded-xl flex items-center justify-center hover:bg-rose-100">
+                <button onclick="window.handleLogout()" class="w-10 h-10 bg-rose-50 text-rose-500 rounded-xl flex items-center justify-center">
                     <i data-lucide="log-out" class="w-5 h-5"></i>
                 </button>
-            </div>
+            </header>
             
             <div class="bg-white p-8 rounded-[2.5rem] shadow-sm border border-slate-100">
-                <h3 class="text-[11px] font-black text-slate-900 uppercase mb-6 flex items-center gap-2">
-                    <i data-lucide="calendar-plus" class="w-4 h-4 text-blue-600"></i> Nuevo Pase de Lista
-                </h3>
                 <div class="space-y-4">
-                    <input type="text" id="classMat" placeholder="NOMBRE DE LA MATERIA" class="input-ceut uppercase">
-                    <input type="text" id="classGru" placeholder="GRUPO (EJ. 5-B)" class="input-ceut uppercase">
-                    <button onclick="window.createQR()" class="btn-primary mt-2">HABILITAR CÓDIGO QR</button>
+                    <input type="text" id="classMat" placeholder="MATERIA" class="input-ceut uppercase">
+                    <input type="text" id="classGru" placeholder="GRUPO" class="input-ceut uppercase">
+                    <button onclick="window.createQR()" class="btn-primary">GENERAR QR</button>
                 </div>
             </div>
 
-            <div id="qr-container" class="hidden mt-10 text-center scale-up animate-fadeIn">
-                <div class="inline-block p-10 bg-white rounded-[4rem] shadow-2xl border-8 border-slate-50">
-                    <div id="qrcode-box" class="mx-auto"></div>
-                    <div class="mt-6">
-                        <p class="text-[11px] font-black text-slate-900 uppercase tracking-[0.3em]">CÓDIGO ACTIVO</p>
-                        <p class="text-[9px] text-slate-400 mt-1 font-bold">SOLO PARA ESTA SESIÓN</p>
-                    </div>
+            <div id="qr-container" class="hidden mt-10 text-center animate-fadeIn">
+                <div class="inline-block p-10 bg-white rounded-[4rem] shadow-2xl border-4 border-slate-50">
+                    <div id="qrcode-box" class="mx-auto border-8 border-white rounded-2xl overflow-hidden"></div>
+                    <p class="mt-6 text-[10px] font-black text-slate-900 uppercase tracking-widest">Asistencia Escaneable</p>
                 </div>
-                <button onclick="location.reload()" class="block mx-auto mt-8 text-[9px] font-black text-slate-300 hover:text-rose-500 uppercase">Finalizar Clase</button>
             </div>
         </section>
 
-        <!-- DASHBOARD: ADMINISTRADOR -->
+        <!-- ADMIN -->
         <section id="view-admin" class="view-section p-8 bg-slate-950 text-white">
             <header class="flex justify-between items-center mb-10">
                 <div>
-                    <h2 class="text-xl font-black text-white tracking-tight uppercase">AUDITORÍA GLOBAL</h2>
-                    <p class="text-[9px] text-blue-400 font-bold uppercase tracking-widest">Panel Psicopedagógico</p>
+                    <h2 class="text-xl font-black text-white tracking-tight uppercase">PANEL CARLOS</h2>
+                    <p class="text-[9px] text-blue-400 font-bold uppercase tracking-widest">Control Global Firestore</p>
                 </div>
                 <button onclick="window.handleLogout()" class="p-3 bg-white/10 rounded-xl text-white">
                     <i data-lucide="log-out" class="w-5 h-5"></i>
                 </button>
             </header>
 
-            <div class="space-y-6">
-                <div class="admin-card">
-                    <h3 class="text-[10px] font-black uppercase text-blue-400 mb-4">Últimos Registros en Nube</h3>
-                    <div class="overflow-x-auto">
-                        <table class="w-full text-left text-[10px]">
-                            <thead class="border-b border-white/10 text-white/40">
-                                <tr>
-                                    <th class="py-3 px-2 font-black uppercase">USUARIO</th>
-                                    <th class="py-3 px-2 font-black uppercase">ROL</th>
-                                    <th class="py-3 px-2 font-black uppercase">ESTADO</th>
-                                </tr>
-                            </thead>
-                            <tbody id="admin-table-body">
-                                <tr>
-                                    <td colspan="3" class="py-10 text-center opacity-30 italic">CONECTANDO A FIRESTORE...</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
+            <div class="admin-card">
+                <h3 class="text-[10px] font-black uppercase text-blue-400 mb-6 flex items-center gap-2">
+                    <i data-lucide="database" class="w-4 h-4"></i> Usuarios Registrados
+                </h3>
+                <div id="admin-list" class="space-y-3 max-h-[60vh] overflow-y-auto pr-2">
+                    <p class="text-center py-10 opacity-30 text-[10px]">Consultando Firebase...</p>
                 </div>
             </div>
         </section>
@@ -252,186 +222,190 @@
     </div>
 
     <script type="module">
+        // Importación de módulos oficiales de Firebase
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getFirestore, doc, setDoc, getDoc, collection, onSnapshot, query } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-        import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, signOut, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, setDoc, getDoc, collection, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
 
-        // CONFIGURACIÓN DE FIREBASE E INFRAESTRUCTURA
-        const firebaseConfig = JSON.parse(__firebase_config);
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
-        const auth = getAuth(app);
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'ceut_v20_final';
+        // 1. CONFIGURACIÓN DE FIREBASE (Carlos Aguilar)
+        const firebaseConfig = {
+            apiKey: "AIzaSyCefP6qEqaCMpo8ZpUiLpN4e_-E4ZNTp94",
+            authDomain: "asistencias-ceut.firebaseapp.com",
+            projectId: "asistencias-ceut",
+            storageBucket: "asistencias-ceut.firebasestorage.app",
+            messagingSenderId: "130615246146",
+            appId: "1:130615246146:web:6ae2c17c828fb28a809cdb"
+        };
+
+        const ADMIN_EMAIL = "carlos.aguilar@ceut.edu.mx";
+        const APP_ID = "ceut_production_v20";
+        
+        let db, auth;
+        try {
+            const app = initializeApp(firebaseConfig);
+            db = getFirestore(app);
+            auth = getAuth(app);
+        } catch (e) {
+            console.error("Fallo crítico en la inicialización de Firebase.");
+        }
 
         let selectedRole = 'student';
         lucide.createIcons();
 
-        // HELPERS DE INTERFAZ
+        // Utilidades de Interfaz
         const showToast = (msg) => {
-            const toast = document.getElementById('error-toast');
-            toast.innerText = msg; toast.style.display = 'block';
-            setTimeout(() => toast.style.display = 'none', 3500);
+            const t = document.getElementById('error-toast');
+            t.innerText = msg; t.style.display = 'block';
+            setTimeout(() => t.style.display = 'none', 4000);
         };
 
-        window.switchView = (viewId) => {
+        window.switchView = (id) => {
             document.querySelectorAll('.view-section').forEach(s => s.classList.remove('active'));
-            document.getElementById('view-' + viewId).classList.add('active');
-            lucide.createIcons();
+            const target = document.getElementById('view-' + id);
+            if (target) {
+                target.classList.add('active');
+                lucide.createIcons();
+            }
         };
 
         window.initFlow = (role) => {
+            document.getElementById('modal-welcome').style.display = 'none';
             selectedRole = role;
             document.getElementById('auth-title').innerText = "ACCESO " + role.toUpperCase();
             window.switchView('auth');
         };
 
-        // ACCIÓN DE LOGIN Y REGISTRO (CON PERSISTENCIA)
+        // 2. LÓGICA DE AUTENTICACIÓN Y REGISTRO
         document.getElementById('btn-submit-auth').onclick = async () => {
             const email = document.getElementById('authEmail').value.trim();
             const pass = document.getElementById('authPass').value.trim();
-            const name = document.getElementById('authName').value.trim().toUpperCase();
-            const idNum = document.getElementById('authId').value.trim().toUpperCase();
+            const name = document.getElementById('authName').value.trim();
+            const idNum = document.getElementById('authId').value.trim();
 
-            if (!email || !pass) return showToast("⚠️ INGRESA CORREO Y CONTRASEÑA");
+            if (!email || !pass) return showToast("⚠️ COMPLETA LOS CAMPOS");
 
+            const btn = document.getElementById('btn-submit-auth');
+            btn.disabled = true;
             document.getElementById('btn-label').classList.add('hidden');
             document.getElementById('btn-spin').classList.remove('hidden');
 
             try {
-                // Paso 1: Intentar inicio de sesión
+                // Intento de login normal
                 await signInWithEmailAndPassword(auth, email, pass);
             } catch (err) {
-                // Paso 2: Si falla y hay datos de registro, crear usuario
+                // Si falla (usuario no existe), intentamos crear la cuenta si los datos están presentes
                 if (name && idNum) {
                     try {
                         const res = await createUserWithEmailAndPassword(auth, email, pass);
                         const profile = { 
-                            name, 
-                            id: idNum, 
+                            name: name.toUpperCase(), 
+                            id: idNum.toUpperCase(), 
                             email, 
                             role: selectedRole, 
-                            ts: Date.now(),
-                            status: 'ACTIVO'
+                            ts: Date.now() 
                         };
-                        // Guardar perfil en Firestore siguiendo REGLA 1
-                        await setDoc(doc(db, 'artifacts', appId, 'users', res.user.uid, 'profile', 'info'), profile);
-                        // También registrarlo en una lista pública para el admin
-                        await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'logs', res.user.uid), {
-                            name, role: selectedRole, email, ts: Date.now()
-                        });
-                        showToast("✅ CUENTA CREADA EN LA NUBE");
+                        // Guardado en Firestore siguiendo las reglas de la plataforma
+                        await setDoc(doc(db, 'artifacts', APP_ID, 'users', res.user.uid, 'profile', 'info'), profile);
+                        await setDoc(doc(db, 'artifacts', APP_ID, 'public', 'data', 'users', res.user.uid), profile);
+                        showToast("✅ CUENTA CREADA EXITOSAMENTE");
                     } catch (regErr) { 
-                        showToast("❌ ERROR: " + regErr.message); 
+                        showToast("❌ ERROR: El correo ya está registrado o datos inválidos."); 
                     }
                 } else {
-                    showToast("❌ USUARIO NO EXISTE. LLENA TODOS LOS CAMPOS PARA REGISTRARTE.");
+                    showToast("❌ DATOS INCORRECTOS O USUARIO INEXISTENTE");
                 }
             } finally {
+                btn.disabled = false;
                 document.getElementById('btn-label').classList.remove('hidden');
                 document.getElementById('btn-spin').classList.add('hidden');
             }
         };
 
-        // MONITOR DE ESTADO DE SESIÓN (PERSISTENCIA REAL)
+        // 3. OBSERVAR ESTADO DE SESIÓN
         onAuthStateChanged(auth, async (user) => {
             if (user) {
-                // Verificación de Admin Forzada por Correo
-                if (user.email === 'deptopsicopedagogico@ceut.edu.mx') {
+                // Verificar si es el administrador principal
+                if (user.email === ADMIN_EMAIL) {
                     initAdminPanel();
                     window.switchView('admin');
                     return;
                 }
 
-                // Recuperar Perfil de Firestore
                 try {
-                    const snap = await getDoc(doc(db, 'artifacts', appId, 'users', user.uid, 'profile', 'info'));
+                    // Cargar perfil desde Firestore
+                    const snap = await getDoc(doc(db, 'artifacts', APP_ID, 'users', user.uid, 'profile', 'info'));
                     if (snap.exists()) {
                         const data = snap.data();
                         if (data.role === 'student') {
                             document.getElementById('std-name').innerText = data.name;
-                            document.getElementById('std-id').innerText = "MATRÍCULA: " + data.id;
+                            document.getElementById('std-id').innerText = "ID: " + data.id;
                             window.switchView('student');
-                        } else if (data.role === 'teacher') {
+                        } else {
                             document.getElementById('prof-name').innerText = data.name;
                             window.switchView('teacher');
-                        } else {
-                            // Si el rol es admin por firestore
-                            initAdminPanel();
-                            window.switchView('admin');
                         }
+                    } else {
+                        // Si no hay datos, forzar re-ingreso
+                        window.switchView('auth');
                     }
-                } catch(e) { showToast("ERROR AL CARGAR PERFIL"); }
+                } catch (e) { 
+                    showToast("ERROR AL CARGAR PERFIL"); 
+                }
             } else {
                 window.switchView('home');
             }
         });
 
-        // FUNCIONALIDAD DOCENTE: GENERAR QR
+        // 4. FUNCIONALIDAD DOCENTE: GENERAR QR
         window.createQR = () => {
             const m = document.getElementById('classMat').value.trim();
             const g = document.getElementById('classGru').value.trim();
             if (!m || !g) return showToast("⚠️ COMPLETA MATERIA Y GRUPO");
 
             const box = document.getElementById('qrcode-box');
-            box.innerHTML = "";
-            const payload = {
-                app: appId,
-                m: m.toUpperCase(),
-                g: g.toUpperCase(),
-                p: document.getElementById('prof-name').innerText,
-                t: Date.now() // Token dinámico para evitar fraude
-            };
-
+            box.innerHTML = ""; // Limpiar anterior
             new QRCode(box, {
-                text: JSON.stringify(payload),
-                width: 220, height: 220,
-                colorDark : "#1e40af",
-                colorLight : "#ffffff",
-                correctLevel : QRCode.CorrectLevel.H
+                text: JSON.stringify({ a: APP_ID, m: m.toUpperCase(), g: g.toUpperCase(), t: Date.now() }),
+                width: 200, height: 200,
+                colorDark: "#1e40af", colorLight: "#ffffff",
+                correctLevel: QRCode.CorrectLevel.H
             });
             document.getElementById('qr-container').classList.remove('hidden');
-            showToast("✅ CÓDIGO QR LISTO");
         };
 
-        // FUNCIONALIDAD ADMIN: MONITOR DE ACTIVIDAD
+        // 5. FUNCIONALIDAD ADMINISTRADOR: PANEL GLOBAL
         const initAdminPanel = () => {
-            const tableBody = document.getElementById('admin-table-body');
-            const q = collection(db, 'artifacts', appId, 'public', 'data', 'logs');
+            const list = document.getElementById('admin-list');
+            const q = collection(db, 'artifacts', APP_ID, 'public', 'data', 'users');
             
+            // Listener en tiempo real para ver quién se registra
             onSnapshot(q, (snapshot) => {
-                tableBody.innerHTML = "";
-                if(snapshot.empty) {
-                    tableBody.innerHTML = '<tr><td colspan="3" class="py-10 text-center opacity-30 italic">SIN REGISTROS AÚN</td></tr>';
+                list.innerHTML = "";
+                if (snapshot.empty) {
+                    list.innerHTML = '<p class="text-center py-10 opacity-30 text-[10px]">BASE DE DATOS VACÍA</p>';
                     return;
                 }
-                snapshot.forEach(doc => {
-                    const d = doc.data();
-                    const row = `
-                        <tr class="border-b border-white/5">
-                            <td class="py-4 px-2">
-                                <p class="font-bold text-white uppercase">${d.name}</p>
-                                <p class="text-[8px] opacity-40">${d.email}</p>
-                            </td>
-                            <td class="py-4 px-2 uppercase font-black text-blue-400">${d.role}</td>
-                            <td class="py-4 px-2">
-                                <span class="bg-emerald-500/10 text-emerald-500 px-2 py-1 rounded-full text-[8px] font-black">EN LÍNEA</span>
-                            </td>
-                        </tr>
+                snapshot.forEach(docSnap => {
+                    const u = docSnap.data();
+                    list.innerHTML += `
+                        <div class="flex items-center justify-between p-4 bg-white/5 rounded-2xl border border-white/10 hover:bg-white/10 transition-all">
+                            <div>
+                                <p class="text-[11px] font-black uppercase text-white">${u.name}</p>
+                                <p class="text-[9px] text-blue-400 font-bold uppercase">${u.role} | ID: ${u.id}</p>
+                                <p class="text-[8px] text-slate-500 mt-1">${u.email}</p>
+                            </div>
+                            <div class="text-right">
+                                <span class="text-[8px] bg-green-500/20 text-green-400 px-2 py-1 rounded-lg font-bold">REGISTRADO</span>
+                            </div>
+                        </div>
                     `;
-                    tableBody.innerHTML += row;
                 });
-            }, (err) => console.error("Error Admin Snapshot:", err));
+            }, (err) => {
+                showToast("ERROR DE PERMISOS: Revisa las reglas de Firestore.");
+            });
         };
 
         window.handleLogout = () => signOut(auth);
-
-        // INICIALIZACIÓN DE ENTORNO
-        (async () => {
-            if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                await signInWithCustomToken(auth, __initial_auth_token).catch(() => {});
-            }
-        })();
-
     </script>
 </body>
 </html>
