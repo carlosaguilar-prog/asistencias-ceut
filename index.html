@@ -22,11 +22,6 @@
             transition: all 0.3s ease;
         }
 
-        /* MODO ACCESIBILIDAD */
-        body.accessible-mode { background-color: #000 !important; font-size: 1.2rem; }
-        .accessible-mode .glass { background: rgba(255,255,255,0.2); border: 2px solid white; }
-        .accessible-mode p, .accessible-mode span { font-weight: 800 !important; color: white !important; }
-
         #app-container { height: 100%; width: 100%; overflow-y: auto; opacity: 0; transition: opacity 0.5s ease; }
 
         .glass { background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.1); }
@@ -34,24 +29,22 @@
         .view-section.active { display: flex; }
 
         .card-admin { background: white; border-radius: 1.5rem; padding: 1.5rem; color: #1e293b; margin-bottom: 1rem; border: 1px solid #e2e8f0; transition: all 0.2s; }
-        .card-admin:hover { border-color: var(--ceutBlue); box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1); }
         
         .badge { padding: 4px 10px; border-radius: 6px; font-size: 10px; font-weight: 800; text-transform: uppercase; }
         .badge-teacher { background: #dbeafe; color: #1e40af; }
         .badge-student { background: #fef3c7; color: #92400e; }
         
-        .mode-switch { background: rgba(255,255,255,0.1); padding: 4px; border-radius: 12px; display: flex; gap: 4px; }
-        .mode-btn { padding: 6px 12px; border-radius: 8px; font-size: 9px; font-weight: 800; text-transform: uppercase; transition: all 0.3s; }
+        .mode-switch { background: rgba(255,255,255,0.15); padding: 4px; border-radius: 12px; display: flex; gap: 4px; }
+        .mode-btn { padding: 8px 16px; border-radius: 8px; font-size: 10px; font-weight: 800; text-transform: uppercase; transition: all 0.3s; color: rgba(255,255,255,0.5); }
         .mode-btn.active { background: var(--accent-gold); color: #0f172a; }
 
-        #accessibility-toggle {
-            position: fixed; bottom: 20px; left: 20px; z-index: 1000;
-            width: 45px; height: 45px; background: #334155;
+        #master-access-trigger {
+            position: fixed; top: 20px; right: 20px; z-index: 1000;
+            width: 45px; height: 45px; background: rgba(212, 175, 55, 0.2);
             border-radius: 50%; display: flex; align-items: center; justify-content: center;
-            border: 1px solid rgba(255,255,255,0.2);
+            border: 1px solid rgba(212, 175, 55, 0.3); backdrop-filter: blur(5px);
         }
 
-        /* Estilos de Impresión */
         @media print {
             .no-print { display: none !important; }
             body { background: white !important; color: black !important; overflow: visible !important; }
@@ -60,7 +53,7 @@
         }
 
         .action-btn { transition: all 0.2s; cursor: pointer; }
-        .action-btn:active { transform: scale(0.9); }
+        .action-btn:active { transform: scale(0.95); }
     </style>
 
     <script src="https://cdn.tailwindcss.com"></script>
@@ -69,13 +62,14 @@
 </head>
 <body>
 
-    <button id="accessibility-toggle" onclick="toggleAccessibility()" class="no-print">
-        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+    <!-- BOTÓN DE ACCESO MAESTRO REINSTALADO -->
+    <button id="master-access-trigger" onclick="prepareAuth('admin')" class="no-print action-btn">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#d4af37" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
     </button>
 
     <div id="loading-overlay" class="fixed inset-0 bg-[#0f172a] z-[9999] flex flex-col items-center justify-center no-print">
         <div class="w-12 h-12 border-4 border-white/10 border-t-[#d4af37] rounded-full animate-spin mb-4"></div>
-        <p class="text-[10px] font-bold tracking-[0.3em] opacity-40">CEUT MASTER CONTROL</p>
+        <p class="text-[10px] font-bold tracking-[0.3em] opacity-40 uppercase">Cargando Sistemas</p>
     </div>
 
     <div id="app-container">
@@ -84,7 +78,7 @@
             <div class="max-w-md w-full">
                 <img src="https://lh3.googleusercontent.com/d/17NobXQ3JbRnLGejZe4Mn2x-Jl45F4rPm" class="w-24 mx-auto mb-6">
                 <h1 class="text-4xl font-extrabold tracking-tighter mb-2">CEUT <span class="text-[#d4af37]">CLOUD</span></h1>
-                <p class="text-[10px] tracking-[0.4em] text-white/40 font-bold uppercase mb-10">Consola de Control Total</p>
+                <p class="text-[10px] tracking-[0.4em] text-white/40 font-bold uppercase mb-10">Control de Acceso Escolar</p>
                 <div class="space-y-5">
                     <button onclick="prepareAuth('teacher')" class="w-full glass p-6 rounded-3xl flex items-center gap-5 action-btn">
                         <div class="w-16 h-16 bg-[#d4af37] rounded-2xl flex items-center justify-center text-3xl">👨‍🏫</div>
@@ -103,10 +97,12 @@
             <div class="w-full max-w-sm text-slate-800">
                 <button onclick="switchView('home')" class="mb-8 text-[12px] font-bold text-slate-400 uppercase tracking-widest no-print">← Regresar</button>
                 <h2 id="auth-title" class="text-3xl font-black text-[#1e40af] mb-6 uppercase tracking-tighter">Acceso</h2>
-                <div class="flex bg-slate-200/50 p-1 rounded-2xl mb-6">
+                
+                <div id="auth-mode-selector" class="flex bg-slate-200/50 p-1 rounded-2xl mb-6">
                     <button onclick="toggleAuthMode('login')" id="btn-mode-login" class="flex-1 py-4 rounded-xl font-bold text-[12px] uppercase bg-white shadow-sm">Entrar</button>
                     <button onclick="toggleAuthMode('register')" id="btn-mode-register" class="flex-1 py-4 rounded-xl font-bold text-[12px] uppercase text-slate-400">Nuevo</button>
                 </div>
+
                 <div class="space-y-4">
                     <div id="reg-fields" class="hidden space-y-4">
                         <input type="text" id="authName" placeholder="NOMBRE COMPLETO" class="w-full p-5 bg-white border-2 border-slate-200 rounded-2xl text-lg font-bold">
@@ -114,7 +110,7 @@
                     </div>
                     <input type="email" id="authEmail" placeholder="CORREO" class="w-full p-5 bg-white border-2 border-slate-200 rounded-2xl text-lg font-bold">
                     <input type="password" id="authPass" placeholder="CONTRASEÑA" class="w-full p-5 bg-white border-2 border-slate-200 rounded-2xl text-lg font-bold">
-                    <button id="btn-auth-confirm" onclick="handleAuth()" class="w-full bg-[#1e40af] text-white p-6 rounded-2xl font-black mt-4 uppercase text-[12px] tracking-widest shadow-xl action-btn">Confirmar</button>
+                    <button id="btn-auth-confirm" onclick="handleAuth()" class="w-full bg-[#1e40af] text-white p-6 rounded-2xl font-black mt-4 uppercase text-[12px] tracking-widest shadow-xl action-btn">Confirmar Acceso</button>
                 </div>
             </div>
         </section>
@@ -125,11 +121,11 @@
                 <div class="flex items-center gap-4">
                     <img src="https://lh3.googleusercontent.com/d/17NobXQ3JbRnLGejZe4Mn2x-Jl45F4rPm" class="w-8 h-8">
                     <div class="mode-switch">
-                        <button class="mode-btn active">Master</button>
-                        <button onclick="switchToTeacherFromAdmin()" class="mode-btn">Docente</button>
+                        <button class="mode-btn active">MASTER</button>
+                        <button onclick="switchView('teacher-panel')" class="mode-btn">DOCENTE</button>
                     </div>
                 </div>
-                <button onclick="logout()" class="text-[10px] font-black bg-white/10 px-4 py-2 rounded-xl border border-white/20">SALIR</button>
+                <button onclick="logout()" class="text-[10px] font-black bg-red-500/10 text-red-500 px-4 py-2 rounded-xl border border-red-500/20">SALIR</button>
             </nav>
             
             <div class="p-5 space-y-6">
@@ -137,44 +133,42 @@
                 <div class="grid grid-cols-2 gap-4 no-print">
                     <div class="bg-white p-6 rounded-3xl border-2 border-slate-100 shadow-sm relative overflow-hidden">
                         <div class="absolute -right-2 -bottom-2 opacity-10 text-6xl font-black">📅</div>
-                        <p class="text-[10px] font-black text-slate-400 uppercase mb-1">Sesiones Activas</p>
+                        <p class="text-[10px] font-black text-slate-400 uppercase mb-1">Clases Hoy</p>
                         <p id="stats-sessions" class="text-4xl font-black text-[#1e40af]">0</p>
                     </div>
                     <div class="bg-white p-6 rounded-3xl border-2 border-slate-100 shadow-sm relative overflow-hidden">
                         <div class="absolute -right-2 -bottom-2 opacity-10 text-6xl font-black">👥</div>
-                        <p class="text-[10px] font-black text-slate-400 uppercase mb-1">Usuarios Totales</p>
+                        <p class="text-[10px] font-black text-slate-400 uppercase mb-1">Usuarios</p>
                         <p id="stats-users" class="text-4xl font-black text-[#d4af37]">0</p>
                     </div>
                 </div>
 
-                <!-- Herramientas de Maestro -->
-                <div class="flex gap-3 no-print overflow-x-auto pb-2 scroll-hide">
-                    <button onclick="exportDataToCSV()" class="bg-emerald-600 text-white px-6 py-4 rounded-2xl font-black text-[11px] uppercase flex items-center gap-2 shadow-lg action-btn">
-                        📥 Exportar Excel
+                <!-- Herramientas Maestro -->
+                <div class="flex gap-3 no-print overflow-x-auto pb-2">
+                    <button onclick="exportDataToCSV()" class="bg-emerald-600 text-white px-6 py-4 rounded-2xl font-black text-[11px] uppercase flex shrink-0 items-center gap-2 shadow-lg action-btn">
+                        📥 Excel
                     </button>
-                    <button onclick="window.print()" class="bg-blue-600 text-white px-6 py-4 rounded-2xl font-black text-[11px] uppercase flex items-center gap-2 shadow-lg action-btn">
-                        🖨️ Imprimir Reporte
+                    <button onclick="window.print()" class="bg-blue-600 text-white px-6 py-4 rounded-2xl font-black text-[11px] uppercase flex shrink-0 items-center gap-2 shadow-lg action-btn">
+                        🖨️ Imprimir
                     </button>
                 </div>
 
                 <!-- Buscador -->
                 <div class="relative no-print">
-                    <input type="text" id="adminSearch" oninput="filterAdminContent()" placeholder="Buscar por materia, docente o grupo..." class="w-full p-5 pl-12 bg-white border-2 border-slate-200 rounded-2xl font-bold shadow-sm">
+                    <input type="text" id="adminSearch" oninput="filterAdminContent()" placeholder="Filtrar por materia o docente..." class="w-full p-5 pl-12 bg-white border-2 border-slate-200 rounded-2xl font-bold shadow-sm">
                     <span class="absolute left-5 top-6 opacity-30">🔍</span>
                 </div>
 
                 <!-- Tabs -->
-                <div class="flex gap-2 no-print">
-                    <button onclick="setAdminTab('sessions')" id="tab-sessions" class="flex-1 py-4 rounded-2xl bg-slate-900 text-white text-[11px] font-black uppercase shadow-lg">Clases</button>
-                    <button onclick="setAdminTab('users')" id="tab-users" class="flex-1 py-4 rounded-2xl bg-white text-slate-400 text-[11px] font-black uppercase border-2 border-slate-100">Directorio</button>
+                <div class="flex gap-2 no-print bg-slate-200 p-1 rounded-2xl">
+                    <button onclick="setAdminTab('sessions')" id="tab-sessions" class="flex-1 py-4 rounded-xl bg-slate-900 text-white text-[11px] font-black uppercase">Clases</button>
+                    <button onclick="setAdminTab('users')" id="tab-users" class="flex-1 py-4 rounded-xl text-slate-400 text-[11px] font-black uppercase">Usuarios</button>
                 </div>
 
                 <div id="admin-content-sessions" class="space-y-4 pb-24">
-                    <h3 class="text-[12px] font-black text-slate-400 uppercase mb-4 px-2">Control de Clases</h3>
                     <div id="global-sessions-list" class="space-y-4"></div>
                 </div>
                 <div id="admin-content-users" class="hidden space-y-4 pb-24">
-                    <h3 class="text-[12px] font-black text-slate-400 uppercase mb-4 px-2">Gestión de Usuarios</h3>
                     <div id="global-users-list" class="space-y-4"></div>
                 </div>
             </div>
@@ -183,11 +177,13 @@
         <!-- PANEL DOCENTE -->
         <section id="view-teacher-panel" class="view-section bg-slate-100">
             <nav class="bg-[#1e40af] p-5 flex justify-between items-center text-white shadow-xl sticky top-0 z-50 no-print">
-                <div id="hybrid-nav-switch" class="hidden mode-switch">
-                    <button onclick="switchView('admin-panel')" class="mode-btn">Master</button>
-                    <button class="mode-btn active">Docente</button>
+                <div id="admin-hybrid-nav" class="hidden">
+                    <div class="mode-switch">
+                        <button onclick="switchView('admin-panel')" class="mode-btn">MASTER</button>
+                        <button class="mode-btn active">DOCENTE</button>
+                    </div>
                 </div>
-                <div id="normal-nav-teacher" class="flex items-center gap-3">
+                <div id="standard-teacher-nav" class="flex items-center gap-3">
                     <div id="nav-initials" class="w-10 h-10 bg-[#d4af37] text-[#1e40af] rounded-xl flex items-center justify-center font-black">T</div>
                     <span id="nav-name" class="text-[12px] font-black uppercase">Docente</span>
                 </div>
@@ -195,7 +191,7 @@
             </nav>
             <div class="p-6 space-y-8">
                 <div class="bg-white p-8 rounded-[2.5rem] shadow-sm border-2 border-slate-100 no-print">
-                    <h3 class="text-[10px] font-black text-slate-300 uppercase mb-6 text-center tracking-[0.4em]">Panel de Apertura</h3>
+                    <h3 class="text-[10px] font-black text-slate-300 uppercase mb-6 text-center tracking-[0.4em]">Nueva Sesión</h3>
                     <div class="space-y-4">
                         <input type="text" id="sCourse" placeholder="MATERIA" class="w-full p-5 bg-slate-50 rounded-2xl text-lg font-black border-2 border-slate-100">
                         <div class="grid grid-cols-2 gap-4">
@@ -206,12 +202,12 @@
                                 <option value="POS">POSGRADO</option>
                             </select>
                         </div>
-                        <button onclick="saveClass()" class="w-full bg-[#d4af37] text-[#1e40af] p-6 rounded-3xl font-black text-[12px] uppercase shadow-xl action-btn mt-4">GENERAR ASISTENCIA</button>
+                        <button onclick="saveClass()" class="w-full bg-[#d4af37] text-[#1e40af] p-6 rounded-3xl font-black text-[12px] uppercase shadow-xl action-btn mt-4">GENERAR QR</button>
                     </div>
                 </div>
-                <div class="space-y-4">
-                    <h3 class="text-[11px] font-black text-slate-400 uppercase tracking-widest pl-2">Sesiones en Curso</h3>
-                    <div id="sessions-list" class="space-y-4 pb-20"></div>
+                <div class="space-y-4 pb-20">
+                    <h3 class="text-[11px] font-black text-slate-400 uppercase tracking-widest pl-2">Mis Sesiones</h3>
+                    <div id="sessions-list" class="space-y-4"></div>
                 </div>
             </div>
         </section>
@@ -221,20 +217,20 @@
             <div class="w-full max-w-sm glass p-10 rounded-[3rem] text-center border-2 border-white/10">
                 <div class="w-20 h-20 bg-white/10 rounded-3xl mx-auto mb-6 flex items-center justify-center text-4xl">🎓</div>
                 <h2 class="text-2xl font-black text-white uppercase mb-1" id="std-nav-name">Alumno</h2>
-                <p class="text-[#d4af37] text-[10px] font-black uppercase tracking-widest mb-10" id="std-nav-id">---</p>
+                <p class="text-[#d4af37] text-[10px] font-black uppercase tracking-widest mb-10" id="std-nav-id">ID: ---</p>
                 <div class="space-y-6">
-                    <input type="text" id="regCode" oninput="onCodeInput(this)" placeholder="CÓDIGO" class="w-full bg-white/10 border-4 border-white/20 p-6 text-center text-5xl font-black rounded-3xl outline-none text-white tracking-[0.2em] focus:border-[#d4af37]" maxlength="6">
+                    <input type="text" id="regCode" oninput="onCodeInput(this)" placeholder="CÓDIGO" class="w-full bg-white/10 border-4 border-white/20 p-6 text-center text-5xl font-black rounded-3xl outline-none text-white tracking-[0.2em]" maxlength="6">
                     <div id="class-detected-info" class="hidden bg-[#d4af37]/20 p-6 rounded-2xl border-2 border-[#d4af37]/30">
                         <p id="det-course" class="text-[#d4af37] text-[12px] font-black uppercase"></p>
                     </div>
-                    <button id="btn-register-attendance" onclick="studentRegister()" disabled class="w-full bg-white/10 text-white/20 p-6 rounded-2xl font-black text-[12px] uppercase">Registrar mi entrada</button>
+                    <button id="btn-register-attendance" onclick="studentRegister()" disabled class="w-full bg-white/10 text-white/20 p-6 rounded-2xl font-black text-[12px] uppercase">Enviar Asistencia</button>
                 </div>
                 <button onclick="logout()" class="mt-12 text-white/30 text-[10px] font-black uppercase underline">Cerrar Sesión</button>
             </div>
         </section>
     </div>
 
-    <!-- MODALES -->
+    <!-- MODAL QR -->
     <div id="qr-modal" class="fixed inset-0 bg-[#0f172a]/98 backdrop-blur-2xl z-[200] hidden flex flex-col items-center justify-center p-8 no-print">
         <div id="qrcode-box" class="p-8 bg-white rounded-[3rem] shadow-2xl mb-8 border-8 border-[#d4af37]"></div>
         <h4 id="modal-code" class="text-7xl font-black text-white tracking-tighter mb-12">000000</h4>
@@ -244,19 +240,21 @@
     <!-- MODAL EDICIÓN ADMIN -->
     <div id="edit-modal" class="fixed inset-0 bg-[#0f172a]/95 backdrop-blur-xl z-[300] hidden flex flex-col items-center justify-center p-8 no-print">
         <div class="bg-white w-full max-w-sm p-8 rounded-[2.5rem] text-slate-800">
-            <h3 class="font-black uppercase text-[12px] text-slate-400 mb-6 text-center">Modificar Sesión</h3>
-            <input type="text" id="editCourse" class="w-full p-5 bg-slate-50 border-2 border-slate-100 rounded-2xl font-black mb-4 uppercase">
-            <input type="text" id="editGrade" class="w-full p-5 bg-slate-50 border-2 border-slate-100 rounded-2xl font-black mb-6 uppercase">
-            <div class="flex gap-3">
-                <button onclick="confirmEdit()" class="flex-1 bg-[#1e40af] text-white p-5 rounded-2xl font-black text-[11px] uppercase">Guardar</button>
-                <button onclick="closeEdit()" class="flex-1 bg-slate-100 text-slate-400 p-5 rounded-2xl font-black text-[11px] uppercase">Cancelar</button>
+            <h3 class="font-black uppercase text-[12px] text-slate-400 mb-6 text-center">Editar Clase</h3>
+            <div class="space-y-4">
+                <input type="text" id="editCourse" placeholder="MATERIA" class="w-full p-5 bg-slate-50 border-2 border-slate-100 rounded-2xl font-black uppercase">
+                <input type="text" id="editGrade" placeholder="GRUPO" class="w-full p-5 bg-slate-50 border-2 border-slate-100 rounded-2xl font-black uppercase">
+                <div class="flex gap-3">
+                    <button onclick="confirmEdit()" class="flex-1 bg-[#1e40af] text-white p-5 rounded-2xl font-black text-[11px] uppercase">Guardar</button>
+                    <button onclick="closeEdit()" class="flex-1 bg-slate-100 text-slate-400 p-5 rounded-2xl font-black text-[11px] uppercase">Cerrar</button>
+                </div>
             </div>
         </div>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
-        import { getFirestore, collection, addDoc, onSnapshot, doc, updateDoc, setDoc, deleteDoc, getDoc, getDocs } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
+        import { getFirestore, collection, addDoc, onSnapshot, doc, updateDoc, setDoc, deleteDoc, getDoc } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
         import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-auth.js";
 
         const firebaseConfig = {
@@ -273,8 +271,6 @@
         let db, auth, currentUser, userData, currentEdit = {};
         let allGlobalSessions = [];
 
-        window.toggleAccessibility = () => document.body.classList.toggle('accessible-mode');
-
         async function init() {
             try {
                 const app = initializeApp(firebaseConfig);
@@ -285,10 +281,11 @@
                     if (user) {
                         currentUser = user;
                         const p = await getDoc(doc(db, 'artifacts', APP_ID, 'users', user.uid, 'profile', 'info'));
+                        
                         if (user.email === ADMIN_EMAIL) {
                             userData = { name: "CARLOS AGUILAR", role: "admin" };
-                            document.getElementById('hybrid-nav-switch').classList.remove('hidden');
-                            document.getElementById('normal-nav-teacher').classList.add('hidden');
+                            document.getElementById('admin-hybrid-nav').classList.remove('hidden');
+                            document.getElementById('standard-teacher-nav').classList.add('hidden');
                             switchView('admin-panel');
                             initAdminMonitoring();
                             listenToTeacherSessions(user.uid);
@@ -304,46 +301,46 @@
                                 switchView('student-panel');
                             }
                         }
-                    } else { switchView('home'); }
+                    } else { 
+                        switchView('home'); 
+                    }
                     document.getElementById('loading-overlay').style.display = 'none';
                     document.getElementById('app-container').style.opacity = '1';
                 });
             } catch (err) { console.error(err); }
         }
 
-        // --- ADMINISTRACIÓN TOTAL ---
+        // --- MASTER CONTROL LOGIC ---
         async function initAdminMonitoring() {
             onSnapshot(collection(db, 'artifacts', APP_ID, 'public_codes'), async (snap) => {
-                const list = document.getElementById('global-sessions-list');
                 document.getElementById('stats-sessions').innerText = snap.size;
                 allGlobalSessions = [];
-                
                 for(const d of snap.docs) {
                     const { teacherId, sessionId } = d.data();
                     const sSnap = await getDoc(doc(db, 'artifacts', APP_ID, 'users', teacherId, 'sessions', sessionId));
                     const tSnap = await getDoc(doc(db, 'artifacts', APP_ID, 'users', teacherId, 'profile', 'info'));
                     if(sSnap.exists()){
                         const s = sSnap.data();
-                        allGlobalSessions.push({ ...s, teacherId, sessionId, teacherName: tSnap.exists() ? tSnap.data().name : "Desconocido" });
+                        allGlobalSessions.push({ ...s, teacherId, sessionId, teacherName: tSnap.exists() ? tSnap.data().name : "S/N" });
                     }
                 }
                 renderAdminSessions(allGlobalSessions);
             });
 
             onSnapshot(collection(db, 'artifacts', APP_ID, 'users'), async (snap) => {
-                const list = document.getElementById('global-users-list');
                 document.getElementById('stats-users').innerText = snap.size;
+                const list = document.getElementById('global-users-list');
                 list.innerHTML = "";
                 for(const u of snap.docs) {
                     const profile = await getDoc(doc(db, 'artifacts', APP_ID, 'users', u.id, 'profile', 'info'));
                     if(profile.exists()){
                         const d = profile.data();
                         const card = document.createElement('div');
-                        card.className = "bg-white p-6 rounded-2xl flex justify-between items-center border-2 border-slate-50";
+                        card.className = "bg-white p-5 rounded-2xl flex justify-between items-center border border-slate-200 shadow-sm";
                         card.innerHTML = `
                             <div>
-                                <p class="text-[12px] font-black uppercase text-slate-800">${d.name}</p>
-                                <p class="text-[10px] text-slate-400 font-bold">${d.email}</p>
+                                <p class="text-[12px] font-black uppercase">${d.name}</p>
+                                <p class="text-[9px] text-slate-400 font-bold">${d.email}</p>
                             </div>
                             <div class="flex items-center gap-3">
                                 <span class="badge ${d.role === 'teacher' ? 'badge-teacher' : 'badge-student'}">${d.role}</span>
@@ -358,19 +355,19 @@
         function renderAdminSessions(data) {
             const list = document.getElementById('global-sessions-list');
             list.innerHTML = data.map(s => `
-                <div class="card-admin shadow-sm">
-                    <div class="flex justify-between items-start mb-4">
+                <div class="card-admin">
+                    <div class="flex justify-between items-start mb-3">
                         <span class="badge badge-teacher">${s.level}</span>
-                        <div class="flex gap-2 no-print">
-                            <button onclick="openEdit('${s.teacherId}', '${s.sessionId}', '${s.course}', '${s.grade}')" class="text-blue-500 font-black text-[10px] uppercase">Editar</button>
+                        <div class="flex gap-3 no-print">
+                            <button onclick="openEdit('${s.teacherId}', '${s.sessionId}', '${s.course}', '${s.grade}')" class="text-blue-600 font-black text-[10px] uppercase">Editar</button>
                             <button onclick="deleteGlobalSession('${s.teacherId}', '${s.sessionId}', '${s.code}')" class="text-red-500 font-black text-[10px] uppercase">Borrar</button>
                         </div>
                     </div>
-                    <h4 class="font-black text-[#1e40af] text-lg uppercase">${s.course}</h4>
-                    <p class="text-[10px] text-slate-400 font-bold uppercase">${s.teacherName} • ${s.grade}</p>
-                    <div class="mt-4 pt-4 border-t border-slate-50 flex justify-between items-center">
-                        <p class="text-[12px] font-black text-[#d4af37]">${s.attendees ? s.attendees.length : 0} ASISTENTES</p>
-                        <p class="text-[9px] font-bold text-slate-300">CÓDIGO: ${s.code}</p>
+                    <h4 class="font-black text-[#1e40af] text-lg uppercase leading-tight">${s.course}</h4>
+                    <p class="text-[10px] text-slate-400 font-bold uppercase">${s.teacherName} • GRUPO ${s.grade}</p>
+                    <div class="mt-4 pt-3 border-t border-slate-50 flex justify-between items-center">
+                        <p class="text-[11px] font-black text-[#d4af37]">${s.attendees ? s.attendees.length : 0} REGISTROS</p>
+                        <p class="text-[10px] font-bold text-slate-300">CÓDIGO: ${s.code}</p>
                     </div>
                 </div>
             `).join('');
@@ -379,22 +376,18 @@
         window.filterAdminContent = () => {
             const val = document.getElementById('adminSearch').value.toUpperCase();
             const filtered = allGlobalSessions.filter(s => 
-                s.course.includes(val) || s.teacherName.toUpperCase().includes(val) || s.grade.includes(val)
+                s.course.includes(val) || s.teacherName.toUpperCase().includes(val)
             );
             renderAdminSessions(filtered);
         };
 
         window.exportDataToCSV = () => {
-            let csv = "Materia,Docente,Grupo,Nivel,Codigo,Asistentes\n";
-            allGlobalSessions.forEach(s => {
-                csv += `"${s.course}","${s.teacherName}","${s.grade}","${s.level}","${s.code}","${s.attendees ? s.attendees.length : 0}"\n`;
-            });
+            let csv = "Materia,Docente,Grupo,Nivel,Asistentes\n";
+            allGlobalSessions.forEach(s => { csv += `"${s.course}","${s.teacherName}","${s.grade}","${s.level}","${s.attendees ? s.attendees.length : 0}"\n`; });
             const blob = new Blob([csv], { type: 'text/csv' });
             const url = window.URL.createObjectURL(blob);
             const a = document.createElement('a');
-            a.setAttribute('href', url);
-            a.setAttribute('download', `REPORTE_CEUT_${new Date().toLocaleDateString()}.csv`);
-            a.click();
+            a.href = url; a.download = `CEUT_CLOUD_REPORT.csv`; a.click();
         };
 
         window.openEdit = (tId, sId, course, grade) => {
@@ -412,22 +405,15 @@
         };
 
         window.closeEdit = () => document.getElementById('edit-modal').classList.add('hidden');
-
-        window.deleteUser = async (uid) => {
-            if(confirm("¿ELIMINAR ESTE USUARIO Y TODOS SUS DATOS?")) {
-                await deleteDoc(doc(db, 'artifacts', APP_ID, 'users', uid, 'profile', 'info'));
-                await deleteDoc(doc(db, 'artifacts', APP_ID, 'users', uid));
-            }
-        };
-
-        window.deleteGlobalSession = async (tId, sId, code) => {
-            if(confirm("¿BORRAR ESTA SESIÓN?")) {
+        window.deleteUser = async (uid) => { if(confirm("¿Eliminar usuario permanentemente?")) await deleteDoc(doc(db, 'artifacts', APP_ID, 'users', uid)); };
+        window.deleteGlobalSession = async (tId, sId, code) => { 
+            if(confirm("¿Eliminar esta clase?")) {
                 await deleteDoc(doc(db, 'artifacts', APP_ID, 'users', tId, 'sessions', sId));
                 await deleteDoc(doc(db, 'artifacts', APP_ID, 'public_codes', code));
             }
         };
 
-        // --- LÓGICA DOCENTE / ALUMNO ---
+        // --- CORE LOGIC ---
         window.saveClass = async () => {
             const c = document.getElementById('sCourse').value.toUpperCase().trim();
             const g = document.getElementById('sGrade').value.toUpperCase().trim();
@@ -448,14 +434,14 @@
                 list.innerHTML = snap.docs.map(d => {
                     const s = d.data();
                     return `
-                    <div class="bg-white p-6 rounded-3xl shadow-sm border-2 border-slate-50 flex justify-between items-center">
-                        <div class="flex-1">
-                            <p class="text-[10px] font-black text-slate-300 uppercase mb-1">${s.level} • ${s.grade}</p>
-                            <h4 class="font-black text-[#1e40af] text-sm uppercase">${s.course}</h4>
-                            <p class="text-[12px] text-[#d4af37] font-black uppercase">${s.attendees ? s.attendees.length : 0} LISTOS</p>
+                    <div class="bg-white p-6 rounded-3xl border-2 border-slate-50 flex justify-between items-center shadow-sm">
+                        <div>
+                            <p class="text-[9px] font-black text-slate-300 uppercase">${s.level} • ${s.grade}</p>
+                            <h4 class="font-black text-[#1e40af] text-[13px] uppercase">${s.course}</h4>
+                            <p class="text-[11px] text-[#d4af37] font-black">${s.attendees ? s.attendees.length : 0} ASISTENTES</p>
                         </div>
                         <div class="flex gap-2">
-                            <button onclick="showQR('${s.code}')" class="bg-[#1e40af] text-white text-[10px] font-black px-4 py-3 rounded-xl shadow-lg action-btn">QR</button>
+                            <button onclick="showQR('${s.code}')" class="bg-[#1e40af] text-white text-[10px] font-black px-4 py-3 rounded-xl shadow-md">QR</button>
                             <button onclick="deleteGlobalSession('${currentUser.uid}', '${d.id}', '${s.code}')" class="p-2 text-slate-200">✕</button>
                         </div>
                     </div>`;
@@ -473,32 +459,48 @@
                     document.getElementById('det-course').innerText = sSnap.data().course;
                     document.getElementById('class-detected-info').classList.remove('hidden');
                     document.getElementById('btn-register-attendance').disabled = false;
-                    document.getElementById('btn-register-attendance').className = "w-full bg-[#d4af37] text-[#1e40af] p-6 rounded-3xl font-black text-[12px] uppercase shadow-2xl action-btn";
-                } else { el.value = ""; }
+                    document.getElementById('btn-register-attendance').className = "w-full bg-[#d4af37] text-[#1e40af] p-6 rounded-3xl font-black text-[12px] uppercase shadow-2xl";
+                }
             }
         };
 
         window.studentRegister = async () => {
             const att = window.detSess.data.attendees || [];
-            if(att.some(a => a.id === userData.id)) return alert("YA REGISTRADO");
-            await updateDoc(window.detSess.ref, { 
-                attendees: [...att, { name: userData.name, id: userData.id, time: new Date().toLocaleTimeString() }] 
-            });
-            alert("ASISTENCIA CONFIRMADA"); location.reload();
+            if(att.some(a => a.id === userData.id)) return alert("ASISTENCIA YA REGISTRADA");
+            await updateDoc(window.detSess.ref, { attendees: [...att, { name: userData.name, id: userData.id, time: new Date().toLocaleTimeString() }] });
+            alert("ASISTENCIA ÉXITOSA"); location.reload();
         };
 
-        // --- SISTEMA CORE ---
         window.logout = () => signOut(auth).then(() => location.reload());
         window.switchView = (id) => {
             document.querySelectorAll('.view-section').forEach(s => s.classList.remove('active'));
             document.getElementById('view-' + id).classList.add('active');
-            window.scrollTo(0,0);
+        };
+
+        window.prepareAuth = (role) => { 
+            window.userRole = role; 
+            if(role === 'admin') {
+                document.getElementById('auth-title').innerText = "ADMIN MASTER";
+                document.getElementById('authEmail').value = ADMIN_EMAIL;
+                document.getElementById('auth-mode-selector').classList.add('hidden');
+                toggleAuthMode('login');
+            } else {
+                document.getElementById('auth-title').innerText = role === 'teacher' ? "DOCENTE" : "ALUMNO";
+                document.getElementById('auth-mode-selector').classList.remove('hidden');
+            }
+            switchView('auth'); 
+        };
+
+        window.toggleAuthMode = (mode) => { 
+            window.authMode = mode; 
+            document.getElementById('reg-fields').classList.toggle('hidden', mode !== 'register');
+            document.getElementById('btn-mode-login').className = mode === 'login' ? 'flex-1 py-4 rounded-xl font-bold text-[12px] uppercase bg-white shadow-sm' : 'flex-1 py-4 rounded-xl font-bold text-[12px] uppercase text-slate-400';
+            document.getElementById('btn-mode-register').className = mode === 'register' ? 'flex-1 py-4 rounded-xl font-bold text-[12px] uppercase bg-white shadow-sm' : 'flex-1 py-4 rounded-xl font-bold text-[12px] uppercase text-slate-400';
         };
 
         window.handleAuth = async () => {
             const email = document.getElementById('authEmail').value.trim();
             const pass = document.getElementById('authPass').value;
-            if (!email || pass.length < 6) return;
             try {
                 if (window.authMode === 'register') {
                     const name = document.getElementById('authName').value.toUpperCase().trim();
@@ -509,17 +511,11 @@
             } catch (e) { alert("ERROR DE ACCESO"); }
         };
 
-        window.prepareAuth = (role) => { window.userRole = role; switchView('auth'); toggleAuthMode('login'); };
-        window.toggleAuthMode = (mode) => { 
-            window.authMode = mode; 
-            document.getElementById('reg-fields').classList.toggle('hidden', mode !== 'register');
-        };
-
         window.setAdminTab = (tab) => {
             document.getElementById('admin-content-sessions').classList.toggle('hidden', tab !== 'sessions');
             document.getElementById('admin-content-users').classList.toggle('hidden', tab !== 'users');
-            document.getElementById('tab-sessions').className = tab === 'sessions' ? 'flex-1 py-4 rounded-2xl bg-slate-900 text-white text-[11px] font-black uppercase shadow-lg' : 'flex-1 py-4 rounded-2xl bg-white text-slate-400 text-[11px] font-black uppercase border-2 border-slate-100';
-            document.getElementById('tab-users').className = tab === 'users' ? 'flex-1 py-4 rounded-2xl bg-slate-900 text-white text-[11px] font-black uppercase shadow-lg' : 'flex-1 py-4 rounded-2xl bg-white text-slate-400 text-[11px] font-black uppercase border-2 border-slate-100';
+            document.getElementById('tab-sessions').className = tab === 'sessions' ? 'flex-1 py-4 rounded-xl bg-slate-900 text-white text-[11px] font-black uppercase' : 'flex-1 py-4 rounded-xl text-slate-400 text-[11px] font-black uppercase';
+            document.getElementById('tab-users').className = tab === 'users' ? 'flex-1 py-4 rounded-xl bg-slate-900 text-white text-[11px] font-black uppercase' : 'flex-1 py-4 rounded-xl text-slate-400 text-[11px] font-black uppercase';
         };
 
         window.showQR = (code) => { 
@@ -528,7 +524,6 @@
             document.getElementById('qr-modal').classList.remove('hidden'); 
         };
         window.closeQR = () => document.getElementById('qr-modal').classList.add('hidden');
-        window.switchToTeacherFromAdmin = () => switchView('teacher-panel');
         function updateNav(name) {
             document.getElementById('nav-name').innerText = name;
             document.getElementById('nav-initials').innerText = name[0];
