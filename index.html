@@ -26,7 +26,6 @@
         .view-section { display: none; width: 100%; min-height: 100vh; flex-direction: column; }
         .view-section.active { display: flex; }
 
-        /* Inputs y Botones Estilo Institucional */
         .input-ceut {
             width: 100%; padding: 1rem 1.2rem; background-color: white; border: 2px solid #e2e8f0;
             border-radius: 14px; font-size: 14px; font-weight: 700; color: var(--ceut-blue); outline: none; transition: all 0.2s;
@@ -43,7 +42,6 @@
             font-size: 12px; text-transform: uppercase; letter-spacing: 0.1em; border: none; cursor: pointer; width: 100%;
         }
 
-        /* QR y Timers */
         .qr-timer-bar { width: 100%; height: 4px; background: #e2e8f0; border-radius: 2px; margin-top: 15px; overflow: hidden; }
         #qr-progress { width: 100%; height: 100%; background: var(--ceut-gold); transition: width 1s linear; }
         
@@ -55,6 +53,20 @@
         .nav-tabs { display: flex; background: #e2e8f0; padding: 4px; border-radius: 16px; margin-bottom: 20px; }
         .nav-tab { flex: 1; text-align: center; padding: 10px; font-size: 10px; font-weight: 800; text-transform: uppercase; border-radius: 12px; cursor: pointer; color: #64748b; }
         .nav-tab.active { background: white; color: var(--ceut-blue); }
+
+        #error-toast {
+            position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+            background: #ef4444; color: white; padding: 12px 24px; border-radius: 12px;
+            font-size: 10px; font-weight: 800; text-transform: uppercase; z-index: 10000;
+            display: none; box-shadow: 0 10px 20px rgba(239, 68, 68, 0.3);
+            text-align: center; width: 90%; max-width: 400px;
+        }
+
+        /* Estilos Impresión */
+        @media print {
+            .no-print { display: none !important; }
+            #modal-list { position: relative !important; display: block !important; }
+        }
     </style>
 
     <script src="https://cdn.tailwindcss.com"></script>
@@ -64,6 +76,8 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
 </head>
 <body>
+
+    <div id="error-toast"></div>
 
     <div id="loading-overlay" class="fixed inset-0 bg-[#0f172a] z-[9999] flex flex-col items-center justify-center">
         <div class="relative w-20 h-20 mb-6">
@@ -81,10 +95,9 @@
                 <h1 class="text-4xl font-extrabold tracking-tighter mb-1 text-slate-900">CEUT <span class="text-[#d4af37]">CLOUD</span></h1>
                 <p class="text-[9px] tracking-[0.4em] text-slate-400 font-bold uppercase mb-12">Portal de Asistencia Institucional</p>
                 <div class="space-y-4">
-                    <!-- ACCESO ADMIN CON ICONO DE CANDADO -->
                     <button id="btn-home-admin" class="w-full bg-slate-900 p-5 rounded-[2rem] shadow-xl flex items-center gap-4 border border-slate-700">
                         <div class="w-12 h-12 bg-white/10 rounded-2xl flex items-center justify-center text-xl">🔒</div>
-                        <div class="text-left text-white"><p class="text-[10px] font-black uppercase">Administración</p><p class="text-[8px] opacity-40">PSICOPEDAGOGÍA</p></div>
+                        <div class="text-left text-white"><p class="text-[10px] font-black uppercase">Administración</p><p class="text-[8px] opacity-40">HERRAMIENTAS DE CONTROL</p></div>
                     </button>
                     <button id="btn-home-teacher" class="w-full bg-white p-5 rounded-[2rem] shadow-xl shadow-slate-200 flex items-center gap-4 border border-slate-100">
                         <div class="w-12 h-12 bg-blue-50 rounded-2xl flex items-center justify-center text-xl">👨‍🏫</div>
@@ -104,8 +117,8 @@
                 <button id="btn-auth-back" class="mb-8 text-[10px] font-black text-slate-400 uppercase">← Regresar</button>
                 <h2 id="auth-title" class="text-3xl font-black text-slate-900 mb-8 uppercase tracking-tighter">Acceso</h2>
                 <div class="flex bg-slate-200 p-1 rounded-2xl mb-6">
-                    <button id="auth-tab-login" class="flex-1 py-3 text-[10px] font-black uppercase rounded-xl bg-white text-blue-700">Login</button>
-                    <button id="auth-tab-reg" class="flex-1 py-3 text-[10px] font-black uppercase rounded-xl text-slate-500">Registro</button>
+                    <button id="auth-tab-login" class="flex-1 py-3 text-[10px] font-black uppercase rounded-xl bg-white text-blue-700">Entrar</button>
+                    <button id="auth-tab-reg" class="flex-1 py-3 text-[10px] font-black uppercase rounded-xl text-slate-500">Crear Cuenta</button>
                 </div>
                 <div class="space-y-3">
                     <div id="reg-inputs" class="hidden space-y-3">
@@ -114,7 +127,7 @@
                     </div>
                     <input type="email" id="authEmail" placeholder="Correo Institucional" class="input-ceut">
                     <input type="password" id="authPass" placeholder="Contraseña" class="input-ceut">
-                    <button id="btn-auth-submit" class="btn-primary mt-4">Entrar al Sistema</button>
+                    <button id="btn-auth-submit" class="btn-primary mt-4">Continuar</button>
                 </div>
             </div>
         </section>
@@ -128,19 +141,29 @@
                 </div>
                 <button id="btn-logout-admin" class="text-white/40 text-[9px] font-bold">CERRAR SESIÓN</button>
             </nav>
-            <div class="p-6">
-                <h3 class="text-white font-black text-2xl uppercase mb-6">Monitoreo <span class="text-[#d4af37]">Global</span></h3>
+            <div class="p-6 overflow-y-auto">
+                <h3 class="text-white font-black text-2xl uppercase mb-6">Herramientas de <span class="text-[#d4af37]">Control Global</span></h3>
+                
+                <!-- Estadísticas Administrativas -->
                 <div id="admin-stats" class="grid grid-cols-2 gap-4 mb-8">
                     <div class="bg-white/5 p-4 rounded-2xl border border-white/5">
-                        <p class="text-white/40 text-[8px] font-black uppercase">Clases Hoy</p>
+                        <p class="text-white/40 text-[8px] font-black uppercase">Clases en Nube</p>
                         <p id="stat-classes" class="text-white text-2xl font-black">0</p>
                     </div>
                     <div class="bg-white/5 p-4 rounded-2xl border border-white/5">
-                        <p class="text-white/40 text-[8px] font-black uppercase">Total Alumnos</p>
+                        <p class="text-white/40 text-[8px] font-black uppercase">Registros Totales</p>
                         <p id="stat-students" class="text-white text-2xl font-black">0</p>
                     </div>
                 </div>
-                <div id="admin-global-list" class="space-y-4"></div>
+
+                <!-- Lista de Sesiones Globales -->
+                <div class="flex items-center justify-between mb-4">
+                    <p class="text-white/40 text-[10px] font-black uppercase tracking-widest">Actividad Reciente</p>
+                    <button onclick="window.location.reload()" class="text-[#d4af37] text-[9px] font-bold">ACTUALIZAR</button>
+                </div>
+                <div id="admin-global-list" class="space-y-4 pb-20">
+                    <p class="text-white/20 text-center py-10 text-[10px] font-bold">Cargando datos de maestros...</p>
+                </div>
             </div>
         </section>
 
@@ -161,7 +184,7 @@
                         <input type="text" id="sCourse" placeholder="MATERIA (EJ. PSICOLOGÍA)" class="input-ceut uppercase mb-4">
                         <div class="grid grid-cols-2 gap-4 mb-4">
                             <input type="text" id="sGrade" placeholder="GRUPO (EJ. 502)" class="input-ceut uppercase">
-                            <input type="text" id="sClassId" class="input-ceut bg-slate-50 font-mono" readonly>
+                            <input type="text" id="sClassId" class="input-ceut bg-slate-50 font-mono" readonly title="ID generado">
                         </div>
                         <button id="btn-create-session" class="btn-primary">Iniciar Pase de Lista QR</button>
                     </div>
@@ -176,13 +199,11 @@
                 <img src="https://lh3.googleusercontent.com/d/17NobXQ3JbRnLGejZe4Mn2x-Jl45F4rPm" class="w-16 mx-auto mb-6 opacity-80 grayscale brightness-200">
                 <h2 id="std-name" class="text-2xl font-black text-white uppercase mb-1">Alumno</h2>
                 <p id="std-id" class="text-[#d4af37] text-[10px] font-black uppercase mb-8">ID: ---</p>
-                
                 <div id="attendance-status" class="space-y-4">
                     <div id="status-waiting" class="animate-pulse flex flex-col items-center">
                         <div class="w-12 h-12 bg-white/10 rounded-full mb-4"></div>
                         <p class="text-white/40 text-[9px] font-bold uppercase tracking-[0.3em]">Escanea el QR del Docente...</p>
                     </div>
-
                     <div id="status-confirm" class="hidden">
                         <div class="bg-white rounded-3xl p-6 text-left border-l-8 border-[#d4af37]">
                             <p class="text-[9px] font-black text-slate-400 uppercase mb-1">Clase Detectada</p>
@@ -191,41 +212,52 @@
                         </div>
                         <button id="btn-confirm-attendance" class="btn-gold mt-6 shadow-xl shadow-black/20">CONFIRMAR MI ASISTENCIA</button>
                     </div>
-
                     <div id="status-success" class="hidden">
                         <div class="w-20 h-20 bg-emerald-500 rounded-full flex items-center justify-center text-white text-3xl mx-auto mb-4">✓</div>
                         <p class="text-emerald-400 font-black text-sm uppercase">Asistencia Exitosa</p>
                         <p id="success-time" class="text-white/40 text-[9px] mt-2 font-bold uppercase tracking-widest">---</p>
                     </div>
                 </div>
-
                 <button id="btn-logout-student" class="mt-12 text-white/20 text-[9px] font-black uppercase">Cerrar Sesión</button>
             </div>
         </section>
     </div>
 
-    <!-- MODALES Y UTILIDADES -->
-    <div id="modal-qr" class="fixed inset-0 z-[1000] hidden flex flex-col items-center justify-center p-8">
+    <!-- MODAL DE LISTA Y EDICIÓN -->
+    <div id="modal-list" class="fixed inset-0 bg-white z-[1000] hidden flex flex-col">
+        <div class="bg-[#1e40af] p-8 text-white flex justify-between items-end no-print">
+            <div>
+                <p class="text-[10px] font-black opacity-50 uppercase mb-1">Reporte Detallado y Edición</p>
+                <h3 id="list-course" class="text-xl font-black uppercase tracking-tight">Materia</h3>
+            </div>
+            <button id="btn-close-list" class="bg-white/10 w-12 h-12 rounded-2xl flex items-center justify-center font-bold">✕</button>
+        </div>
+        
+        <!-- Header de impresión (solo visible al imprimir) -->
+        <div class="hidden print:block p-10 border-b-4 border-[#1e40af]">
+            <h1 class="text-3xl font-black uppercase">Reporte de Asistencia CEUT</h1>
+            <p id="print-info" class="text-slate-500 font-bold uppercase mt-2"></p>
+        </div>
+
+        <div id="list-body" class="flex-1 p-6 overflow-y-auto space-y-3 bg-slate-50"></div>
+        
+        <!-- Herramientas Administrativas dentro del Modal -->
+        <div class="p-6 border-t border-slate-100 grid grid-cols-2 gap-3 no-print">
+            <button id="btn-edit-session" class="bg-slate-800 text-white py-4 rounded-xl font-black uppercase text-[9px]">Editar Sesión</button>
+            <button id="btn-print" class="bg-slate-200 text-slate-800 py-4 rounded-xl font-black uppercase text-[9px]">Imprimir Lista</button>
+            <button id="btn-pdf" class="bg-red-600 text-white py-4 rounded-xl font-black uppercase text-[9px]">Descargar PDF</button>
+            <button id="btn-delete-session" class="bg-rose-100 text-rose-600 py-4 rounded-xl font-black uppercase text-[9px]">Eliminar Todo</button>
+        </div>
+    </div>
+
+    <!-- MODAL QR -->
+    <div id="modal-qr" class="fixed inset-0 z-[1000] hidden flex flex-col items-center justify-center p-8 no-print">
         <div class="qr-container mb-8">
             <div id="qrcode"></div>
             <div class="qr-timer-bar"><div id="qr-progress"></div></div>
             <p class="text-[8px] font-black text-slate-300 uppercase mt-4 text-center tracking-widest">Seguridad Dinámica Activa</p>
         </div>
         <button id="btn-close-qr" class="btn-primary max-w-xs bg-white text-blue-950">Finalizar Pase de Lista</button>
-    </div>
-
-    <div id="modal-list" class="fixed inset-0 bg-white z-[1000] hidden flex flex-col">
-        <div class="bg-[#1e40af] p-8 text-white flex justify-between items-end">
-            <div>
-                <p class="text-[10px] font-black opacity-50 uppercase mb-1">Reporte Detallado</p>
-                <h3 id="list-course" class="text-xl font-black uppercase tracking-tight">Materia</h3>
-            </div>
-            <button id="btn-close-list" class="bg-white/10 w-12 h-12 rounded-2xl flex items-center justify-center font-bold">✕</button>
-        </div>
-        <div id="list-body" class="flex-1 p-6 overflow-y-auto space-y-3 bg-slate-50"></div>
-        <div class="p-6 border-t border-slate-100 flex gap-4">
-            <button id="btn-pdf" class="flex-1 bg-red-600 text-white py-5 rounded-2xl font-black uppercase text-[10px]">Descargar PDF</button>
-        </div>
     </div>
 
     <script type="module">
@@ -241,9 +273,16 @@
         };
 
         const APP_ID = "ceut_cloud_v14";
-        const ADMIN_EMAIL = "deptopsicopedagogico@ceut.edu.mx";
-        let db, auth, user, profile, qrInterval;
+        const ADMIN_LIST = ["deptopsicopedagogico@ceut.edu.mx", "carlos.aguilar@ceut.edu.mx"];
+        
+        let db, auth, user, profile, qrInterval, currentSessionRef = null, currentSessionData = null;
         let currentAuthMode = 'login', currentTargetRole = 'student';
+
+        const showToast = (msg) => {
+            const t = document.getElementById('error-toast');
+            t.innerText = msg; t.style.display = 'block';
+            setTimeout(() => t.style.display = 'none', 5000);
+        };
 
         const init = async () => {
             try {
@@ -257,7 +296,11 @@
                         if (snap.exists()) {
                             profile = snap.data();
                             setupDashboard();
-                        } else { await signOut(auth); switchView('home'); }
+                        } else { 
+                            showToast("Perfil no encontrado. Por favor, crea una cuenta de nuevo.");
+                            await signOut(auth); 
+                            switchView('home'); 
+                        }
                     } else { switchView('home'); }
                     hideLoader();
                 });
@@ -275,7 +318,7 @@
         };
 
         const setupDashboard = () => {
-            if(user.email === ADMIN_EMAIL) {
+            if(ADMIN_LIST.includes(user.email)) {
                 switchView('admin-panel');
                 listenGlobalSessions();
                 return;
@@ -296,16 +339,18 @@
         const listenGlobalSessions = () => {
             onSnapshot(collectionGroup(db, 'sessions'), (snap) => {
                 const list = document.getElementById('admin-global-list');
-                const sessions = snap.docs.map(d => ({...d.data(), id: d.id, ref: d.ref}));
+                const sessions = snap.docs.map(d => ({...d.data(), id: d.id, fullPath: d.ref.path}));
                 document.getElementById('stat-classes').innerText = sessions.length;
                 document.getElementById('stat-students').innerText = sessions.reduce((acc, s) => acc + s.attendees.length, 0);
                 list.innerHTML = sessions.sort((a,b) => b.timestamp - a.timestamp).map(s => `
                     <div class="bg-white/5 p-5 rounded-2xl border border-white/5 flex justify-between items-center">
                         <div>
                             <p class="text-[#d4af37] text-[10px] font-black uppercase">${s.course}</p>
-                            <p class="text-white/40 text-[8px] uppercase">Grupo: ${s.grade} • Alumnos: ${s.attendees.length}</p>
+                            <p class="text-white/40 text-[8px] uppercase">G: ${s.grade} • Alumnos: ${s.attendees.length}</p>
                         </div>
-                        <button onclick="window.appOpenList('${JSON.stringify({...s, ref: null}).replace(/"/g, '&quot;')}')" class="bg-white/10 px-4 py-2 rounded-lg text-white text-[9px] font-bold uppercase">Ver</button>
+                        <div class="flex gap-2">
+                            <button onclick="window.appAdminOpen('${encodeURIComponent(JSON.stringify(s))}')" class="bg-[#d4af37] px-4 py-2 rounded-lg text-slate-950 text-[9px] font-bold uppercase">Administrar</button>
+                        </div>
                     </div>
                 `).join('');
             });
@@ -316,13 +361,14 @@
                 const list = document.getElementById('teacher-sessions-list');
                 list.innerHTML = snap.docs.sort((a,b) => b.data().timestamp - a.data().timestamp).map(d => {
                     const s = d.data();
+                    const obj = {...s, id: d.id, fullPath: d.ref.path};
                     return `
                         <div class="card-ceut">
                             <h4 class="font-black uppercase text-slate-800 text-sm mb-1">${s.course}</h4>
                             <p class="text-[9px] font-black text-slate-400 uppercase mb-4 tracking-widest">GRUPO ${s.grade} • ID: ${s.classId}</p>
                             <div class="flex gap-2">
                                 <button onclick="window.appShowQR('${s.classId}')" class="flex-1 bg-slate-100 py-3 rounded-xl text-[9px] font-black uppercase">QR</button>
-                                <button onclick="window.appOpenList('${JSON.stringify({...s, id: d.id}).replace(/"/g, '&quot;')}')" class="flex-[2] bg-blue-600 py-3 rounded-xl text-[9px] font-black text-white uppercase">Lista (${s.attendees.length})</button>
+                                <button onclick="window.appAdminOpen('${encodeURIComponent(JSON.stringify(obj))}')" class="flex-[2] bg-blue-600 py-3 rounded-xl text-[9px] font-black text-white uppercase">Lista (${s.attendees.length})</button>
                             </div>
                         </div>
                     `;
@@ -330,6 +376,80 @@
             });
         };
 
+        window.appAdminOpen = async (encodedData) => {
+            const s = JSON.parse(decodeURIComponent(encodedData));
+            currentSessionRef = doc(db, s.fullPath);
+            currentSessionData = s;
+            
+            document.getElementById('list-course').innerText = s.course;
+            document.getElementById('print-info').innerText = `${s.course} | GRUPO: ${s.grade} | FECHA: ${new Date(s.timestamp).toLocaleDateString()}`;
+            
+            const renderList = () => {
+                document.getElementById('list-body').innerHTML = currentSessionData.attendees.map((a, idx) => `
+                    <div class="bg-white p-4 rounded-xl border border-slate-100 flex justify-between items-center shadow-sm">
+                        <div>
+                            <div class="text-[10px] font-black uppercase text-slate-800">${a.name}</div>
+                            <div class="text-[8px] text-slate-400 font-bold uppercase">${a.id} • ${a.time}</div>
+                        </div>
+                        <button onclick="window.appRemoveStudent(${idx})" class="w-8 h-8 bg-rose-50 text-rose-500 rounded-lg flex items-center justify-center text-xs font-bold no-print">✕</button>
+                    </div>
+                `).join('') || '<p class="text-center text-slate-400 text-[10px] py-10 uppercase font-bold">Sin alumnos registrados</p>';
+            };
+
+            renderList();
+            document.getElementById('modal-list').classList.remove('hidden');
+        };
+
+        window.appRemoveStudent = async (index) => {
+            if(!confirm("¿Eliminar a este alumno de la lista?")) return;
+            const newAttendees = [...currentSessionData.attendees];
+            newAttendees.splice(index, 1);
+            await updateDoc(currentSessionRef, { attendees: newAttendees });
+            currentSessionData.attendees = newAttendees;
+            showToast("Alumno eliminado");
+            appAdminOpen(encodeURIComponent(JSON.stringify(currentSessionData)));
+        };
+
+        document.getElementById('btn-edit-session').onclick = async () => {
+            const nCourse = prompt("Nuevo nombre de la materia:", currentSessionData.course);
+            const nGrade = prompt("Nuevo grupo:", currentSessionData.grade);
+            if(nCourse && nGrade) {
+                await updateDoc(currentSessionRef, { course: nCourse.toUpperCase(), grade: nGrade.toUpperCase() });
+                currentSessionData.course = nCourse.toUpperCase();
+                currentSessionData.grade = nGrade.toUpperCase();
+                document.getElementById('list-course').innerText = currentSessionData.course;
+                showToast("Información actualizada");
+            }
+        };
+
+        document.getElementById('btn-delete-session').onclick = async () => {
+            if(!confirm("¿ELIMINAR ESTA CLASE PERMANENTEMENTE? Esta acción no se puede deshacer.")) return;
+            await deleteDoc(currentSessionRef);
+            document.getElementById('modal-list').classList.add('hidden');
+            showToast("Sesión eliminada del sistema");
+        };
+
+        document.getElementById('btn-print').onclick = () => window.print();
+
+        document.getElementById('btn-pdf').onclick = () => {
+            const { jsPDF } = window.jspdf;
+            const pdf = new jsPDF();
+            pdf.setFillColor(30, 64, 175); pdf.rect(0, 0, 210, 40, 'F');
+            pdf.setTextColor(255, 255, 255); pdf.setFontSize(22); pdf.text("CEUT CLOUD - REPORTE", 15, 25);
+            pdf.setTextColor(40, 40, 40); pdf.setFontSize(10);
+            pdf.text(`MATERIA: ${currentSessionData.course} | GRUPO: ${currentSessionData.grade}`, 15, 50);
+            pdf.text(`FECHA: ${new Date(currentSessionData.timestamp).toLocaleDateString()}`, 15, 55);
+            pdf.autoTable({ 
+                head: [['Alumno', 'Matrícula', 'Hora']], 
+                body: currentSessionData.attendees.map(a => [a.name, a.id, a.time]), 
+                startY: 65, 
+                theme: 'striped', 
+                headStyles: { fillColor: [30, 64, 175] } 
+            });
+            pdf.save(`Asistencia_${currentSessionData.course}_${currentSessionData.grade}.pdf`);
+        };
+
+        // --- Resto de lógica de Auth y QR ---
         window.appShowQR = (cid) => {
             const qrBox = document.getElementById('qrcode');
             const progress = document.getElementById('qr-progress');
@@ -351,7 +471,7 @@
             const cid = params.get('cid'), tk = params.get('tk'); 
             if(!cid || !tk) return;
             const currentToken = Math.floor(Date.now() / 10000);
-            if(Math.abs(currentToken - parseInt(tk)) > 2) return;
+            if(Math.abs(currentToken - parseInt(tk)) > 2) { showToast("QR Expirado. Escanea de nuevo."); return; }
             try {
                 const q = query(collectionGroup(db, 'sessions'), where("classId", "==", cid));
                 const snap = await getDocs(q);
@@ -368,56 +488,35 @@
                             document.getElementById('status-confirm').classList.add('hidden');
                             document.getElementById('status-success').classList.remove('hidden');
                             document.getElementById('success-time').innerText = `REGISTRADO: ${new Date().toLocaleTimeString()}`;
+                        } else {
+                            showToast("Ya estás registrado en esta clase");
                         }
                     };
                 }
             } catch (e) { console.error(e); }
         };
 
-        const exportPDF = (s) => {
-            const { jsPDF } = window.jspdf;
-            const pdf = new jsPDF();
-            pdf.setFillColor(30, 64, 175); pdf.rect(0, 0, 210, 40, 'F');
-            pdf.setTextColor(255, 255, 255); pdf.setFontSize(22); pdf.text("CEUT CLOUD - REPORTE", 15, 25);
-            pdf.setTextColor(40, 40, 40); pdf.setFontSize(10);
-            pdf.text(`MATERIA: ${s.course} | GRUPO: ${s.grade}`, 15, 50);
-            pdf.text(`FECHA: ${new Date(s.timestamp).toLocaleDateString()}`, 15, 55);
-            pdf.autoTable({ head: [['Alumno', 'ID', 'Hora']], body: s.attendees.map(a => [a.name, a.id, a.time]), startY: 65, theme: 'striped', headStyles: { fillColor: [30, 64, 175] } });
-            pdf.save(`Asistencia_${s.course}.pdf`);
-        };
-
-        window.appOpenList = (json) => {
-            const s = JSON.parse(json);
-            document.getElementById('list-course').innerText = s.course;
-            document.getElementById('list-body').innerHTML = s.attendees.map(a => `
-                <div class="bg-white p-4 rounded-xl border border-slate-100 flex justify-between items-center shadow-sm">
-                    <div class="text-[10px] font-black uppercase">${a.name}</div>
-                    <div class="text-[9px] text-blue-600 font-bold">${a.time}</div>
-                </div>
-            `).join('');
-            document.getElementById('btn-pdf').onclick = () => exportPDF(s);
-            document.getElementById('modal-list').classList.remove('hidden');
-        };
-
-        document.getElementById('btn-home-admin').onclick = () => { currentTargetRole = 'admin'; switchView('auth'); document.getElementById('auth-title').innerText = "Admin Depto"; };
+        document.getElementById('btn-home-admin').onclick = () => { currentTargetRole = 'admin'; switchView('auth'); document.getElementById('auth-title').innerText = "Psicopedagogía"; };
         document.getElementById('btn-home-teacher').onclick = () => { currentTargetRole = 'teacher'; switchView('auth'); document.getElementById('auth-title').innerText = "Docentes"; };
         document.getElementById('btn-home-student').onclick = () => { currentTargetRole = 'student'; switchView('auth'); document.getElementById('auth-title').innerText = "Alumnos"; };
         document.getElementById('btn-auth-back').onclick = () => switchView('home');
 
         document.getElementById('btn-auth-submit').onclick = async () => {
-            const email = document.getElementById('authEmail').value, pass = document.getElementById('authPass').value;
+            const email = document.getElementById('authEmail').value.trim(), pass = document.getElementById('authPass').value;
+            if(!email || !pass) { showToast("Llena todos los campos"); return; }
             try {
                 if(currentAuthMode === 'register') {
                     const name = document.getElementById('authName').value.toUpperCase(), id = document.getElementById('authId').value.toUpperCase();
+                    if(!name || !id) { showToast("Completa nombre e ID"); return; }
                     const res = await createUserWithEmailAndPassword(auth, email, pass);
                     await setDoc(doc(db, 'artifacts', APP_ID, 'users', res.user.uid, 'profile', 'info'), { name, id, email, role: currentTargetRole });
                 } else { await signInWithEmailAndPassword(auth, email, pass); }
-            } catch(e) { alert("Error de acceso: " + e.message); }
+            } catch(e) { showToast("Error: " + e.message); }
         };
 
         document.getElementById('btn-create-session').onclick = async () => {
             const course = document.getElementById('sCourse').value.toUpperCase(), grade = document.getElementById('sGrade').value.toUpperCase(), cid = document.getElementById('sClassId').value;
-            if(!course || !grade) return;
+            if(!course || !grade) { showToast("Materia y Grupo requeridos"); return; }
             await addDoc(collection(db, 'artifacts', APP_ID, 'users', user.uid, 'sessions'), { course, grade, classId: cid, timestamp: Date.now(), attendees: [] });
             window.appShowQR(cid);
         };
@@ -427,8 +526,19 @@
         document.getElementById('btn-logout-student').onclick = () => signOut(auth);
         document.getElementById('btn-close-qr').onclick = () => { clearInterval(qrInterval); document.getElementById('modal-qr').classList.add('hidden'); };
         document.getElementById('btn-close-list').onclick = () => document.getElementById('modal-list').classList.add('hidden');
-        document.getElementById('auth-tab-login').onclick = () => { currentAuthMode = 'login'; document.getElementById('reg-inputs').classList.add('hidden'); };
-        document.getElementById('auth-tab-reg').onclick = () => { currentAuthMode = 'register'; document.getElementById('reg-inputs').classList.remove('hidden'); };
+        
+        document.getElementById('auth-tab-login').onclick = () => { 
+            currentAuthMode = 'login'; 
+            document.getElementById('reg-inputs').classList.add('hidden');
+            document.getElementById('auth-tab-login').classList.add('bg-white', 'text-blue-700');
+            document.getElementById('auth-tab-reg').classList.remove('bg-white', 'text-blue-700');
+        };
+        document.getElementById('auth-tab-reg').onclick = () => { 
+            currentAuthMode = 'register'; 
+            document.getElementById('reg-inputs').classList.remove('hidden');
+            document.getElementById('auth-tab-reg').classList.add('bg-white', 'text-blue-700');
+            document.getElementById('auth-tab-login').classList.remove('bg-white', 'text-blue-700');
+        };
 
         window.onload = init;
     </script>
