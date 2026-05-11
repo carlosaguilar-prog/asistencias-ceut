@@ -2,75 +2,148 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>CEUT | Sistema de Asistencia Institucional</title>
+    
+    <!-- Recursos Externos -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
+
     <style>
+        :root {
+            --ceut-blue: #1e40af;
+            --ceut-dark: #0f172a;
+        }
+
         body { 
             background-color: #f8fafc; 
             font-family: 'Plus Jakarta Sans', sans-serif;
-            background-image: radial-gradient(#1e40af10 1px, transparent 1px);
-            background-size: 20px 20px;
+            background-image: radial-gradient(#1e40af08 1.5px, transparent 1.5px);
+            background-size: 30px 30px;
+            overflow-x: hidden;
         }
+
         .portal-card {
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            cursor: pointer;
+            transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+            border: 1px solid #e2e8f0;
+            background: white;
+            text-decoration: none;
         }
+
         .portal-card:hover {
-            transform: translateY(-10px);
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            transform: translateY(-12px);
+            border-color: var(--ceut-blue);
+            box-shadow: 0 30px 60px -12px rgba(30, 64, 175, 0.12);
+        }
+
+        .icon-box {
+            transition: transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .portal-card:hover .icon-box {
+            transform: scale(1.15) rotate(-5deg);
+        }
+
+        .btn-action {
+            transition: all 0.3s ease;
+        }
+
+        .portal-card:hover .btn-action {
+            background-color: var(--ceut-blue);
+            color: white;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .animate-cascade {
+            animation: fadeIn 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
         }
     </style>
 </head>
 <body class="min-h-screen flex flex-col items-center justify-center p-6">
 
-    <!-- CABECERA -->
-    <div class="text-center mb-12">
-        <img src="https://lh3.googleusercontent.com/d/17NobXQ3JbRnLGejZe4Mn2x-Jl45F4rPm" class="w-24 mx-auto mb-6" alt="Logo CEUT">
-        <h1 class="text-4xl font-black italic tracking-tighter text-[#1e40af] mb-2 uppercase">Centro de Estudios Universitarios de Tehuacán</h1>
-        <p class="text-slate-400 font-bold text-xs uppercase tracking-[0.3em]">Sistema de Control de Asistencias QR v1.0</p>
-    </div>
+    <!-- CABECERA INSTITUCIONAL -->
+    <header class="text-center mb-16 animate-cascade">
+        <div class="relative inline-block">
+            <img src="https://lh3.googleusercontent.com/d/17NobXQ3JbRnLGejZe4Mn2x-Jl45F4rPm" 
+                 class="w-24 md:w-32 mx-auto mb-8 drop-shadow-2xl" 
+                 alt="Logo Institucional CEUT">
+        </div>
+        
+        <h1 class="text-3xl md:text-5xl font-extrabold tracking-tighter text-[#1e40af] mb-4 uppercase italic">
+            Centro Universitario <br class="md:hidden"> Tehuacán
+        </h1>
+        
+        <div class="inline-flex items-center gap-3 px-5 py-2 bg-blue-50 border border-blue-100 rounded-full">
+            <span class="flex h-2 w-2 relative">
+                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
+                <span class="relative inline-flex rounded-full h-2 w-2 bg-blue-600"></span>
+            </span>
+            <p class="text-slate-500 font-black text-[10px] uppercase tracking-[0.3em]">
+                Sistema de Gestión de Asistencias v1.0
+            </p>
+        </div>
+    </header>
 
-    <!-- SELECCIÓN DE PORTAL -->
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-8 w-full max-w-5xl">
+    <!-- PORTALES DE ACCESO -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8 w-full max-w-6xl">
         
         <!-- ESTUDIANTES -->
-        <a href="alumno.html" class="portal-card bg-white p-8 rounded-[3rem] border border-slate-200 text-center flex flex-col items-center">
-            <div class="w-16 h-16 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center mb-6">
-                <i data-lucide="user" class="w-8 h-8"></i>
+        <a href="alumno.html" class="portal-card p-10 rounded-[3.5rem] text-center flex flex-col items-center group animate-cascade" style="animation-delay: 0.1s">
+            <div class="icon-box w-20 h-20 bg-blue-50 text-blue-600 rounded-3xl flex items-center justify-center mb-8">
+                <i data-lucide="user-check" class="w-10 h-10"></i>
             </div>
-            <h3 class="text-xl font-black italic uppercase text-slate-900 mb-2">Estudiantes</h3>
-            <p class="text-[10px] text-slate-400 font-bold uppercase leading-relaxed">Registro de asistencia mediante QR y Código Institucional</p>
-            <span class="mt-6 text-[10px] font-black text-blue-600 uppercase italic">Ingresar al Portal →</span>
+            <h3 class="text-2xl font-black italic uppercase text-slate-900 mb-3">Estudiantes</h3>
+            <p class="text-[11px] text-slate-400 font-bold uppercase leading-relaxed max-w-[220px] mb-8">
+                Registro de asistencia mediante escaneo QR y geolocalización
+            </p>
+            <div class="btn-action w-full py-4 rounded-2xl bg-slate-50 text-[10px] font-black text-blue-600 uppercase tracking-widest italic border border-slate-100">
+                Entrar al Portal →
+            </div>
         </a>
 
         <!-- DOCENTES -->
-        <a href="maestro.html" class="portal-card bg-white p-8 rounded-[3rem] border border-slate-200 text-center flex flex-col items-center border-t-4 border-t-blue-600">
-            <div class="w-16 h-16 bg-blue-600 text-white rounded-2xl flex items-center justify-center mb-6 shadow-lg">
-                <i data-lucide="graduation-cap" class="w-8 h-8"></i>
+        <a href="maestro.html" class="portal-card p-10 rounded-[3.5rem] text-center flex flex-col items-center border-t-8 border-t-blue-600 group shadow-xl animate-cascade" style="animation-delay: 0.2s">
+            <div class="icon-box w-20 h-20 bg-blue-600 text-white rounded-3xl flex items-center justify-center mb-8 shadow-lg shadow-blue-200">
+                <i data-lucide="graduation-cap" class="w-10 h-10"></i>
             </div>
-            <h3 class="text-xl font-black italic uppercase text-slate-900 mb-2">Docentes</h3>
-            <p class="text-[10px] text-slate-400 font-bold uppercase leading-relaxed">Apertura de clases, generación de QR y control de grupo</p>
-            <span class="mt-6 text-[10px] font-black text-blue-600 uppercase italic">Consola de Mando →</span>
+            <h3 class="text-2xl font-black italic uppercase text-slate-900 mb-3">Docentes</h3>
+            <p class="text-[11px] text-slate-400 font-bold uppercase leading-relaxed max-w-[220px] mb-8">
+                Generación de códigos QR dinámicos y control de grupos
+            </p>
+            <div class="btn-action w-full py-4 rounded-2xl bg-blue-600 text-white text-[10px] font-black uppercase tracking-widest italic shadow-md">
+                Panel de Control →
+            </div>
         </a>
 
         <!-- DIRECCIÓN -->
-        <a href="admin.html" class="portal-card bg-white p-8 rounded-[3rem] border border-slate-200 text-center flex flex-col items-center">
-            <div class="w-16 h-16 bg-slate-900 text-white rounded-2xl flex items-center justify-center mb-6">
-                <i data-lucide="shield-check" class="w-8 h-8"></i>
+        <a href="admin.html" class="portal-card p-10 rounded-[3.5rem] text-center flex flex-col items-center group animate-cascade" style="animation-delay: 0.3s">
+            <div class="icon-box w-20 h-20 bg-slate-900 text-white rounded-3xl flex items-center justify-center mb-8">
+                <i data-lucide="shield-check" class="w-10 h-10"></i>
             </div>
-            <h3 class="text-xl font-black italic uppercase text-slate-900 mb-2">Dirección</h3>
-            <p class="text-[10px] text-slate-400 font-bold uppercase leading-relaxed">Supervisión institucional, reportes y gestión master</p>
-            <span class="mt-6 text-[10px] font-black text-slate-900 uppercase italic">Acceso Restringido →</span>
+            <h3 class="text-2xl font-black italic uppercase text-slate-900 mb-3">Dirección</h3>
+            <p class="text-[11px] text-slate-400 font-bold uppercase leading-relaxed max-w-[220px] mb-8">
+                Supervisión institucional, analítica y reportes administrativos
+            </p>
+            <div class="btn-action w-full py-4 rounded-2xl bg-slate-900 text-white text-[10px] font-black uppercase tracking-widest italic">
+                Administración →
+            </div>
         </a>
 
     </div>
 
-    <!-- FOOTER -->
-    <footer class="mt-16 text-center">
-        <p class="text-[9px] font-black text-slate-300 uppercase tracking-widest italic">Desarrollado para el Departamento Psicopedagógico - CEUT 2024</p>
+    <!-- PIE DE PÁGINA -->
+    <footer class="mt-24 text-center">
+        <p class="text-[10px] font-black text-slate-300 uppercase tracking-[0.4em] italic mb-2">
+            Centro Universitario Tehuacán
+        </p>
+        <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest">
+            Innovación Educativa • Departamento de Psicopedagogía • 2024
+        </p>
     </footer>
 
     <script>
