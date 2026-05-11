@@ -1,318 +1,391 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>CEUT | Portal Docente</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
-    <script src="https://unpkg.com/lucide@latest"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-    <style>
-        :root { --ceut-blue: #1e40af; --ceut-dark: #0f172a; }
-        body { background-color: #f8fafc; font-family: 'Plus Jakarta Sans', sans-serif; }
-        .card-docente { background: white; border-radius: 2.5rem; border: 1px solid #e2e8f0; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.05); }
-        .input-ceut { width: 100%; padding: 0.8rem 1rem; border: 2px solid #e2e8f0; border-radius: 14px; font-size: 13px; font-weight: 600; transition: all 0.2s; }
-        .input-ceut:focus { border-color: var(--ceut-blue); outline: none; }
-        .btn-docente { background: var(--ceut-blue); color: white; padding: 1.1rem; border-radius: 20px; font-weight: 800; font-size: 11px; text-transform: uppercase; width: 100%; cursor: pointer; transition: all 0.3s; }
-        .btn-docente:hover { transform: translateY(-2px); box-shadow: 0 12px 20px -8px rgba(30, 64, 175, 0.4); }
-    </style>
-</head>
-<body class="p-4 md:p-8">
-    <div id="app" class="max-w-4xl mx-auto">
-        
-        <!-- LOGIN / REGISTRO DOCENTE -->
-        <div id="auth-section" class="min-h-[80vh] flex items-center justify-center">
-            <div class="card-docente p-10 w-full max-w-md text-center">
-                <img src="https://lh3.googleusercontent.com/d/17NobXQ3JbRnLGejZe4Mn2x-Jl45F4rPm" class="w-16 mx-auto mb-6" alt="Logo CEUT">
-                <h2 class="text-2xl font-black italic mb-2 uppercase tracking-tighter">Portal Docente</h2>
-                <p class="text-[10px] font-bold text-slate-400 mb-8 uppercase tracking-widest italic">Gestión de Cátedra Cloud</p>
-                
-                <div class="space-y-3 text-left">
-                    <input type="email" id="email" placeholder="Correo Institucional" class="input-ceut">
-                    <input type="password" id="pass" placeholder="Contraseña" class="input-ceut">
-                    
-                    <div id="reg-fields" class="hidden space-y-3 pt-4 border-t border-slate-100">
-                        <input type="text" id="reg-name" placeholder="NOMBRE COMPLETO" class="input-ceut uppercase">
-                        <input type="text" id="reg-id" placeholder="ID EMPLEADO / NÓMINA" class="input-ceut uppercase">
-                    </div>
+import React, { useState, useEffect } from 'react';
+import { initializeApp } from 'firebase/app';
+import { 
+  getFirestore, collection, doc, setDoc, getDoc, 
+  onSnapshot, addDoc, deleteDoc 
+} from 'firebase/firestore';
+import { 
+  getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged 
+} from 'firebase/auth';
+import { 
+  User, BookOpen, QrCode, ListChecks, Trash2, 
+  Printer, Download, Award, CheckCircle2, UserPlus, ShieldCheck 
+} from 'lucide-react';
 
-                    <button id="login-btn" class="btn-docente mt-4">Entrar al Panel</button>
-                    <button onclick="toggleReg()" id="toggle-text" class="w-full text-[10px] font-black text-slate-400 uppercase mt-4">¿Nuevo docente? Regístrate aquí</button>
-                </div>
-            </div>
-        </div>
+// Configuración de Firebase
+const firebaseConfig = JSON.parse(__firebase_config);
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+const appId = typeof __app_id !== 'undefined' ? __app_id : 'ceut-asistencias-2026';
 
-        <!-- DASHBOARD DOCENTE -->
-        <div id="dashboard" class="hidden">
-            <header class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
-                <div>
-                    <h1 id="prof-name" class="text-2xl font-black italic uppercase text-slate-900 leading-none mb-1">---</h1>
-                    <div class="flex items-center gap-2">
-                        <span id="prof-folio" class="bg-blue-600 text-white text-[9px] font-black px-3 py-0.5 rounded-full italic tracking-widest uppercase">FOLIO: ---</span>
-                        <span class="text-slate-400 text-[10px] font-bold uppercase italic">Docente Certificado</span>
-                    </div>
-                </div>
-                <button onclick="logout()" class="flex items-center gap-2 bg-white border border-slate-200 px-5 py-2.5 rounded-2xl text-xs font-black text-rose-500 uppercase italic transition-all hover:bg-rose-50">
-                    <i data-lucide="log-out" class="w-4 h-4"></i> Salir
-                </button>
-            </header>
+export default function App() {
+  const [user, setUser] = useState(null);
+  const [isRegistered, setIsRegistered] = useState(false);
+  const [activeTab, setActiveTab] = useState('profile');
+  const [profile, setProfile] = useState({ name: '', employeeId: '', degree: 'Lic.' });
+  const [classes, setClasses] = useState([]);
+  const [attendance, setAttendance] = useState([]);
+  const [selectedClassForQR, setSelectedClassForQR] = useState('');
+  const [qrPayload, setQrPayload] = useState('');
+  const [timeLeft, setTimeLeft] = useState(30);
+  const [loading, setLoading] = useState(true);
 
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                <!-- CREACIÓN DE CLASE -->
-                <div class="md:col-span-1 space-y-6">
-                    <div class="card-docente p-8 border-t-8 border-t-blue-600">
-                        <h3 class="text-xs font-black uppercase text-slate-900 mb-6 flex items-center gap-2 italic">
-                            <i data-lucide="plus-circle" class="w-4 h-4 text-blue-600"></i> Nueva Sesión
-                        </h3>
-                        <div class="space-y-4">
-                            <div>
-                                <label class="text-[9px] font-black text-slate-400 uppercase ml-2 mb-1 block tracking-widest">Materia / Asignatura</label>
-                                <input type="text" id="class-name" placeholder="Ej. Psicología Evolutiva" class="input-ceut uppercase">
-                            </div>
-                            <div class="grid grid-cols-2 gap-3">
-                                <div>
-                                    <label class="text-[9px] font-black text-slate-400 uppercase ml-2 mb-1 block tracking-widest">Grado</label>
-                                    <input type="text" id="class-grade" placeholder="4to" class="input-ceut uppercase">
-                                </div>
-                                <div>
-                                    <label class="text-[9px] font-black text-slate-400 uppercase ml-2 mb-1 block tracking-widest">Grupo</label>
-                                    <input type="text" id="class-group" placeholder="B" class="input-ceut uppercase">
-                                </div>
-                            </div>
-                            <div>
-                                <label class="text-[9px] font-black text-slate-400 uppercase ml-2 mb-1 block tracking-widest">Carrera</label>
-                                <input type="text" id="class-career" placeholder="Psicopedagogía" class="input-ceut uppercase">
-                            </div>
-                            <button id="start-btn" onclick="openClass()" class="btn-docente mt-2">Abrir Pase de Lista</button>
-                        </div>
-                    </div>
-                </div>
+  // 1. AUTENTICACIÓN (Regla 3)
+  useEffect(() => {
+    const initAuth = async () => {
+      if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+        await signInWithCustomToken(auth, __initial_auth_token);
+      } else {
+        await signInAnonymously(auth);
+      }
+    };
+    initAuth();
+    const unsubscribe = onAuthStateChanged(auth, (u) => {
+      if (u) setUser(u);
+    });
+    return () => unsubscribe();
+  }, []);
 
-                <!-- MONITOR DE CLASE ACTIVA -->
-                <div class="md:col-span-2">
-                    <div id="active-class-panel" class="card-docente p-8 min-h-[400px] flex flex-col items-center justify-center text-center">
-                        <div id="no-active-msg">
-                            <div class="w-20 h-20 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-6 text-slate-200">
-                                <i data-lucide="monitor-off" class="w-10 h-10"></i>
-                            </div>
-                            <p class="text-[10px] font-black text-slate-300 uppercase tracking-widest italic">No hay ninguna clase abierta actualmente</p>
-                        </div>
+  // 2. CARGAR PERFIL Y DATOS (Regla 1)
+  useEffect(() => {
+    if (!user) return;
 
-                        <div id="active-content" class="hidden w-full">
-                            <div class="flex flex-col md:flex-row gap-8 items-center">
-                                <div class="bg-white p-4 rounded-3xl border-4 border-blue-600 shadow-2xl">
-                                    <div id="qrcode"></div>
-                                    <p class="mt-4 text-[11px] font-black uppercase italic text-blue-600 tracking-tighter">Escaneo Requerido</p>
-                                </div>
-                                <div class="flex-1 text-left space-y-4">
-                                    <div class="bg-blue-50 p-6 rounded-[2rem] border border-blue-100">
-                                        <p id="active-folio" class="text-[9px] font-black text-blue-600 uppercase mb-1 italic">FOLIO CLASE: ---</p>
-                                        <h2 id="active-name" class="text-2xl font-black text-slate-900 uppercase italic leading-tight">---</h2>
-                                        <p id="active-meta" class="text-[10px] font-bold text-slate-500 uppercase mt-1">---</p>
-                                    </div>
-                                    <div class="flex gap-4">
-                                        <div class="flex-1 bg-slate-900 p-4 rounded-2xl text-center">
-                                            <p class="text-[8px] font-black text-slate-400 uppercase mb-1">Código OTP</p>
-                                            <p id="active-otp" class="text-2xl font-black text-white tracking-[0.3em]">---</p>
-                                        </div>
-                                        <button onclick="closeClass()" class="bg-rose-50 text-rose-500 px-6 rounded-2xl font-black text-[9px] uppercase italic border border-rose-100 hover:bg-rose-500 hover:text-white transition-all">
-                                            Terminar Sesión
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <div class="mt-8 pt-8 border-t border-slate-100">
-                                <div class="flex justify-between items-center mb-4">
-                                    <h4 class="text-[10px] font-black uppercase text-slate-400 italic">Alumnos Registrados</h4>
-                                    <span id="counter" class="bg-blue-600 text-white text-[10px] font-black px-4 py-1 rounded-full">0</span>
-                                </div>
-                                <div id="attendees-list" class="grid grid-cols-1 sm:grid-cols-2 gap-3 max-h-[200px] overflow-y-auto pr-2">
-                                    <!-- Dinámico -->
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+    const profDoc = doc(db, 'artifacts', appId, 'users', user.uid, 'profile', 'data');
+    
+    // Verificar si ya existe el registro único
+    getDoc(profDoc).then(snap => {
+      if (snap.exists()) {
+        setProfile(snap.data());
+        setIsRegistered(true);
+        setActiveTab('classes');
+      }
+      setLoading(false);
+    });
 
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getFirestore, doc, setDoc, getDoc, updateDoc, deleteDoc, onSnapshot, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-        import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+    // Escuchar Clases del docente
+    const classesRef = collection(db, 'artifacts', appId, 'users', user.uid, 'clases');
+    const unsubClasses = onSnapshot(classesRef, (snap) => {
+      setClasses(snap.docs.map(d => ({ id: d.id, ...d.data() })));
+    }, (err) => console.error(err));
 
-        const firebaseConfig = {
-            apiKey: "AIzaSyCefP6qEqaCMpo8ZpUiLpN4e_-E4ZNTp94",
-            authDomain: "asistencias-ceut.firebaseapp.com",
-            projectId: "asistencias-ceut",
-            storageBucket: "asistencias-ceut.firebasestorage.app",
-            messagingSenderId: "130615246146",
-            appId: "1:130615246146:web:6ae2c17c828fb28a809cdb"
-        };
+    // Escuchar Asistencias globales (filtradas por profId en memoria)
+    const attRef = collection(db, 'artifacts', appId, 'public', 'data', 'asistencias');
+    const unsubAtt = onSnapshot(attRef, (snap) => {
+      const allAtt = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+      setAttendance(allAtt.filter(a => a.profId === user.uid));
+    }, (err) => console.error(err));
 
-        const appId = 'ceut_asistencias_v1';
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
-        const auth = getAuth(app);
+    return () => { unsubClasses(); unsubAtt(); };
+  }, [user]);
 
-        let profProfile = null;
-        let isReg = false;
-        let activeClassId = null;
-        let qrcode = new QRCode(document.getElementById("qrcode"), { width: 180, height: 180, correctLevel: QRCode.CorrectLevel.H });
-
-        const genFolioDoc = () => `CEUT-DOC-${Math.floor(1000 + Math.random() * 9000)}`;
-        const genFolioCls = () => `CLS-${Math.floor(100000 + Math.random() * 900000)}`;
-        const genOTP = () => Math.floor(100000 + Math.random() * 900000).toString();
-        const getLoc = () => new Promise((res, rej) => navigator.geolocation.getCurrentPosition(p => res({lat: p.coords.latitude, lng: p.coords.longitude}), e => rej(e), {enableHighAccuracy: true}));
-
-        window.toggleReg = () => {
-            isReg = !isReg;
-            document.getElementById('reg-fields').classList.toggle('hidden');
-            document.getElementById('login-btn').innerText = isReg ? "Crear Perfil Docente" : "Entrar al Panel";
-            document.getElementById('toggle-text').innerText = isReg ? "¿Ya tienes cuenta? Entra aquí" : "¿Nuevo docente? Regístrate aquí";
-        };
-
-        onAuthStateChanged(auth, async (u) => {
-            if(u) {
-                const snap = await getDoc(doc(db, 'artifacts', appId, 'users', u.uid, 'profile', 'info'));
-                if(snap.exists() && snap.data().role === 'teacher') {
-                    profProfile = snap.data();
-                    document.getElementById('auth-section').classList.add('hidden');
-                    document.getElementById('dashboard').classList.remove('hidden');
-                    document.getElementById('prof-name').innerText = profProfile.name;
-                    document.getElementById('prof-folio').innerText = `FOLIO: ${profProfile.folio}`;
-                    checkActiveClass();
-                } else if(snap.exists()) {
-                    alert("Acceso denegado: Use el portal de alumnos.");
-                    signOut(auth);
-                }
-            } else {
-                document.getElementById('auth-section').classList.remove('hidden');
-                document.getElementById('dashboard').classList.add('hidden');
-            }
+  // 3. QR DINÁMICO (30 SEGUNDOS)
+  useEffect(() => {
+    let timer;
+    if (activeTab === 'qr' && selectedClassForQR) {
+      timer = setInterval(() => {
+        setTimeLeft((prev) => {
+          if (prev <= 1) {
+            generateQR();
+            return 30;
+          }
+          return prev - 1;
         });
+      }, 1000);
+    }
+    return () => clearInterval(timer);
+  }, [activeTab, selectedClassForQR]);
 
-        document.getElementById('login-btn').onclick = async () => {
-            const email = document.getElementById('email').value, pass = document.getElementById('pass').value;
-            if(!email || !pass) return alert("Complete los campos");
-            try {
-                if(isReg) {
-                    const name = document.getElementById('reg-name').value, empId = document.getElementById('reg-id').value;
-                    if(!name || !empId) return alert("Datos de registro incompletos");
-                    const res = await createUserWithEmailAndPassword(auth, email, pass);
-                    await setDoc(doc(db, 'artifacts', appId, 'users', res.user.uid, 'profile', 'info'), {
-                        uid: res.user.uid, name: name.toUpperCase(), nomina: empId, 
-                        folio: genFolioDoc(), role: 'teacher', email, createdAt: Date.now()
-                    });
-                } else {
-                    await signInWithEmailAndPassword(auth, email, pass);
-                }
-            } catch(e) { alert("Error: " + e.message); }
-        };
+  const generateQR = () => {
+    const random = Math.random().toString(36).substring(7).toUpperCase();
+    const payload = JSON.stringify({
+      profId: user.uid,
+      classId: selectedClassForQR,
+      token: random,
+      ts: Date.now()
+    });
+    setQrPayload(payload);
+  };
 
-        async function checkActiveClass() {
-            const q = query(collection(db, 'artifacts', appId, 'public', 'data', 'classes'), where("teacherId", "==", auth.currentUser.uid), where("isOpen", "==", true));
-            const snap = await getDocs(q);
-            if(!snap.empty) {
-                showActiveClass(snap.docs[0].id, snap.docs[0].data());
-            }
-        }
+  // ACCIONES
+  const handleRegister = async (e) => {
+    e.preventDefault();
+    if (!profile.name || !profile.employeeId) return;
+    
+    const profDoc = doc(db, 'artifacts', appId, 'users', user.uid, 'profile', 'data');
+    await setDoc(profDoc, { ...profile, registeredAt: Date.now() });
+    setIsRegistered(true);
+    setActiveTab('classes');
+  };
 
-        window.openClass = async () => {
-            const name = document.getElementById('class-name').value;
-            const grade = document.getElementById('class-grade').value;
-            const group = document.getElementById('class-group').value;
-            const career = document.getElementById('class-career').value;
-            
-            if(!name || !grade || !group || !career) return alert("Complete todos los campos de la clase.");
-            
-            const btn = document.getElementById('start-btn');
-            btn.disabled = true;
-            btn.innerText = "OBTENIENDO GPS...";
+  const addClass = async (e) => {
+    e.preventDefault();
+    const form = e.target;
+    const newClass = {
+      name: form.className.value,
+      group: form.classGroup.value,
+      level: form.classLevel.value,
+      createdAt: Date.now()
+    };
+    await addDoc(collection(db, 'artifacts', appId, 'users', user.uid, 'clases'), newClass);
+    form.reset();
+  };
 
-            try {
-                const coords = await getLoc();
-                const clsId = genFolioCls();
-                const classData = {
-                    id: clsId,
-                    name: name.toUpperCase(),
-                    grade: grade.toUpperCase(),
-                    group: group.toUpperCase(),
-                    career: career.toUpperCase(),
-                    teacherId: auth.currentUser.uid,
-                    teacherName: profProfile.name,
-                    otp: genOTP(),
-                    coords: coords,
-                    isOpen: true,
-                    createdAt: Date.now(),
-                    attendeesCount: 0
-                };
+  const deleteClass = async (id) => {
+    if (confirm('¿Eliminar esta clase? Los registros de asistencia no se borrarán.')) {
+      await deleteDoc(doc(db, 'artifacts', appId, 'users', user.uid, 'clases', id));
+    }
+  };
 
-                await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'classes', clsId), classData);
-                showActiveClass(clsId, classData);
+  const deleteAttendance = async (id) => {
+    if (confirm('¿Eliminar este registro de asistencia?')) {
+      await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'asistencias', id));
+    }
+  };
+
+  const downloadCSV = () => {
+    let csv = "Fecha,Materia,Grado_Grupo,Alumno,Matricula\n";
+    attendance.forEach(a => {
+      csv += `${new Date(a.ts).toLocaleDateString()},${a.className},${a.classGroup},${a.studentName},${a.studentId}\n`;
+    });
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `asistencias_${profile.name.replace(/\s/g, '_')}.csv`;
+    link.click();
+  };
+
+  if (loading) return (
+    <div className="min-h-screen bg-[#000b21] flex flex-col items-center justify-center text-white space-y-4">
+      <div className="w-12 h-12 border-4 border-[#eab308] border-t-transparent rounded-full animate-spin"></div>
+      <p className="font-black uppercase italic tracking-widest text-xs">Cargando Espacio Tigre...</p>
+    </div>
+  );
+
+  return (
+    <div className="min-h-screen bg-[#000b21] text-white selection:bg-[#eab308] selection:text-black pb-20">
+      {/* Fondo de Marca */}
+      <div className="fixed inset-0 z-[-1] opacity-5 pointer-events-none">
+        <div className="absolute inset-0" style={{ backgroundImage: 'linear-gradient(45deg, #3b4ba4 25%, transparent 25%), linear-gradient(-45deg, #3b4ba4 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #3b4ba4 75%), linear-gradient(-45deg, transparent 75%, #3b4ba4 75%)', backgroundSize: '80px 80px' }}></div>
+      </div>
+
+      <div className="h-2 bg-[#eab308] sticky top-0 z-50 shadow-lg"></div>
+
+      {/* Header Institucional */}
+      <header className="py-10 bg-[#000b21] border-b border-white/10 flex flex-col items-center no-print">
+        <img src="https://lh3.googleusercontent.com/d/17NobXQ3JbRnLGejZe4Mn2x-Jl45F4rPm" className="w-44 mb-4" alt="CEUT LOGO" />
+        <h1 className="text-2xl font-black uppercase italic tracking-tighter">Portal Docente</h1>
+        {isRegistered && (
+          <div className="mt-4 flex items-center gap-2 bg-[#3b4ba4] px-4 py-1.5 rounded-full border border-white/10">
+            <ShieldCheck size={14} className="text-[#eab308]" />
+            <span className="text-[10px] font-black uppercase tracking-widest italic">{profile.degree} {profile.name}</span>
+          </div>
+        )}
+      </header>
+
+      <main className="container mx-auto px-4 py-8 max-w-5xl">
+        
+        {/* LÓGICA DE REGISTRO ÚNICO */}
+        {!isRegistered ? (
+          <section className="max-w-md mx-auto animate-in fade-in zoom-in duration-500">
+            <div className="bg-[#3b4ba4] p-10 rounded-[2.5rem] border-b-[12px] border-[#eab308] shadow-2xl">
+              <div className="flex flex-col items-center mb-8">
+                <div className="w-20 h-20 bg-[#000b21] rounded-3xl flex items-center justify-center mb-4 border border-white/10">
+                  <UserPlus size={40} className="text-[#eab308]" />
+                </div>
+                <h2 className="text-2xl font-black uppercase italic text-center leading-tight">Registro Único de Docente</h2>
+                <p className="text-[10px] uppercase font-bold text-blue-200 mt-2 tracking-widest opacity-60 text-center">Identifíquese para habilitar sus herramientas</p>
+              </div>
+
+              <form onSubmit={handleRegister} className="space-y-5">
+                <div className="grid grid-cols-4 gap-2">
+                   <select 
+                    value={profile.degree} 
+                    onChange={e => setProfile({...profile, degree: e.target.value})}
+                    className="col-span-1 bg-[#000b21] p-4 rounded-2xl font-bold border-2 border-white/5 outline-none focus:border-[#eab308]"
+                   >
+                    <option>Lic.</option>
+                    <option>Mtro.</option>
+                    <option>Dr.</option>
+                   </select>
+                   <input 
+                    type="text" 
+                    required
+                    className="col-span-3 bg-[#000b21] p-4 rounded-2xl font-bold italic border-2 border-white/5 outline-none focus:border-[#eab308]" 
+                    placeholder="Nombre Completo"
+                    value={profile.name}
+                    onChange={e => setProfile({...profile, name: e.target.value})}
+                   />
+                </div>
+                <input 
+                  type="text" 
+                  required
+                  className="w-full bg-[#000b21] p-4 rounded-2xl font-bold italic border-2 border-white/5 outline-none focus:border-[#eab308]" 
+                  placeholder="Número de Empleado / ID"
+                  value={profile.employeeId}
+                  onChange={e => setProfile({...profile, employeeId: e.target.value})}
+                />
+                <button type="submit" className="w-full bg-[#eab308] text-black font-black py-5 rounded-2xl uppercase italic hover:scale-[1.02] active:scale-95 transition-all shadow-xl shadow-yellow-900/20 flex items-center justify-center gap-2">
+                  Activar Mi Espacio Tigre
+                </button>
+              </form>
+            </div>
+          </section>
+        ) : (
+          <>
+            {/* Navegación para Usuarios Registrados */}
+            <nav className="grid grid-cols-3 gap-3 mb-10 no-print">
+              <button onClick={() => setActiveTab('classes')} className={`p-5 rounded-2xl font-black uppercase italic text-xs flex flex-col items-center gap-2 transition-all border-b-4 ${activeTab === 'classes' ? 'bg-[#eab308] text-black border-yellow-600' : 'bg-[#3b4ba4] border-blue-900 hover:bg-[#4a5bc4]'}`}>
+                <BookOpen size={20}/> Clases
+              </button>
+              <button onClick={() => setActiveTab('qr')} className={`p-5 rounded-2xl font-black uppercase italic text-xs flex flex-col items-center gap-2 transition-all border-b-4 ${activeTab === 'qr' ? 'bg-[#eab308] text-black border-yellow-600' : 'bg-[#3b4ba4] border-blue-900 hover:bg-[#4a5bc4]'}`}>
+                <QrCode size={20}/> QR Dinámico
+              </button>
+              <button onClick={() => setActiveTab('lists')} className={`p-5 rounded-2xl font-black uppercase italic text-xs flex flex-col items-center gap-2 transition-all border-b-4 ${activeTab === 'lists' ? 'bg-[#eab308] text-black border-yellow-600' : 'bg-[#3b4ba4] border-blue-900 hover:bg-[#4a5bc4]'}`}>
+                <ListChecks size={20}/> Listas
+              </button>
+            </nav>
+
+            {/* VISTA: GESTIÓN DE CLASES */}
+            {activeTab === 'classes' && (
+              <div className="animate-in fade-in duration-500">
+                <div className="bg-[#3b4ba4] p-8 rounded-3xl mb-8 border-b-8 border-[#eab308] shadow-lg">
+                  <h2 className="text-xl font-black uppercase italic mb-6">Registrar Materia (Única Ocasión)</h2>
+                  <form onSubmit={addClass} className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                    <input name="className" required className="bg-[#000b21] p-4 rounded-xl font-bold italic text-sm" placeholder="Nombre de la Materia" />
+                    <input name="classGroup" required className="bg-[#000b21] p-4 rounded-xl font-bold italic text-sm" placeholder="Grado y Grupo" />
+                    <select name="classLevel" className="bg-[#000b21] p-4 rounded-xl font-bold italic text-sm">
+                      <option value="Licenciatura">Licenciatura</option>
+                      <option value="Preparatoria">Preparatoria</option>
+                    </select>
+                    <button type="submit" className="bg-[#eab308] text-black font-black rounded-xl uppercase italic hover:bg-white transition-all shadow-lg">Guardar</button>
+                  </form>
+                </div>
                 
-                // Limpiar inputs
-                document.getElementById('class-name').value = "";
-                document.getElementById('class-grade').value = "";
-                document.getElementById('class-group').value = "";
-                document.getElementById('class-career').value = "";
-            } catch(e) {
-                alert("Error: Active el GPS para abrir la geocerca de clase.");
-            } finally {
-                btn.disabled = false;
-                btn.innerText = "Abrir Pase de Lista";
-            }
-        };
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {classes.map(c => (
+                    <div key={c.id} className="bg-[#0d1b3e] border border-white/5 p-6 rounded-2xl flex justify-between items-center group hover:border-[#eab308] transition-all">
+                      <div>
+                        <span className="text-[9px] font-black bg-[#eab308] text-black px-2 py-0.5 rounded uppercase tracking-tighter">{c.level}</span>
+                        <h3 className="text-xl font-black italic mt-2">{c.name}</h3>
+                        <p className="text-xs font-bold text-blue-300 uppercase tracking-widest">{c.group}</p>
+                      </div>
+                      <button onClick={() => deleteClass(c.id)} className="text-rose-400 p-3 hover:bg-rose-500/20 rounded-xl opacity-0 group-hover:opacity-100 transition-all"><Trash2 size={20}/></button>
+                    </div>
+                  ))}
+                  {classes.length === 0 && (
+                    <div className="col-span-full py-16 text-center bg-white/5 rounded-3xl border-2 border-dashed border-white/10 opacity-30">
+                      <p className="font-black uppercase italic tracking-widest">No hay clases registradas aún</p>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
 
-        function showActiveClass(cid, data) {
-            activeClassId = cid;
-            document.getElementById('no-active-msg').classList.add('hidden');
-            document.getElementById('active-content').classList.remove('hidden');
-            
-            document.getElementById('active-folio').innerText = `FOLIO CLASE: ${cid}`;
-            document.getElementById('active-name').innerText = data.name;
-            document.getElementById('active-meta').innerText = `${data.career} | ${data.grade} - ${data.group}`;
-            document.getElementById('active-otp').innerText = data.otp;
+            {/* VISTA: QR DINÁMICO */}
+            {activeTab === 'qr' && (
+              <div className="flex flex-col items-center animate-in zoom-in duration-500">
+                <div className="bg-[#3b4ba4] p-10 rounded-[3rem] border-b-[12px] border-[#eab308] text-center w-full max-w-lg shadow-2xl">
+                  <h2 className="text-3xl font-black uppercase italic mb-2">Pase de Lista</h2>
+                  <p className="text-[10px] font-black uppercase text-blue-200 tracking-[0.2em] mb-8">Código dinámico cada 30s</p>
+                  
+                  <select 
+                    className="w-full bg-[#000b21] p-5 rounded-2xl font-black italic mb-8 border-2 border-white/10 text-center text-[#eab308]"
+                    value={selectedClassForQR}
+                    onChange={e => { setSelectedClassForQR(e.target.value); generateQR(); }}
+                  >
+                    <option value="">-- ELIGIR MATERIA --</option>
+                    {classes.map(c => <option key={c.id} value={c.id}>{c.name} ({c.group})</option>)}
+                  </select>
 
-            // QR contiene el ID de la clase para el escaneo del alumno
-            qrcode.makeCode(JSON.stringify({ classId: cid }));
+                  {selectedClassForQR && qrPayload ? (
+                    <div className="space-y-8">
+                      <div className="bg-white p-6 rounded-[2rem] inline-block shadow-2xl border-4 border-[#eab308]">
+                        <img 
+                          src={`https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(qrPayload)}&color=000b21`} 
+                          alt="QR Dinámico"
+                          className="w-60 h-60"
+                        />
+                      </div>
+                      <div className="flex flex-col items-center gap-3">
+                        <div className="flex items-center gap-3 bg-[#000b21] px-6 py-2 rounded-full border border-white/10">
+                          <div className="w-2.5 h-2.5 bg-[#eab308] rounded-full animate-ping"></div>
+                          <span className="text-xs font-black italic uppercase">Actualizando en {timeLeft}s</span>
+                        </div>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="py-20 opacity-20">
+                      <QrCode size={100} className="mx-auto" />
+                      <p className="mt-4 font-black uppercase italic text-xs tracking-widest">Seleccione una materia arriba</p>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
 
-            // Escuchar asistencias en tiempo real
-            onSnapshot(query(collection(db, 'artifacts', appId, 'users'), where("role", "==", "student")), async (snap) => {
-                const list = document.getElementById('attendees-list');
-                let count = 0;
-                let html = "";
-                
-                // Buscamos alumnos que tengan el ID de esta clase en su historial
-                const students = await getDocs(collection(db, 'artifacts', appId, 'users'));
-                students.forEach(docSnap => {
-                    // Nota: En una app real esto se filtra por subcolección o arrayUnion
-                    // Para este prototipo, leemos los perfiles que contienen el ID de clase activa
-                });
+            {/* VISTA: LISTAS */}
+            {activeTab === 'lists' && (
+              <div className="animate-in fade-in duration-500">
+                <div className="flex flex-col md:flex-row justify-between items-center mb-8 no-print gap-4">
+                  <div>
+                    <h2 className="text-3xl font-black uppercase italic leading-none">Asistencias</h2>
+                    <p className="text-blue-300 text-[10px] font-black uppercase tracking-[0.3em] mt-2 italic">Historial Sincronizado en Nube</p>
+                  </div>
+                  <div className="flex gap-3">
+                    <button onClick={() => window.print()} className="bg-[#3b4ba4] p-4 rounded-2xl hover:bg-[#eab308] hover:text-black transition-all shadow-lg flex items-center gap-2 font-black uppercase italic text-[10px]"><Printer size={16}/> Imprimir</button>
+                    <button onClick={downloadCSV} className="bg-[#3b4ba4] p-4 rounded-2xl hover:bg-[#eab308] hover:text-black transition-all shadow-lg flex items-center gap-2 font-black uppercase italic text-[10px]"><Download size={16}/> Descargar CSV</button>
+                  </div>
+                </div>
 
-                // Implementación simplificada: monitor de cambios en el contador de la clase
-                onSnapshot(doc(db, 'artifacts', appId, 'public', 'data', 'classes', cid), (doc) => {
-                   if(doc.exists()) {
-                       // En un sistema real, aquí actualizaríamos la lista de nombres
-                       // Por ahora actualizamos el contador global
-                   }
-                });
-            });
-        }
+                <div className="bg-[#0d1b3e] rounded-[2.5rem] overflow-hidden border border-white/5 shadow-2xl">
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-left">
+                      <thead className="bg-[#3b4ba4] text-[#eab308] text-[9px] font-black uppercase italic tracking-widest border-b border-white/10">
+                        <tr>
+                          <th className="p-6">Fecha / Hora</th>
+                          <th className="p-6">Asignatura</th>
+                          <th className="p-6">Alumno</th>
+                          <th className="p-6">Matrícula</th>
+                          <th className="p-6 no-print">Gestión</th>
+                        </tr>
+                      </thead>
+                      <tbody className="text-[11px] font-bold uppercase italic">
+                        {attendance.sort((a,b) => b.ts - a.ts).map(a => (
+                          <tr key={a.id} className="border-b border-white/5 hover:bg-white/5 transition-all">
+                            <td className="p-6 opacity-60">{new Date(a.ts).toLocaleString()}</td>
+                            <td className="p-6 text-[#eab308] font-black">{a.className} <br/><span className="text-[8px] text-white opacity-50">{a.classGroup}</span></td>
+                            <td className="p-6">{a.studentName}</td>
+                            <td className="p-6 font-mono opacity-80">{a.studentId}</td>
+                            <td className="p-6 no-print text-center">
+                              <button onClick={() => deleteAttendance(a.id)} className="text-rose-400/40 hover:text-rose-400 p-2"><Trash2 size={16}/></button>
+                            </td>
+                          </tr>
+                        ))}
+                        {attendance.length === 0 && (
+                          <tr><td colSpan="5" className="p-24 text-center opacity-30 italic font-black uppercase tracking-widest text-lg">Sin pases de lista registrados</td></tr>
+                        )}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            )}
+          </>
+        )}
+      </main>
 
-        window.closeClass = async () => {
-            if(!confirm("¿Desea finalizar el pase de lista? El QR dejará de ser válido.")) return;
-            try {
-                await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'classes', activeClassId), { isOpen: false });
-                location.reload(); // Reset UI
-            } catch(e) { alert("Error al cerrar: " + e.message); }
-        };
-
-        window.logout = () => signOut(auth);
-        lucide.createIcons();
-    </script>
-</body>
-</html>
+      <footer className="w-full py-12 px-10 border-t border-white/5 mt-auto no-print flex flex-col md:flex-row justify-between items-center gap-6">
+        <div className="text-[9px] font-black uppercase italic tracking-widest opacity-40 text-center md:text-left leading-relaxed">
+          © 2026 Depto. Psicopedagógico<br/>
+          Centro Universitario Tehuacán
+        </div>
+        <div className="flex gap-10 opacity-30">
+          <Award size={24} />
+          <CheckCircle2 size={24} />
+        </div>
+      </footer>
+    </div>
+  );
+}
