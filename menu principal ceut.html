@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CEUT | Sistema de Asistencia Institucional</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        body { 
+            background-color: #f8fafc; 
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-image: radial-gradient(#1e40af10 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+        .portal-card {
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+        }
+        .portal-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col items-center justify-center p-6">
+
+    <!-- CABECERA -->
+    <div class="text-center mb-12">
+        <img src="https://lh3.googleusercontent.com/d/17NobXQ3JbRnLGejZe4Mn2x-Jl45F4rPm" class="w-24 mx-auto mb-6" alt="Logo CEUT">
+        <h1 class="text-4xl font-black italic tracking-tighter text-[#1e40af] mb-2 uppercase">Centro de Estudios Universitarios de Tehuacán</h1>
+        <p class="text-slate-400 font-bold text-xs uppercase tracking-[0.3em]">Sistema de Control de Asistencias QR v1.0</p>
+    </div>
+
+    <!-- SELECCIÓN DE PORTAL -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8 w-full max-w-5xl">
+        
+        <!-- ESTUDIANTES -->
+        <a href="alumno.html" class="portal-card bg-white p-8 rounded-[3rem] border border-slate-200 text-center flex flex-col items-center">
+            <div class="w-16 h-16 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center mb-6">
+                <i data-lucide="user" class="w-8 h-8"></i>
+            </div>
+            <h3 class="text-xl font-black italic uppercase text-slate-900 mb-2">Estudiantes</h3>
+            <p class="text-[10px] text-slate-400 font-bold uppercase leading-relaxed">Registro de asistencia mediante QR y Código Institucional</p>
+            <span class="mt-6 text-[10px] font-black text-blue-600 uppercase italic">Ingresar al Portal →</span>
+        </a>
+
+        <!-- DOCENTES -->
+        <a href="maestro.html" class="portal-card bg-white p-8 rounded-[3rem] border border-slate-200 text-center flex flex-col items-center border-t-4 border-t-blue-600">
+            <div class="w-16 h-16 bg-blue-600 text-white rounded-2xl flex items-center justify-center mb-6 shadow-lg">
+                <i data-lucide="graduation-cap" class="w-8 h-8"></i>
+            </div>
+            <h3 class="text-xl font-black italic uppercase text-slate-900 mb-2">Docentes</h3>
+            <p class="text-[10px] text-slate-400 font-bold uppercase leading-relaxed">Apertura de clases, generación de QR y control de grupo</p>
+            <span class="mt-6 text-[10px] font-black text-blue-600 uppercase italic">Consola de Mando →</span>
+        </a>
+
+        <!-- DIRECCIÓN -->
+        <a href="admin.html" class="portal-card bg-white p-8 rounded-[3rem] border border-slate-200 text-center flex flex-col items-center">
+            <div class="w-16 h-16 bg-slate-900 text-white rounded-2xl flex items-center justify-center mb-6">
+                <i data-lucide="shield-check" class="w-8 h-8"></i>
+            </div>
+            <h3 class="text-xl font-black italic uppercase text-slate-900 mb-2">Dirección</h3>
+            <p class="text-[10px] text-slate-400 font-bold uppercase leading-relaxed">Supervisión institucional, reportes y gestión master</p>
+            <span class="mt-6 text-[10px] font-black text-slate-900 uppercase italic">Acceso Restringido →</span>
+        </a>
+
+    </div>
+
+    <!-- FOOTER -->
+    <footer class="mt-16 text-center">
+        <p class="text-[9px] font-black text-slate-300 uppercase tracking-widest italic">Desarrollado para el Departamento Psicopedagógico - CEUT 2024</p>
+    </footer>
+
+    <script>
+        lucide.createIcons();
+    </script>
+</body>
+</html>

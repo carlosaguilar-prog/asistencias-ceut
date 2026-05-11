@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CEUT | Control Maestro - Carlos Aguilar</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        :root { --ceut-blue: #1e40af; --ceut-gold: #E5A900; }
+        body { background-color: #f1f5f9; font-family: 'Plus Jakarta Sans', sans-serif; color: #1e293b; }
+        .card-elite { background: white; border-radius: 2rem; border: 1px solid #e2e8f0; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.05); }
+        .sidebar-item { display: flex; align-items: center; gap: 12px; padding: 12px 20px; border-radius: 14px; font-weight: 700; font-size: 13px; transition: all 0.3s; cursor: pointer; color: #64748b; text-transform: uppercase; }
+        .sidebar-item.active { background: var(--ceut-blue); color: white; }
+        .stat-card { background: white; padding: 24px; border-radius: 24px; border-bottom: 4px solid var(--ceut-gold); }
+        .table-header { font-size: 10px; font-weight: 800; color: #94a3b8; text-transform: uppercase; letter-spacing: 1px; padding: 16px; border-bottom: 2px solid #f1f5f9; }
+        .loader { border: 3px solid #f3f3f3; border-top: 3px solid #1e40af; border-radius: 50%; width: 20px; height: 20px; animation: spin 1s linear infinite; display: none; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    </style>
+</head>
+<body>
+    <div id="app" class="flex min-h-screen">
+        
+        <!-- SIDEBAR -->
+        <aside class="w-72 bg-white border-r border-slate-200 p-8 flex flex-col hidden lg:flex">
+            <div class="flex items-center gap-3 mb-10">
+                <img src="https://lh3.googleusercontent.com/d/17NobXQ3JbRnLGejZe4Mn2x-Jl45F4rPm" class="w-10" alt="CEUT">
+                <h1 class="text-2xl font-black italic tracking-tighter text-[#1e40af]">CEUT</h1>
+            </div>
+
+            <nav class="space-y-2 flex-1">
+                <div class="sidebar-item active"><i data-lucide="layout-dashboard"></i> Dashboard Global</div>
+                <div class="sidebar-item"><i data-lucide="users"></i> Docentes</div>
+                <div class="sidebar-item"><i data-lucide="graduation-cap"></i> Alumnos</div>
+                <div class="sidebar-item"><i data-lucide="file-text"></i> Reportes Excel</div>
+            </nav>
+
+            <div class="pt-6 border-t border-slate-100">
+                <button onclick="logout()" class="sidebar-item text-rose-500 hover:bg-rose-50 w-full"><i data-lucide="log-out"></i> Cerrar Sesión</button>
+            </div>
+        </aside>
+
+        <!-- MAIN CONTENT -->
+        <main class="flex-1 p-6 md:p-12 overflow-y-auto">
+            <header class="flex justify-between items-center mb-10">
+                <div>
+                    <h2 class="text-2xl font-black italic uppercase">Control Institucional Maestro</h2>
+                    <p class="text-xs font-bold text-slate-400 uppercase tracking-widest">Responsable: Mtro. Carlos Aguilar Sánchez</p>
+                </div>
+                <div id="admin-info" class="text-right hidden md:block">
+                    <p id="admin-name" class="font-black text-sm uppercase">CARLOS AGUILAR SÁNCHEZ</p>
+                    <span class="text-[9px] bg-blue-600 text-white px-2 py-0.5 rounded-full font-bold">NIVEL: MASTER ADMIN</span>
+                </div>
+            </header>
+
+            <!-- STATS GRID -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+                <div class="stat-card">
+                    <p class="text-[10px] font-black text-slate-400 uppercase mb-1">Clases Activas Hoy</p>
+                    <h3 id="stat-classes" class="text-3xl font-black text-[#1e40af]">0</h3>
+                </div>
+                <div class="stat-card">
+                    <p class="text-[10px] font-black text-slate-400 uppercase mb-1">Asistencias Totales</p>
+                    <h3 id="stat-attendance" class="text-3xl font-black text-[#1e40af]">0</h3>
+                </div>
+                <div class="stat-card">
+                    <p class="text-[10px] font-black text-slate-400 uppercase mb-1">Docentes en Línea</p>
+                    <h3 id="stat-teachers" class="text-3xl font-black text-[#1e40af]">0</h3>
+                </div>
+            </div>
+
+            <!-- TABLA DE ACTIVIDAD RECIENTE -->
+            <div class="card-elite overflow-hidden">
+                <div class="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
+                    <h4 class="text-xs font-black uppercase tracking-widest italic">Monitor de Asistencias en Tiempo Real</h4>
+                    <button id="export-btn" class="bg-emerald-600 text-white px-4 py-2 rounded-xl text-[10px] font-black uppercase flex items-center gap-2 hover:bg-emerald-700 transition-all">
+                        <i data-lucide="download" class="w-3 h-3"></i> Exportar Datos
+                    </button>
+                </div>
+                
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left">
+                        <thead>
+                            <tr class="bg-white">
+                                <th class="table-header">Carrera / Grupo</th>
+                                <th class="table-header">Asignatura</th>
+                                <th class="table-header">Docente Responsable</th>
+                                <th class="table-header text-center">Estado</th>
+                            </tr>
+                        </thead>
+                        <tbody id="table-body" class="bg-white divide-y divide-slate-100">
+                            <tr><td colspan="4" class="p-10 text-center text-slate-400 font-bold italic uppercase text-xs">Cargando datos institucionales...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+
+        <!-- SECCIÓN DE LOGIN -->
+        <div id="auth-overlay" class="fixed inset-0 bg-[#1e40af] z-50 flex items-center justify-center p-6">
+            <div class="bg-white p-10 rounded-[3rem] w-full max-w-md text-center shadow-2xl">
+                <img src="https://lh3.googleusercontent.com/d/17NobXQ3JbRnLGejZe4Mn2x-Jl45F4rPm" class="w-20 mx-auto mb-6" alt="CEUT">
+                <h2 class="text-2xl font-black italic mb-2 uppercase tracking-tighter">Acceso Directivo</h2>
+                <p class="text-[10px] font-bold text-slate-400 mb-8 uppercase tracking-widest italic">Personal Autorizado: Mtro. Carlos Aguilar</p>
+                
+                <div class="space-y-3">
+                    <input type="email" id="email" placeholder="carlos.aguilar@ceut.edu.mx" class="w-full p-4 bg-slate-100 rounded-2xl border-none font-bold text-sm outline-none focus:ring-2 ring-blue-600">
+                    <input type="password" id="pass" placeholder="Contraseña Maestra" class="w-full p-4 bg-slate-100 rounded-2xl border-none font-bold text-sm outline-none focus:ring-2 ring-blue-600">
+                    
+                    <button id="login-btn" class="w-full bg-[#1e40af] text-white py-4 rounded-2xl font-black italic uppercase text-xs mt-4 flex items-center justify-center gap-2">
+                        <span>Desbloquear Panel</span>
+                        <div id="login-loader" class="loader"></div>
+                    </button>
+                    
+                    <p id="error-msg" class="text-[10px] text-rose-500 font-black uppercase mt-2 hidden"></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getFirestore, collection, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+
+        // Configuración oficial proporcionada
+        const firebaseConfig = {
+            apiKey: "AIzaSyCefP6qEqaCMpo8ZpUiLpN4e_-E4ZNTp94",
+            authDomain: "asistencias-ceut.firebaseapp.com",
+            projectId: "asistencias-ceut",
+            storageBucket: "asistencias-ceut.firebasestorage.app",
+            messagingSenderId: "130615246146",
+            appId: "1:130615246146:web:6ae2c17c828fb28a809cdb"
+        };
+
+        const appId = 'ceut_asistencias_v1';
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const auth = getAuth(app);
+
+        const MASTER_ADMIN_EMAIL = "carlos.aguilar@ceut.edu.mx";
+
+        // Escucha cambios en el estado de autenticación
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                if (user.email === MASTER_ADMIN_EMAIL) {
+                    document.getElementById('auth-overlay').style.display = 'none';
+                    startDashboard();
+                } else {
+                    showError("USUARIO NO AUTORIZADO PARA NIVEL MASTER.");
+                    signOut(auth);
+                }
+            } else {
+                document.getElementById('auth-overlay').style.display = 'flex';
+            }
+        });
+
+        // Función de Login
+        document.getElementById('login-btn').onclick = async () => {
+            const email = document.getElementById('email').value.trim();
+            const pass = document.getElementById('pass').value;
+            const loader = document.getElementById('login-loader');
+            const btnText = document.querySelector('#login-btn span');
+
+            if(!email || !pass) return showError("RELLENE TODOS LOS CAMPOS.");
+            if(email !== MASTER_ADMIN_EMAIL) return showError("ESTE CORREO NO ES EL DEL MAESTRO CARLOS.");
+
+            try {
+                btnText.style.opacity = '0.5';
+                loader.style.display = 'block';
+                hideError();
+                
+                await signInWithEmailAndPassword(auth, email, pass);
+                // El onAuthStateChanged se encargará del resto
+            } catch (e) {
+                console.error(e);
+                showError("CONTRASEÑA INCORRECTA O ERROR DE CONEXIÓN.");
+            } finally {
+                btnText.style.opacity = '1';
+                loader.style.display = 'none';
+            }
+        };
+
+        function showError(msg) {
+            const el = document.getElementById('error-msg');
+            el.innerText = msg;
+            el.classList.remove('hidden');
+        }
+
+        function hideError() {
+            document.getElementById('error-msg').classList.add('hidden');
+        }
+
+        function startDashboard() {
+            // Monitor de Clases
+            onSnapshot(collection(db, 'artifacts', appId, 'public', 'data', 'classes'), (snap) => {
+                const classes = snap.docs.map(d => d.data());
+                document.getElementById('stat-classes').innerText = classes.filter(c => c.isOpen).length;
+                
+                const uniqueTeachers = [...new Set(classes.map(c => c.teacherId))];
+                document.getElementById('stat-teachers').innerText = uniqueTeachers.length;
+                
+                renderTable(classes);
+            }, (err) => {
+                console.error("Error Firestore:", err);
+                showError("ERROR AL CARGAR DATOS: REVISE LAS REGLAS DE FIRESTORE.");
+            });
+
+            // Monitor de Usuarios/Asistencias
+            onSnapshot(collection(db, 'artifacts', appId, 'users'), (snap) => {
+                let total = 0;
+                snap.docs.forEach(doc => {
+                    const data = doc.data();
+                    if(data.asistencias) total += data.asistencias.length;
+                });
+                document.getElementById('stat-attendance').innerText = total;
+            });
+        }
+
+        function renderTable(classes) {
+            const tbody = document.getElementById('table-body');
+            if(classes.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="4" class="p-10 text-center text-slate-400 font-bold italic uppercase text-xs">Sin actividad registrada hoy</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = classes.map(c => `
+                <tr class="hover:bg-slate-50 transition-colors">
+                    <td class="p-4">
+                        <div class="font-black text-xs uppercase">${c.career || 'General'}</div>
+                        <div class="text-[10px] text-slate-400 font-bold uppercase">${c.degree || ''} ${c.group || ''}</div>
+                    </td>
+                    <td class="p-4 font-bold text-xs uppercase italic">${c.name}</td>
+                    <td class="p-4 font-bold text-xs uppercase text-blue-800">${c.teacherName}</td>
+                    <td class="p-4 text-center">
+                        <span class="px-3 py-1 rounded-full text-[9px] font-black uppercase italic ${c.isOpen ? 'bg-green-100 text-green-600' : 'bg-slate-100 text-slate-400'}">
+                            ${c.isOpen ? 'En Curso' : 'Cerrada'}
+                        </span>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        window.logout = () => signOut(auth);
+        lucide.createIcons();
+    </script>
+</body>
+</html>
