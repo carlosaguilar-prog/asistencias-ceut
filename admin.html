@@ -3,8 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>CEUT | Panel Dual de Control</title>
+    <title>CEUT | Panel Administrativo Seguro</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Firebase Compat SDKs -->
     <script src="https://www.gstatic.com/firebasejs/11.0.2/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/11.0.2/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/11.0.2/firebase-firestore-compat.js"></script>
@@ -14,346 +15,195 @@
         body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #000b21; color: white; overflow-x: hidden; }
         .tiger-gradient { background: linear-gradient(135deg, #3b4ba4 0%, #1e296b 100%); }
         .glass { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(15px); border: 1px solid rgba(255, 255, 255, 0.08); }
-        .gold-glow { text-shadow: 0 0 15px rgba(234, 179, 8, 0.3); }
         .admin-badge { background: linear-gradient(90deg, #eab308 0%, #ca8a04 100%); color: black; }
-        .view-transition { transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
-        .input-ceut { background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(234, 179, 8, 0.2); border-radius: 1rem; padding: 12px; color: white; width: 100%; font-size: 0.8rem; }
-        .input-ceut:focus { border-color: #eab308; outline: none; }
-        ::-webkit-scrollbar { width: 6px; }
-        ::-webkit-scrollbar-thumb { background: #3b4ba4; border-radius: 10px; }
+        .input-ceut { background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(234, 179, 8, 0.2); border-radius: 1rem; padding: 12px; color: white; width: 100%; font-size: 0.8rem; transition: all 0.3s; }
+        .input-ceut:focus { border-color: #eab308; outline: none; background: rgba(234, 179, 8, 0.1); }
+        .hidden { display: none !important; }
+        .fade-in { animation: fadeIn 0.5s ease forwards; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body class="min-h-screen pb-12">
 
-    <!-- Navbar Superior -->
-    <nav class="w-full tiger-gradient p-6 border-b-4 border-yellow-500 sticky top-0 z-50 shadow-2xl">
-        <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
-            <div class="flex items-center gap-4">
-                <img src="https://lh3.googleusercontent.com/d/17NobXQ3JbRnLGejZe4Mn2x-Jl45F4rPm" class="w-24" alt="CEUT">
-                <div class="h-10 w-[1px] bg-white/20 hidden md:block"></div>
-                <div>
-                    <h1 class="text-lg font-black italic uppercase tracking-tighter leading-none flex items-center gap-2">
-                        Supervisión Dual 
-                        <span class="text-[9px] admin-badge px-2 py-0.5 rounded-md not-italic tracking-widest uppercase">Admin + Docente</span>
-                    </h1>
-                    <p class="text-[9px] font-bold text-yellow-400 uppercase tracking-[0.3em]">Gestión Centralizada CEUT</p>
-                </div>
-            </div>
-            
-            <div class="flex items-center gap-3">
-                <!-- Conmutador de Vista -->
-                <div class="flex bg-black/40 p-1 rounded-xl border border-white/10">
-                    <button id="view-admin-btn" class="px-4 py-2 rounded-lg text-[10px] font-black uppercase italic transition-all bg-yellow-500 text-black">
-                        Auditoría
-                    </button>
-                    <button id="view-docente-btn" class="px-4 py-2 rounded-lg text-[10px] font-black uppercase italic transition-all text-white/40 hover:text-white">
-                        Mis Clases
-                    </button>
-                </div>
-
-                <div class="h-8 w-[1px] bg-white/10 mx-2"></div>
-
-                <button id="logout-btn" class="p-3 glass rounded-2xl text-rose-400 hover:bg-rose-500/20 transition-all">
-                    <i data-lucide="log-out" class="w-5 h-5"></i>
-                </button>
+    <!-- PANTALLA DE LOGIN -->
+    <div id="security-lock" class="fixed inset-0 z-[100] bg-[#000b21] flex flex-col items-center justify-center p-6 text-center">
+        <div class="mb-8">
+            <img src="https://lh3.googleusercontent.com/d/17NobXQ3JbRnLGejZe4Mn2x-Jl45F4rPm" alt="CEUT Logo" class="w-48 mx-auto mb-6">
+            <div class="inline-flex items-center gap-2 px-4 py-2 bg-yellow-500/10 border border-yellow-500/20 rounded-full">
+                <i data-lucide="shield-lock" class="w-4 h-4 text-yellow-500"></i>
+                <span class="text-[10px] font-black uppercase tracking-[0.2em] text-yellow-500 italic">Acceso Restringido</span>
             </div>
         </div>
-    </nav>
-
-    <!-- CONTENIDO PRINCIPAL -->
-    <main class="max-w-7xl mx-auto px-6 mt-8">
         
-        <!-- VISTA 1: AUDITORÍA GLOBAL (ADMIN) -->
-        <div id="section-admin" class="view-transition">
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-                <div class="glass p-6 rounded-[2rem] border-l-8 border-blue-500">
-                    <p class="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1">Asistencias Totales</p>
-                    <h3 id="stat-total" class="text-4xl font-black italic gold-glow">0</h3>
+        <div class="w-full max-w-sm space-y-6">
+            <form id="admin-login-form" class="space-y-4">
+                <input type="email" id="admin-email" required placeholder="carlos.aguilar@ceut.edu.mx" class="input-ceut w-full">
+                <input type="password" id="admin-password" required placeholder="Contraseña" class="input-ceut w-full">
+                <div id="login-error" class="hidden text-rose-500 text-[10px] font-black uppercase italic bg-rose-500/10 py-3 px-4 rounded-lg"></div>
+                <button type="submit" id="login-btn" class="w-full bg-yellow-500 text-black py-4 rounded-2xl font-black uppercase italic text-xs hover:scale-105 transition-all">
+                    Entrar al Sistema
+                </button>
+            </form>
+            <a href="index.html" class="text-slate-500 text-[10px] font-black uppercase">Volver al Inicio</a>
+        </div>
+    </div>
+
+    <!-- PANEL PRINCIPAL -->
+    <div id="admin-interface" class="hidden fade-in">
+        <nav class="w-full tiger-gradient p-6 border-b-4 border-yellow-500 sticky top-0 z-50">
+            <div class="max-w-7xl mx-auto flex justify-between items-center">
+                <div class="flex items-center gap-4">
+                    <img src="https://lh3.googleusercontent.com/d/17NobXQ3JbRnLGejZe4Mn2x-Jl45F4rPm" class="w-24" alt="CEUT Logo">
+                    <h1 class="text-lg font-black italic uppercase">Panel Administrativo</h1>
                 </div>
+                <button id="logout-btn" class="p-3 glass rounded-2xl text-rose-400"><i data-lucide="log-out"></i></button>
+            </div>
+        </nav>
+
+        <main class="max-w-7xl mx-auto px-6 mt-8">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
                 <div class="glass p-6 rounded-[2rem] border-l-8 border-yellow-500">
-                    <p class="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1">Docentes Activos</p>
-                    <h3 id="stat-profs" class="text-4xl font-black italic">0</h3>
+                    <p class="text-[10px] font-black text-slate-500 uppercase">Total Asistencias</p>
+                    <h3 id="stat-total" class="text-4xl font-black italic">0</h3>
                 </div>
-                <div class="glass p-6 rounded-[2rem] border-l-8 border-green-500">
-                    <p class="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1">Última Actividad</p>
-                    <h3 id="stat-time" class="text-xl font-black italic mt-2">--:--</h3>
-                </div>
-                <div class="glass p-6 rounded-[2rem] border-l-8 border-rose-500">
-                    <p class="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1">Alertas</p>
-                    <h3 class="text-4xl font-black italic text-rose-500">0</h3>
+                <div class="glass p-6 rounded-[2rem] border-l-8 border-blue-500">
+                    <p class="text-[10px] font-black text-slate-500 uppercase">Sincronización</p>
+                    <h3 class="text-xl font-black italic text-green-500">EN LÍNEA</h3>
                 </div>
             </div>
 
-            <div class="glass rounded-[2.5rem] overflow-hidden shadow-2xl">
-                <div class="p-6 border-b border-white/10 flex flex-col md:flex-row justify-between items-center gap-4">
-                    <h2 class="text-sm font-black italic uppercase flex items-center gap-2">
-                        <i data-lucide="shield-check" class="text-yellow-500"></i> Bitácora de Institución
-                    </h2>
-                    <div class="flex gap-2 w-full md:w-auto">
-                        <input type="text" id="filter-input" placeholder="BUSCAR ALUMNO..." class="input-ceut md:w-64">
-                        <button id="download-btn" class="p-3 glass rounded-xl text-yellow-500 hover:bg-yellow-500 hover:text-black transition-all">
-                            <i data-lucide="download" class="w-5 h-5"></i>
-                        </button>
-                    </div>
+            <div class="glass rounded-[2.5rem] overflow-hidden">
+                <div class="p-6 border-b border-white/10 flex justify-between items-center">
+                    <h2 class="text-sm font-black italic uppercase">Registros de Asistencia</h2>
+                    <button id="download-btn" class="bg-yellow-500 text-black px-4 py-2 rounded-xl text-[10px] font-bold">Descargar Excel</button>
                 </div>
                 <div class="overflow-x-auto">
                     <table class="w-full text-left">
-                        <thead class="bg-white/5 text-[9px] font-black uppercase tracking-widest text-slate-500">
+                        <thead class="bg-white/5 text-[9px] font-black uppercase text-slate-500">
                             <tr>
                                 <th class="px-6 py-4">Hora</th>
-                                <th class="px-6 py-4">Alumno</th>
-                                <th class="px-6 py-4">Materia / Grupo</th>
+                                <th class="px-6 py-4">Estudiante</th>
+                                <th class="px-6 py-4">Materia</th>
                                 <th class="px-6 py-4 text-right">Acción</th>
                             </tr>
                         </thead>
-                        <tbody id="attendance-body" class="text-[10px] font-bold uppercase italic">
-                            <!-- Datos inyectados por JS -->
-                        </tbody>
+                        <tbody id="attendance-body" class="text-[10px] font-bold uppercase italic"></tbody>
                     </table>
                 </div>
             </div>
-        </div>
-
-        <!-- VISTA 2: MIS CLASES (DOCENTE) -->
-        <div id="section-docente" class="view-transition hidden">
-            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
-                <!-- Generador de QR -->
-                <div class="lg:col-span-4 space-y-6">
-                    <div class="glass p-8 rounded-[2.5rem] border-t-4 border-yellow-500">
-                        <h2 class="text-sm font-black italic uppercase mb-6 flex items-center gap-2">
-                            <i data-lucide="plus-circle" class="text-yellow-500"></i> Nueva Clase
-                        </h2>
-                        <div class="space-y-4">
-                            <input type="text" id="class-name" placeholder="NOMBRE DE LA MATERIA" class="input-ceut uppercase">
-                            <input type="text" id="class-group" placeholder="GRUPO (EJ. 6A)" class="input-ceut uppercase">
-                            <button id="create-class-btn" class="w-full py-4 bg-yellow-500 text-black rounded-xl font-black uppercase italic text-xs shadow-lg shadow-yellow-500/20 hover:scale-[1.02] transition-transform">
-                                Abrir Pase de Lista
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Clases Creadas por Mi -->
-                <div class="lg:col-span-8">
-                    <div class="glass p-8 rounded-[2.5rem] min-h-[400px]">
-                        <h2 class="text-xs font-black uppercase text-slate-500 tracking-[0.2em] mb-6">Mis Sesiones del Día</h2>
-                        <div id="my-classes-container" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <!-- Clases del docente -->
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-    </main>
+        </main>
+    </div>
 
     <script>
-        // Inicialización de Firebase
-        const firebaseConfig = JSON.parse(__firebase_config);
+        // CONFIGURACIÓN DE TU FIREBASE REAL
+        const firebaseConfig = {
+            apiKey: "AIzaSyCefP6qEqaCMpo8ZpUiLpN4e_-E4ZNTp94",
+            authDomain: "asistencias-ceut.firebaseapp.com",
+            projectId: "asistencias-ceut",
+            storageBucket: "asistencias-ceut.firebasestorage.app",
+            messagingSenderId: "130615246146",
+            appId: "1:130615246146:web:6ae2c17c828fb28a809cdb"
+        };
+
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
         const auth = firebase.auth();
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'ceut-asistencias-2026';
+        const appId = "asistencias-ceut-prod"; // ID consistente para tus datos
+        const ADMIN_EMAIL = "carlos.aguilar@ceut.edu.mx";
 
-        let allRecords = [];
-        let myClasses = [];
-        let currentUser = null;
+        lucide.createIcons();
 
-        // Gestión de Vistas
-        const adminViewBtn = document.getElementById('view-admin-btn');
-        const docenteViewBtn = document.getElementById('view-docente-btn');
-        const sectionAdmin = document.getElementById('section-admin');
-        const sectionDocente = document.getElementById('section-docente');
-
-        function switchView(view) {
-            if (view === 'admin') {
-                sectionAdmin.classList.remove('hidden');
-                sectionDocente.classList.add('hidden');
-                adminViewBtn.classList.add('bg-yellow-500', 'text-black');
-                adminViewBtn.classList.remove('text-white/40');
-                docenteViewBtn.classList.remove('bg-yellow-500', 'text-black');
-                docenteViewBtn.classList.add('text-white/40');
+        // Control de sesión
+        auth.onAuthStateChanged(user => {
+            if (user && user.email === ADMIN_EMAIL) {
+                document.getElementById('security-lock').classList.add('hidden');
+                document.getElementById('admin-interface').classList.remove('hidden');
+                loadData();
             } else {
-                sectionAdmin.classList.add('hidden');
-                sectionDocente.classList.remove('hidden');
-                docenteViewBtn.classList.add('bg-yellow-500', 'text-black');
-                docenteViewBtn.classList.remove('text-white/40');
-                adminViewBtn.classList.remove('bg-yellow-500', 'text-black');
-                adminViewBtn.classList.add('text-white/40');
+                document.getElementById('security-lock').classList.remove('hidden');
+                document.getElementById('admin-interface').classList.add('hidden');
             }
-        }
+        });
 
-        adminViewBtn.onclick = () => switchView('admin');
-        docenteViewBtn.onclick = () => switchView('docente');
+        // Login
+        document.getElementById('admin-login-form').onsubmit = async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('admin-email').value.trim();
+            const pass = document.getElementById('admin-password').value;
+            const btn = document.getElementById('login-btn');
+            const err = document.getElementById('login-error');
 
-        // Navegación Segura
-        const safeNavigate = (url) => {
-            if (url) window.location.href = url;
-        };
-
-        window.onload = async () => {
-            lucide.createIcons();
-
-            // Login
-            try {
-                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                    await auth.signInWithCustomToken(__initial_auth_token);
-                } else {
-                    await auth.signInAnonymously();
-                }
-            } catch (e) { console.error(e); }
-
-            auth.onAuthStateChanged(user => {
-                if (user) {
-                    currentUser = user;
-                    startRealtimeSync();
-                }
-            });
-
-            // Botones
-            document.getElementById('logout-btn').onclick = () => auth.signOut().then(() => safeNavigate('index.html'));
-            document.getElementById('create-class-btn').onclick = createNewClass;
-            document.getElementById('download-btn').onclick = downloadReport;
-            document.getElementById('filter-input').oninput = filterAttendance;
-        };
-
-        function startRealtimeSync() {
-            // 1. Escuchar TODAS las asistencias (Modo Admin)
-            db.collection('artifacts').doc(appId).collection('public').doc('data').collection('asistencias')
-                .onSnapshot(snap => {
-                    allRecords = snap.docs.map(doc => ({id: doc.id, ...doc.data()}));
-                    allRecords.sort((a,b) => (b.ts || 0) - (a.ts || 0));
-                    renderAdminTable();
-                }, err => console.error(err));
-
-            // 2. Escuchar MIS clases (Modo Docente)
-            db.collection('artifacts').doc(appId).collection('public').doc('data').collection('clases')
-                .onSnapshot(snap => {
-                    const allClases = snap.docs.map(doc => ({id: doc.id, ...doc.data()}));
-                    myClasses = allClases.filter(c => c.profId === currentUser.uid);
-                    renderMyClasses();
-                });
-        }
-
-        function renderAdminTable() {
-            const tbody = document.getElementById('attendance-body');
-            tbody.innerHTML = "";
-            
-            // Actualizar Stats
-            document.getElementById('stat-total').innerText = allRecords.length;
-            const profs = new Set(allRecords.map(r => r.profId)).size;
-            document.getElementById('stat-profs').innerText = profs;
-            if (allRecords[0]) {
-                document.getElementById('stat-time').innerText = new Date(allRecords[0].ts).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
-            }
-
-            allRecords.forEach(r => {
-                const tr = document.createElement('tr');
-                tr.className = "border-b border-white/5 hover:bg-white/5 transition-all";
-                tr.innerHTML = `
-                    <td class="px-6 py-4 opacity-40 font-mono">${new Date(r.ts).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}</td>
-                    <td class="px-6 py-4">
-                        <div class="text-white">${r.studentName}</div>
-                        <div class="text-yellow-500 text-[8px] tracking-widest">${r.studentId}</div>
-                    </td>
-                    <td class="px-6 py-4">
-                        <div class="text-blue-300">${r.className}</div>
-                        <div class="text-[8px] opacity-40">G: ${r.classGroup}</div>
-                    </td>
-                    <td class="px-6 py-4 text-right">
-                        <button onclick="deleteRecord('${r.id}')" class="text-rose-500/30 hover:text-rose-500 transition-all">
-                            <i data-lucide="trash-2" class="w-4 h-4"></i>
-                        </button>
-                    </td>
-                `;
-                tbody.appendChild(tr);
-            });
-            lucide.createIcons();
-        }
-
-        function renderMyClasses() {
-            const container = document.getElementById('my-classes-container');
-            container.innerHTML = "";
-
-            if (myClasses.length === 0) {
-                container.innerHTML = `<p class="col-span-full text-center py-10 opacity-20 text-[10px] uppercase font-black italic">No tienes clases creadas hoy</p>`;
+            if(email !== ADMIN_EMAIL) {
+                err.innerText = "Correo no autorizado";
+                err.classList.remove('hidden');
                 return;
             }
 
-            myClasses.forEach(c => {
-                const div = document.createElement('div');
-                div.className = "glass p-5 rounded-2xl border border-white/10 relative overflow-hidden";
-                div.innerHTML = `
-                    <div class="flex justify-between items-start mb-4">
-                        <div>
-                            <h4 class="text-xs font-black text-white uppercase">${c.name}</h4>
-                            <p class="text-[9px] text-yellow-500 font-bold uppercase tracking-widest">Grupo: ${c.group}</p>
-                        </div>
-                        <div class="bg-yellow-500 text-black px-2 py-1 rounded text-[10px] font-black">${c.code}</div>
-                    </div>
-                    <div class="flex gap-2">
-                        <button onclick="deleteClass('${c.id}')" class="text-[8px] font-black uppercase text-rose-400 bg-rose-500/10 px-3 py-2 rounded-lg hover:bg-rose-500/20 transition-all">Cerrar Sesión</button>
-                    </div>
-                `;
-                container.appendChild(div);
-            });
-        }
+            btn.disabled = true;
+            btn.innerText = "Verificando...";
 
-        async function createNewClass() {
-            const name = document.getElementById('class-name').value;
-            const group = document.getElementById('class-group').value;
-            if (!name || !group) return;
-
-            const code = Math.floor(100000 + Math.random() * 900000).toString();
-            
             try {
-                await db.collection('artifacts').doc(appId).collection('public').doc('data').collection('clases').add({
-                    name: name.toUpperCase(),
-                    group: group.toUpperCase(),
-                    code: code,
-                    profId: currentUser.uid,
-                    profName: "Admin/Maestro",
-                    ts: Date.now(),
-                    active: true
+                await auth.signInWithEmailAndPassword(email, pass);
+            } catch (e) {
+                err.innerText = "Error: " + e.message;
+                err.classList.remove('hidden');
+            } finally {
+                btn.disabled = false;
+                btn.innerText = "Entrar al Sistema";
+            }
+        };
+
+        // Logout
+        document.getElementById('logout-btn').onclick = () => auth.signOut();
+
+        // Carga de datos en tiempo real
+        function loadData() {
+            db.collection('artifacts').doc(appId).collection('public').doc('data').collection('asistencias')
+                .onSnapshot(snap => {
+                    const tbody = document.getElementById('attendance-body');
+                    tbody.innerHTML = "";
+                    document.getElementById('stat-total').innerText = snap.size;
+
+                    snap.forEach(doc => {
+                        const r = doc.data();
+                        const tr = document.createElement('tr');
+                        tr.className = "border-b border-white/5";
+                        tr.innerHTML = `
+                            <td class="px-6 py-4 opacity-50">${new Date(r.ts).toLocaleTimeString()}</td>
+                            <td class="px-6 py-4">${r.studentName}<br><span class="text-yellow-500 text-[8px]">${r.studentId}</span></td>
+                            <td class="px-6 py-4">${r.className}</td>
+                            <td class="px-6 py-4 text-right">
+                                <button onclick="deleteRow('${doc.id}')" class="text-rose-500 p-2"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+                            </td>
+                        `;
+                        tbody.appendChild(tr);
+                    });
+                    lucide.createIcons();
                 });
-                document.getElementById('class-name').value = "";
-                document.getElementById('class-group').value = "";
-            } catch (e) { console.error(e); }
         }
 
-        async function deleteRecord(id) {
-            if (confirm("¿Eliminar este registro de asistencia permanentemente?")) {
+        async function deleteRow(id) {
+            if(confirm("¿Eliminar registro?")) {
                 await db.collection('artifacts').doc(appId).collection('public').doc('data').collection('asistencias').doc(id).delete();
             }
         }
 
-        async function deleteClass(id) {
-            if (confirm("¿Cerrar esta clase? Los alumnos ya no podrán registrarse.")) {
-                await db.collection('artifacts').doc(appId).collection('public').doc('data').collection('clases').doc(id).delete();
-            }
-        }
-
-        function filterAttendance() {
-            const q = document.getElementById('filter-input').value.toLowerCase();
-            const rows = document.querySelectorAll('#attendance-body tr');
-            rows.forEach(r => {
-                r.style.display = r.innerText.toLowerCase().includes(q) ? '' : 'none';
-            });
-        }
-
-        function downloadReport() {
-            let csv = "Fecha,Hora,Alumno,Matricula,Materia,Grupo\n";
-            allRecords.forEach(r => {
-                const d = new Date(r.ts);
-                csv += `"${d.toLocaleDateString()}","${d.toLocaleTimeString()}","${r.studentName}","${r.studentId}","${r.className}","${r.classGroup}"\n`;
+        document.getElementById('download-btn').onclick = () => {
+            let csv = "Fecha,Alumno,Matricula,Materia\n";
+            document.querySelectorAll('#attendance-body tr').forEach(tr => {
+                const tds = tr.querySelectorAll('td');
+                csv += `${tds[0].innerText},${tds[1].innerText.replace('\n', ' ')},${tds[2].innerText}\n`;
             });
             const blob = new Blob([csv], { type: 'text/csv' });
             const url = window.URL.createObjectURL(blob);
             const a = document.createElement('a');
-            a.href = url;
-            a.download = `CEUT_Reporte_Global_${new Date().toISOString().split('T')[0]}.csv`;
+            a.setAttribute('hidden', '');
+            a.setAttribute('href', url);
+            a.setAttribute('download', 'asistencias.csv');
+            document.body.appendChild(a);
             a.click();
-        }
+            document.body.removeChild(a);
+        };
     </script>
 </body>
 </html>
