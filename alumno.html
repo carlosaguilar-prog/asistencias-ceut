@@ -1,175 +1,199 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es-MX">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>CEUT | Portal de Asistencia</title>
+    <title>CEUT | Registro de Asistencia</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Firebase SDKs (Compat Mode) -->
-    <script src="https://www.gstatic.com/firebasejs/11.0.2/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/11.0.2/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/11.0.2/firebase-firestore-compat.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/11.0.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/11.0.2/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/11.0.2/firebase-auth-compat.js"></script>
+    
     <style>
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #000b21; color: white; overflow-x: hidden; }
-        .tiger-gradient { background: linear-gradient(135deg, #3b4ba4 0%, #1e296b 100%); }
-        .gold-border { border-bottom: 4px solid #eab308; }
-        .glass { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.1); }
-        .input-ceut { background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 1rem; padding: 0.85rem; color: white; width: 100%; outline: none; transition: all 0.3s; font-size: 0.9rem; }
-        .input-ceut:focus { border-color: #eab308; background: rgba(234, 179, 8, 0.05); }
-        .select-ceut { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='white'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 1rem center; background-size: 1rem; padding-right: 2.5rem; }
-        .pin-input { letter-spacing: 0.5em; font-size: 1.5rem; font-weight: 800; text-align: center; }
+        :root {
+            --ceut-blue: #3b4ba4;
+            --ceut-blue-dark: #000b21;
+            --ceut-gold: #eab308;
+        }
+        
+        body { 
+            background-color: var(--ceut-blue-dark); 
+            font-family: 'Plus Jakarta Sans', sans-serif; 
+            color: white; 
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0;
+        }
+
+        .glass-card { 
+            background: rgba(255, 255, 255, 0.03); 
+            backdrop-filter: blur(20px); 
+            border: 1px solid rgba(255, 255, 255, 0.1); 
+            border-radius: 2rem; 
+        }
+
+        .input-ceut { 
+            background: rgba(255, 255, 255, 0.05); 
+            border: 1px solid rgba(234, 179, 8, 0.2); 
+            border-radius: 0.75rem; 
+            color: white; 
+            padding: 0.8rem 1rem;
+            width: 100%;
+            font-size: 0.9rem;
+        }
+
+        .input-ceut:focus {
+            border-color: var(--ceut-gold);
+            outline: none;
+            background: rgba(234, 179, 8, 0.1);
+        }
+
+        .btn-gold { 
+            background: linear-gradient(135deg, #fef08a, var(--ceut-gold), #ca8a04); 
+            color: #000b21; 
+            font-weight: 800; 
+            text-transform: uppercase;
+            transition: all 0.2s;
+        }
+
+        .btn-gold:active { transform: scale(0.98); }
+
         .hidden { display: none !important; }
-        .fade-in { animation: fadeIn 0.4s ease-out forwards; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        option { background-color: #000b21; color: white; }
-        .folio-badge { background: linear-gradient(90deg, #eab308 0%, #ca8a04 100%); color: #000; padding: 2px 8px; border-radius: 6px; font-weight: 900; letter-spacing: 1px; }
+        
+        select.input-ceut option {
+            background-color: var(--ceut-blue-dark);
+            color: white;
+        }
+
+        .divider { border-top: 1px solid rgba(255, 255, 255, 0.1); margin: 1.5rem 0; }
+
+        /* Animación para el folio generado */
+        .folio-badge {
+            background: rgba(234, 179, 8, 0.1);
+            border: 1px dashed var(--ceut-gold);
+            padding: 1rem;
+            border-radius: 1rem;
+            font-family: monospace;
+            color: var(--ceut-gold);
+            font-size: 1.2rem;
+            font-weight: 900;
+        }
     </style>
 </head>
-<body class="min-h-screen flex flex-col items-center">
+<body class="p-6">
 
-    <!-- Header Institucional -->
-    <header class="w-full py-6 flex flex-col items-center tiger-gradient gold-border shadow-2xl sticky top-0 z-50">
-        <img src="https://lh3.googleusercontent.com/d/17NobXQ3JbRnLGejZe4Mn2x-Jl45F4rPm" class="w-32 mb-2" alt="CEUT">
-        <h1 class="text-[10px] font-black uppercase tracking-[0.4em] italic text-yellow-400">Portal del Estudiante</h1>
-    </header>
-
-    <main class="w-full max-w-md px-6 py-8 flex-grow">
+    <div class="max-w-md w-full glass-card p-8 border-t-8 border-white relative overflow-hidden">
         
-        <!-- PANTALLA DE CARGA INICIAL -->
-        <div id="loading-screen" class="flex flex-col items-center justify-center py-20">
-            <div class="w-8 h-8 border-4 border-yellow-500 border-t-transparent rounded-full animate-spin mb-4"></div>
-            <p class="text-[10px] font-black uppercase tracking-widest italic text-slate-400">Sincronizando Sistema...</p>
+        <!-- PANTALLA 0: LOGIN -->
+        <div id="step-login" class="hidden">
+            <div class="text-center mb-6">
+                <img src="https://lh3.googleusercontent.com/d/17NobXQ3JbRnLGejZe4Mn2x-Jl45F4rPm" class="w-24 mx-auto mb-4">
+                <h2 class="text-2xl font-black uppercase italic">Acceso <span class="text-yellow-500">Tigre</span></h2>
+                <p class="text-[10px] opacity-60 uppercase tracking-widest">Portal del Alumno</p>
+            </div>
+            <div class="space-y-4">
+                <input type="text" id="login-folio" placeholder="FOLIO ASIGNADO (E.G. CEUT-2024-XXXX)" class="input-ceut uppercase">
+                <input type="password" id="login-pass" placeholder="CONTRASEÑA" class="input-ceut">
+                <button onclick="intentarLogin()" class="btn-gold w-full py-4 rounded-xl">Entrar al Portal</button>
+                <div class="divider"></div>
+                <button onclick="cambiarVista('registro')" class="text-[10px] font-bold text-blue-400 uppercase w-full">¿Eres nuevo? Regístrate aquí</button>
+            </div>
         </div>
 
-        <!-- PANTALLA DE LOGIN -->
-        <div id="login-screen" class="hidden space-y-6 fade-in">
-            <div class="text-center mb-8">
-                <h2 class="text-2xl font-black uppercase italic text-yellow-400">Bienvenido</h2>
-                <p class="text-[9px] opacity-60 uppercase font-bold tracking-widest">Ingresa con tus credenciales únicas</p>
+        <!-- PANTALLA 1: REGISTRO ÚNICO (FOLIO AUTOMÁTICO) -->
+        <div id="step-registro" class="hidden">
+            <div class="text-center mb-6">
+                <h2 class="text-2xl font-black uppercase italic">Registro <span class="text-yellow-500">Único</span></h2>
+                <p class="text-[10px] opacity-60 uppercase tracking-widest">Tu folio se generará automáticamente</p>
             </div>
-            <div class="glass p-6 rounded-[2rem] space-y-4">
-                <input type="text" id="login-folio" class="input-ceut font-bold uppercase" placeholder="FOLIO ÚNICO (CEUT-XXXXX)">
-                <input type="password" id="login-pass" class="input-ceut font-bold" placeholder="CONTRASEÑA">
-                <button onclick="handleLogin()" id="btn-login" class="w-full bg-yellow-500 text-black font-black py-4 rounded-2xl uppercase italic active:scale-95 transition-all">
-                    Entrar al Portal
-                </button>
-            </div>
-            <p class="text-center text-[10px] font-bold opacity-40 uppercase">¿No tienes cuenta? <button onclick="showRegister()" class="text-yellow-500 underline">Regístrate aquí</button></p>
-        </div>
 
-        <!-- FORMULARIO DE REGISTRO -->
-        <div id="register-screen" class="hidden space-y-4 fade-in">
-            <div class="text-center mb-4">
-                <h2 class="text-xl font-black uppercase italic text-yellow-400">Nuevo Registro</h2>
-                <p class="text-[9px] opacity-60 uppercase font-bold tracking-widest mt-1">Crea tu identidad escolar</p>
-            </div>
-            
-            <div class="glass p-5 rounded-[2rem] space-y-3">
-                <input type="text" id="std-name" class="input-ceut font-bold uppercase" placeholder="NOMBRE COMPLETO">
-                <input type="text" id="std-id" class="input-ceut font-bold uppercase" placeholder="MATRÍCULA">
+            <div class="space-y-3 overflow-y-auto max-h-[60vh] pr-2">
+                <input type="text" id="reg-nombre" placeholder="NOMBRE COMPLETO" class="input-ceut uppercase">
+                <input type="text" id="reg-carrera" placeholder="CARRERA / ESPECIALIDAD" class="input-ceut uppercase">
                 
                 <div class="grid grid-cols-2 gap-3">
-                    <input type="text" id="std-grade" class="input-ceut font-bold uppercase" placeholder="GRADO">
-                    <input type="text" id="std-group" class="input-ceut font-bold uppercase" placeholder="GRUPO">
+                    <input type="text" id="reg-grado" placeholder="GRADO" class="input-ceut">
+                    <input type="text" id="reg-grupo" placeholder="GRUPO" class="input-ceut uppercase">
                 </div>
 
-                <select id="std-level" class="input-ceut select-ceut font-bold uppercase" onchange="toggleCareerField()">
-                    <option value="" disabled selected>NIVEL EDUCATIVO</option>
+                <select id="reg-nivel" class="input-ceut">
+                    <option value="">NIVEL EDUCATIVO...</option>
                     <option value="PREPARATORIA">PREPARATORIA</option>
-                    <option value="LICENCIATURA ESCOLARIZADA">LICENCIATURA ESCOLARIZADA</option>
-                    <option value="LICENCIATURA MIXTA">LICENCIATURA MIXTA</option>
+                    <option value="LICENCIATURA">LICENCIATURA</option>
+                    <option value="MAESTRIA">MAESTRÍA</option>
                 </select>
 
-                <div id="career-container" class="hidden">
-                    <input type="text" id="std-career" class="input-ceut font-bold uppercase" placeholder="CARRERA">
+                <select id="reg-modalidad" class="input-ceut">
+                    <option value="">MODALIDAD...</option>
+                    <option value="ESCOLARIZADA">ESCOLARIZADA</option>
+                    <option value="MIXTA">MIXTA</option>
+                </select>
+
+                <div class="pt-2">
+                    <label class="text-[8px] font-bold uppercase ml-2 opacity-40">Crea una Contraseña de Acceso</label>
+                    <input type="password" id="reg-pass" placeholder="MÍNIMO 6 CARACTERES" class="input-ceut mt-1">
                 </div>
 
-                <div class="pt-2 border-t border-white/10 mt-2">
-                    <p class="text-[9px] font-black text-yellow-500 uppercase mb-2">Seguridad de la cuenta</p>
-                    <input type="password" id="std-pass" class="input-ceut font-bold" placeholder="CREAR CONTRASEÑA">
-                </div>
-
-                <button onclick="saveProfile()" id="btn-register" class="w-full bg-yellow-500 text-black font-black py-4 rounded-2xl uppercase italic active:scale-95 transition-all mt-4">
-                    Crear Cuenta y Folio
-                </button>
-            </div>
-            <button onclick="showLogin()" class="w-full text-[10px] font-bold opacity-40 uppercase">Volver al inicio</button>
-        </div>
-
-        <!-- PANEL PRINCIPAL (POST-LOGIN) -->
-        <div id="main-panel" class="hidden space-y-6 fade-in">
-            <!-- Tarjeta de Perfil -->
-            <div class="glass p-5 rounded-3xl flex items-center justify-between border-l-4 border-yellow-500">
-                <div class="flex-grow">
-                    <div class="flex items-center gap-2">
-                        <p class="text-[9px] font-black text-yellow-500 uppercase tracking-widest">Sesión Activa</p>
-                        <span id="display-folio" class="folio-badge text-[8px]">FOLIO: ---</span>
-                    </div>
-                    <h3 id="display-name" class="font-black italic text-lg leading-tight mt-1 uppercase">---</h3>
-                    <p id="display-info" class="text-[9px] font-bold opacity-40 uppercase mt-1 tracking-tighter">---</p>
-                </div>
-                <button onclick="handleLogout()" class="ml-4 p-2 bg-red-500/10 border border-red-500/20 rounded-xl">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2.5"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
-                </button>
-            </div>
-
-            <!-- PIN Section -->
-            <div id="pin-section" class="glass p-8 rounded-[2.5rem] text-center border border-white/5">
-                <h2 class="text-sm font-black uppercase italic text-slate-400 mb-6 tracking-widest">Código de 6 Dígitos</h2>
-                <input type="text" id="pin-input" maxlength="6" class="input-ceut pin-input mb-6" placeholder="000000" inputmode="numeric">
-                <button onclick="validatePin()" id="btn-validate" class="w-full bg-white text-black font-black py-4 rounded-2xl uppercase italic active:scale-95 transition-all shadow-xl">
-                    Verificar Asistencia
-                </button>
+                <button id="btn-registrar-final" onclick="guardarPerfil()" class="btn-gold w-full py-4 rounded-xl mt-4 shadow-lg">Generar Folio y Registrar</button>
+                <button onclick="cambiarVista('login')" class="text-[10px] font-bold text-slate-500 uppercase w-full py-2">Volver al inicio</button>
             </div>
         </div>
 
-        <!-- Ficha de Clase Detectada -->
-        <div id="confirmation-card" class="hidden fade-in">
-            <div class="bg-[#3b4ba4] p-8 rounded-[3rem] border-b-[10px] border-yellow-500 shadow-2xl relative overflow-hidden">
-                <h2 class="text-2xl font-black uppercase italic mb-6">Confirmar Clase</h2>
-                <div class="space-y-4 mb-8">
-                    <div class="bg-black/20 p-4 rounded-2xl border border-white/5">
-                        <p class="text-[9px] font-black text-yellow-500 uppercase tracking-widest mb-1">Materia</p>
-                        <p id="conf-class-name" class="font-black italic text-lg leading-tight uppercase">---</p>
-                    </div>
-                    <div class="grid grid-cols-2 gap-3">
-                        <div class="bg-black/20 p-4 rounded-2xl border border-white/5">
-                            <p class="text-[9px] font-black text-yellow-500 uppercase tracking-widest mb-1">Grupo Clase</p>
-                            <p id="conf-class-group" class="font-black italic uppercase">---</p>
-                        </div>
-                        <div class="bg-black/20 p-4 rounded-2xl border border-white/5">
-                            <p class="text-[9px] font-black text-yellow-500 uppercase tracking-widest mb-1">Docente</p>
-                            <p id="conf-prof-name" class="font-black italic text-[10px] uppercase truncate">---</p>
-                        </div>
-                    </div>
+        <!-- PANTALLA 1.5: MOSTRAR FOLIO GENERADO -->
+        <div id="step-folio-result" class="hidden text-center">
+            <i data-lucide="award" class="w-16 h-16 mx-auto text-yellow-500 mb-4"></i>
+            <h2 class="text-xl font-black uppercase italic">¡Registro Completado!</h2>
+            <p class="text-[10px] opacity-60 uppercase mb-6">Guarda tu folio para futuros accesos</p>
+            
+            <div class="folio-badge mb-6" id="generated-folio-display">CEUT-2024-XXXX</div>
+            
+            <p class="text-[10px] text-slate-400 mb-8 italic">Este folio junto con tu contraseña te permitirán entrar desde cualquier dispositivo.</p>
+            
+            <button onclick="continuarAPaseLista()" class="btn-gold w-full py-4 rounded-xl">Ir al Pase de Lista</button>
+        </div>
+
+        <!-- PANTALLA 2: PASE DE LISTA -->
+        <div id="step-asistencia" class="hidden text-center">
+            <div class="mb-6">
+                <i data-lucide="user-check" class="w-12 h-12 mx-auto text-yellow-500 mb-2"></i>
+                <h3 id="display-alumno-nombre" class="text-lg font-black uppercase italic">BIENVENIDO</h3>
+                <p id="display-alumno-info" class="text-[9px] opacity-50 uppercase"></p>
+                <p id="display-alumno-carrera" class="text-[8px] text-blue-400 font-bold uppercase mt-1"></p>
+            </div>
+
+            <div class="space-y-6">
+                <div class="text-left">
+                    <label class="text-[10px] font-bold uppercase ml-2 opacity-60">Código de Clase (6 dígitos)</label>
+                    <input type="text" id="input-codigo" maxlength="6" placeholder="000000" 
+                           class="input-ceut w-full p-4 text-center text-4xl font-black tracking-[0.4em] mt-1 border-2">
                 </div>
-                <button id="btn-confirm" onclick="submitAttendance()" class="w-full bg-yellow-500 text-black font-black py-5 rounded-2xl uppercase italic shadow-xl active:scale-95 transition-all">
+                
+                <button onclick="registrarAsistencia()" class="btn-gold w-full py-4 rounded-xl shadow-lg">
                     Confirmar Asistencia
                 </button>
-                <button onclick="resetPinView()" class="w-full mt-4 text-[10px] font-black uppercase italic opacity-40">Cancelar</button>
+                
+                <button onclick="cerrarSesionLocal()" class="text-[9px] uppercase opacity-30 hover:opacity-100 transition-opacity">
+                    Cerrar Sesión (${JSON.parse(sessionStorage.getItem('ceut_active_user'))?.folio || ''})
+                </button>
             </div>
         </div>
 
-        <!-- Pantalla de Éxito -->
-        <div id="success-screen" class="hidden fixed inset-0 z-[100] flex items-center justify-center p-6 bg-[#000b21]/98 backdrop-blur-xl">
-            <div class="text-center fade-in">
-                <div class="w-20 h-20 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-6">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
-                </div>
-                <h2 class="text-2xl font-black uppercase italic mb-2">¡Asistencia Lista!</h2>
-                <p class="text-[10px] font-bold opacity-40 uppercase tracking-widest mb-8">Registro guardado exitosamente</p>
-                <button onclick="location.reload()" class="bg-white text-black font-black px-10 py-3 rounded-full uppercase italic text-[10px]">Cerrar</button>
-            </div>
+        <!-- PANTALLA 3: ÉXITO -->
+        <div id="step-exito" class="hidden text-center py-10">
+            <i data-lucide="check-circle" class="w-20 h-20 mx-auto text-green-500 mb-4"></i>
+            <h3 class="text-2xl font-black uppercase italic">¡ASISTENCIA REGISTRADA!</h3>
+            <p class="text-sm opacity-70 mt-2">Se ha enviado el registro al docente.</p>
+            <button onclick="location.reload()" class="btn-gold px-12 py-4 rounded-xl mt-8 text-xs">Aceptar</button>
         </div>
-
-    </main>
-
-    <footer class="py-10 opacity-20 text-center">
-        <p class="text-[10px] font-black uppercase tracking-[0.3em]">CEUT Digital 2026</p>
-    </footer>
+    </div>
 
     <script>
+        // Configuración Firebase
         const firebaseConfig = {
             apiKey: "AIzaSyCefP6qEqaCMpo8ZpUiLpN4e_-E4ZNTp94",
             authDomain: "asistencias-ceut.firebaseapp.com",
@@ -181,219 +205,167 @@
 
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
-        const auth = firebase.auth();
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'ceut-prod-v2';
-
-        let studentProfile = null;
-        let classData = null;
+        const appId = 'ceut-prod-v2';
 
         window.onload = () => {
-            // Chequeamos si hay un Folio guardado en el dispositivo para auto-login
-            const savedFolio = localStorage.getItem('ceut_folio');
-            const savedPass = localStorage.getItem('ceut_pass');
-
-            if (savedFolio && savedPass) {
-                attemptAutoLogin(savedFolio, savedPass);
+            const perfilSesion = sessionStorage.getItem('ceut_active_user');
+            if (perfilSesion) {
+                mostrarPaseLista(JSON.parse(perfilSesion));
             } else {
-                hideLoading();
-                showLogin();
+                cambiarVista('login');
             }
+            lucide.createIcons();
         };
 
-        function showLoading() { document.getElementById('loading-screen').classList.remove('hidden'); }
-        function hideLoading() { document.getElementById('loading-screen').classList.add('hidden'); }
-        function showLogin() { 
-            document.getElementById('login-screen').classList.remove('hidden');
-            document.getElementById('register-screen').classList.add('hidden');
-            document.getElementById('main-panel').classList.add('hidden');
-        }
-        function showRegister() {
-            document.getElementById('login-screen').classList.add('hidden');
-            document.getElementById('register-screen').classList.remove('hidden');
-        }
-
-        function toggleCareerField() {
-            const level = document.getElementById('std-level').value;
-            const careerContainer = document.getElementById('career-container');
-            careerContainer.classList.toggle('hidden', !level.includes("LICENCIATURA"));
-        }
-
-        // --- LÓGICA DE LOGIN ---
-        async function handleLogin() {
-            const folio = document.getElementById('login-folio').value.trim().toUpperCase();
-            const pass = document.getElementById('login-pass').value.trim();
-            const btn = document.getElementById('btn-login');
-
-            if (!folio || !pass) return alert("Ingresa tus credenciales.");
-
-            btn.disabled = true;
-            btn.innerText = "VERIFICANDO...";
-
-            try {
-                // Buscamos en la colección pública de perfiles por Folio
-                const query = await db.collection('artifacts').doc(appId)
-                    .collection('public').doc('data')
-                    .collection('students_registry')
-                    .where('folio', '==', folio)
-                    .get();
-
-                if (query.empty) throw new Error("Folio no encontrado.");
-                
-                const profile = query.docs[0].data();
-                if (profile.password !== pass) throw new Error("Contraseña incorrecta.");
-
-                // Guardamos en local para persistencia
-                localStorage.setItem('ceut_folio', folio);
-                localStorage.setItem('ceut_pass', pass);
-                
-                studentProfile = profile;
-                renderMainPanel();
-            } catch (e) {
-                alert(e.message);
-                btn.disabled = false;
-                btn.innerText = "Entrar al Portal";
-            }
-        }
-
-        async function attemptAutoLogin(folio, pass) {
-            try {
-                const query = await db.collection('artifacts').doc(appId)
-                    .collection('public').doc('data')
-                    .collection('students_registry')
-                    .where('folio', '==', folio)
-                    .get();
-
-                if (!query.empty) {
-                    const profile = query.docs[0].data();
-                    if (profile.password === pass) {
-                        studentProfile = profile;
-                        renderMainPanel();
-                        return;
-                    }
-                }
-                showLogin();
-            } catch (e) {
-                showLogin();
-            } finally {
-                hideLoading();
-            }
-        }
-
-        function renderMainPanel() {
-            document.getElementById('login-screen').classList.add('hidden');
-            document.getElementById('register-screen').classList.add('hidden');
-            document.getElementById('main-panel').classList.remove('hidden');
+        function cambiarVista(vista) {
+            document.getElementById('step-login').classList.add('hidden');
+            document.getElementById('step-registro').classList.add('hidden');
+            document.getElementById('step-asistencia').classList.add('hidden');
+            document.getElementById('step-folio-result').classList.add('hidden');
             
-            document.getElementById('display-name').innerText = studentProfile.name;
-            document.getElementById('display-id').innerText = `ID: ${studentProfile.studentId}`;
-            document.getElementById('display-folio').innerText = `FOLIO: ${studentProfile.folio}`;
-            document.getElementById('display-info').innerText = `${studentProfile.level} | ${studentProfile.grade}° ${studentProfile.group}`;
+            if(vista === 'login') document.getElementById('step-login').classList.remove('hidden');
+            if(vista === 'registro') document.getElementById('step-registro').classList.remove('hidden');
+            
+            lucide.createIcons();
         }
 
-        function handleLogout() {
-            localStorage.removeItem('ceut_folio');
-            localStorage.removeItem('ceut_pass');
-            location.reload();
+        // Función para generar folio único
+        function generarFolio() {
+            const year = new Date().getFullYear();
+            const random = Math.floor(1000 + Math.random() * 9000); // 4 dígitos aleatorios
+            return `CEUT-${year}-${random}`;
         }
 
-        // --- LÓGICA DE REGISTRO ---
-        async function saveProfile() {
-            const fields = {
-                name: document.getElementById('std-name').value.trim().toUpperCase(),
-                studentId: document.getElementById('std-id').value.trim().toUpperCase(),
-                grade: document.getElementById('std-grade').value.trim().toUpperCase(),
-                group: document.getElementById('std-group').value.trim().toUpperCase(),
-                level: document.getElementById('std-level').value,
-                career: document.getElementById('std-career').value.trim().toUpperCase() || "N/A",
-                password: document.getElementById('std-pass').value.trim()
-            };
+        async function intentarLogin() {
+            const folio = document.getElementById('login-folio').value.trim().toUpperCase();
+            const pass = document.getElementById('login-pass').value;
 
-            if (Object.values(fields).some(v => !v)) return alert("Completa todos los campos.");
-
-            const btn = document.getElementById('btn-register');
-            btn.disabled = true;
-            btn.innerText = "CREANDO CUENTA...";
+            if(!folio || !pass) return alert("Completa los datos de acceso.");
 
             try {
-                const folio = `CEUT-${new Date().getFullYear().toString().slice(-2)}${Math.random().toString(36).substring(2, 7).toUpperCase()}`;
-                const profileData = { ...fields, folio, registeredAt: Date.now() };
+                const studentDoc = await db.collection('artifacts').doc(appId).collection('public').doc('data')
+                                         .collection('students_registry').doc(folio).get();
 
-                // Guardamos en una colección pública para permitir el login por Folio
-                await db.collection('artifacts').doc(appId)
-                    .collection('public').doc('data')
-                    .collection('students_registry')
-                    .add(profileData);
+                if(!studentDoc.exists) return alert("El folio no existe en el sistema.");
 
-                alert(`¡Registro Exitoso! Tu Folio es: ${folio}. Úsalo para entrar.`);
-                localStorage.setItem('ceut_folio', folio);
-                localStorage.setItem('ceut_pass', fields.password);
-                location.reload();
-            } catch (e) {
-                alert("Error al registrar. Intenta de nuevo.");
-                btn.disabled = false;
-                btn.innerText = "Crear Cuenta y Folio";
-            }
-        }
-
-        // --- VALIDACIÓN DE PIN ---
-        async function validatePin() {
-            const pin = document.getElementById('pin-input').value.trim();
-            const btn = document.getElementById('btn-validate');
-            if (pin.length !== 6) return alert("Código de 6 dígitos.");
-
-            btn.disabled = true;
-            btn.innerText = "VALIDANDO...";
-
-            try {
-                const pinRef = db.collection('artifacts').doc(appId).collection('public').doc('data').collection('active_pins').doc(pin);
-                const snap = await pinRef.get();
-
-                if (snap.exists && snap.data().expiresAt > Date.now()) {
-                    classData = snap.data();
-                    document.getElementById('conf-class-name').innerText = classData.className;
-                    document.getElementById('conf-class-group').innerText = classData.group;
-                    document.getElementById('conf-prof-name').innerText = classData.profName || "DOCENTE ASIGNADO";
-                    
-                    document.getElementById('main-panel').classList.add('hidden');
-                    document.getElementById('confirmation-card').classList.remove('hidden');
+                const data = studentDoc.data();
+                if(data.password === pass) {
+                    sessionStorage.setItem('ceut_active_user', JSON.stringify(data));
+                    mostrarPaseLista(data);
                 } else {
-                    alert("Código inválido o expirado.");
-                    btn.disabled = false;
-                    btn.innerText = "Verificar Asistencia";
+                    alert("Contraseña incorrecta.");
                 }
             } catch (e) {
                 alert("Error de conexión.");
-                btn.disabled = false;
             }
         }
 
-        async function submitAttendance() {
-            const btn = document.getElementById('btn-confirm');
-            btn.disabled = true;
-            btn.innerText = "ENVIANDO...";
+        async function guardarPerfil() {
+            const pass = document.getElementById('reg-pass').value;
+            const nombre = document.getElementById('reg-nombre').value.trim().toUpperCase();
+            const carrera = document.getElementById('reg-carrera').value.trim().toUpperCase();
+            const nivel = document.getElementById('reg-nivel').value;
+
+            if (!nombre || !carrera || !nivel || pass.length < 6) {
+                alert("Completa todos los campos correctamente (Contraseña min. 6 caracteres).");
+                return;
+            }
+
+            document.getElementById('btn-registrar-final').disabled = true;
+            document.getElementById('btn-registrar-final').innerText = "Generando...";
+
+            const nuevoFolio = generarFolio();
+
+            const perfil = {
+                nombre: nombre,
+                folio: nuevoFolio,
+                carrera: carrera,
+                grado: document.getElementById('reg-grado').value.trim(),
+                grupo: document.getElementById('reg-grupo').value.trim().toUpperCase(),
+                nivel: nivel,
+                modalidad: document.getElementById('reg-modalidad').value,
+                password: pass,
+                registradoEl: new Date().getTime()
+            };
 
             try {
-                await db.collection('artifacts').doc(appId).collection('public').doc('data').collection('asistencias').add({
-                    ...studentProfile,
-                    password: "", // No guardamos la contraseña en el reporte de asistencia
-                    className: classData.className,
-                    classGroup: classData.group,
-                    profId: classData.profId,
-                    ts: Date.now()
-                });
-                document.getElementById('success-screen').classList.remove('hidden');
+                // Guardar en la base de datos usando el nuevo Folio como ID de documento
+                await db.collection('artifacts').doc(appId).collection('public').doc('data')
+                        .collection('students_registry').doc(nuevoFolio).set(perfil);
+                
+                sessionStorage.setItem('ceut_active_user', JSON.stringify(perfil));
+                
+                // Mostrar pantalla de folio generado
+                document.getElementById('step-registro').classList.add('hidden');
+                document.getElementById('step-folio-result').classList.remove('hidden');
+                document.getElementById('generated-folio-display').innerText = nuevoFolio;
+                lucide.createIcons();
+                
             } catch (e) {
-                alert("Error al registrar.");
-                btn.disabled = false;
+                alert("Error al crear cuenta. Intenta de nuevo.");
+                document.getElementById('btn-registrar-final').disabled = false;
+                document.getElementById('btn-registrar-final').innerText = "Generar Folio y Registrar";
             }
         }
 
-        function resetPinView() {
-            document.getElementById('confirmation-card').classList.add('hidden');
-            document.getElementById('main-panel').classList.remove('hidden');
-            document.getElementById('pin-input').value = "";
-            document.getElementById('btn-validate').disabled = false;
-            document.getElementById('btn-validate').innerText = "Verificar Asistencia";
+        function continuarAPaseLista() {
+            const perfil = JSON.parse(sessionStorage.getItem('ceut_active_user'));
+            mostrarPaseLista(perfil);
+        }
+
+        function mostrarPaseLista(perfil) {
+            document.getElementById('step-login').classList.add('hidden');
+            document.getElementById('step-registro').classList.add('hidden');
+            document.getElementById('step-folio-result').classList.add('hidden');
+            document.getElementById('step-asistencia').classList.remove('hidden');
+            
+            document.getElementById('display-alumno-nombre').innerText = perfil.nombre;
+            document.getElementById('display-alumno-carrera').innerText = perfil.carrera;
+            document.getElementById('display-alumno-info').innerText = 
+                `${perfil.nivel} | ${perfil.modalidad} | ${perfil.grado}° ${perfil.grupo}`;
+            
+            lucide.createIcons();
+        }
+
+        async function registrarAsistencia() {
+            const codigo = document.getElementById('input-codigo').value.trim();
+            const perfil = JSON.parse(sessionStorage.getItem('ceut_active_user'));
+
+            if (codigo.length !== 6) return alert("Código inválido.");
+
+            try {
+                const pinDoc = await db.collection('artifacts').doc(appId).collection('public').doc('data')
+                                     .collection('active_pins').doc(codigo).get();
+
+                if (!pinDoc.exists) return alert("EL CÓDIGO NO EXISTE O YA EXPIRÓ.");
+
+                const claseData = pinDoc.data();
+
+                await db.collection('artifacts').doc(appId).collection('public').doc('data')
+                      .collection('asistencias').add({
+                          folio: perfil.folio,
+                          studentName: perfil.nombre,
+                          studentCareer: perfil.carrera,
+                          studentLevel: perfil.nivel,
+                          grade: perfil.grado,
+                          group: perfil.grupo,
+                          className: claseData.className,
+                          profId: claseData.profId,
+                          ts: Date.now()
+                      });
+
+                document.getElementById('step-asistencia').classList.add('hidden');
+                document.getElementById('step-exito').classList.remove('hidden');
+                lucide.createIcons();
+
+            } catch (error) {
+                alert("Error al registrar asistencia.");
+            }
+        }
+
+        function cerrarSesionLocal() {
+            sessionStorage.removeItem('ceut_active_user');
+            location.reload();
         }
     </script>
 </body>
