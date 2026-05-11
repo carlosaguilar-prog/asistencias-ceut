@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>CEUT | Registro de Asistencia</title>
+    <title>CEUT | Portal de Asistencia</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/html5-qrcode"></script>
+    <!-- Firebase SDKs (Compat Mode) -->
     <script src="https://www.gstatic.com/firebasejs/11.0.2/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/11.0.2/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/11.0.2/firebase-firestore-compat.js"></script>
@@ -15,9 +15,15 @@
         .tiger-gradient { background: linear-gradient(135deg, #3b4ba4 0%, #1e296b 100%); }
         .gold-border { border-bottom: 4px solid #eab308; }
         .glass { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.1); }
-        #reader { border: none !important; border-radius: 1.5rem; overflow: hidden; }
-        .animate-pulse-slow { animation: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
-        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: .5; } }
+        .input-ceut { background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 1rem; padding: 0.85rem; color: white; width: 100%; outline: none; transition: all 0.3s; font-size: 0.9rem; }
+        .input-ceut:focus { border-color: #eab308; background: rgba(234, 179, 8, 0.05); }
+        .select-ceut { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='white'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 1rem center; background-size: 1rem; padding-right: 2.5rem; }
+        .pin-input { letter-spacing: 0.5em; font-size: 1.5rem; font-weight: 800; text-align: center; }
+        .hidden { display: none !important; }
+        .fade-in { animation: fadeIn 0.4s ease-out forwards; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        option { background-color: #000b21; color: white; }
+        .folio-badge { background: linear-gradient(90deg, #eab308 0%, #ca8a04 100%); color: #000; padding: 2px 8px; border-radius: 6px; font-weight: 900; letter-spacing: 1px; }
     </style>
 </head>
 <body class="min-h-screen flex flex-col items-center">
@@ -30,244 +36,364 @@
 
     <main class="w-full max-w-md px-6 py-8 flex-grow">
         
-        <!-- Sección de Identidad y Estado -->
-        <div id="auth-section" class="mb-6">
-            <div class="glass p-5 rounded-3xl">
-                <div id="loading-state" class="flex items-center justify-center gap-3 py-2">
-                    <div class="w-4 h-4 border-2 border-yellow-500 border-t-transparent rounded-full animate-spin"></div>
-                    <p class="text-[10px] font-black uppercase tracking-widest italic">Verificando Credenciales...</p>
-                </div>
+        <!-- PANTALLA DE CARGA INICIAL -->
+        <div id="loading-screen" class="flex flex-col items-center justify-center py-20">
+            <div class="w-8 h-8 border-4 border-yellow-500 border-t-transparent rounded-full animate-spin mb-4"></div>
+            <p class="text-[10px] font-black uppercase tracking-widest italic text-slate-400">Sincronizando Sistema...</p>
+        </div>
+
+        <!-- PANTALLA DE LOGIN -->
+        <div id="login-screen" class="hidden space-y-6 fade-in">
+            <div class="text-center mb-8">
+                <h2 class="text-2xl font-black uppercase italic text-yellow-400">Bienvenido</h2>
+                <p class="text-[9px] opacity-60 uppercase font-bold tracking-widest">Ingresa con tus credenciales únicas</p>
+            </div>
+            <div class="glass p-6 rounded-[2rem] space-y-4">
+                <input type="text" id="login-folio" class="input-ceut font-bold uppercase" placeholder="FOLIO ÚNICO (CEUT-XXXXX)">
+                <input type="password" id="login-pass" class="input-ceut font-bold" placeholder="CONTRASEÑA">
+                <button onclick="handleLogin()" id="btn-login" class="w-full bg-yellow-500 text-black font-black py-4 rounded-2xl uppercase italic active:scale-95 transition-all">
+                    Entrar al Portal
+                </button>
+            </div>
+            <p class="text-center text-[10px] font-bold opacity-40 uppercase">¿No tienes cuenta? <button onclick="showRegister()" class="text-yellow-500 underline">Regístrate aquí</button></p>
+        </div>
+
+        <!-- FORMULARIO DE REGISTRO -->
+        <div id="register-screen" class="hidden space-y-4 fade-in">
+            <div class="text-center mb-4">
+                <h2 class="text-xl font-black uppercase italic text-yellow-400">Nuevo Registro</h2>
+                <p class="text-[9px] opacity-60 uppercase font-bold tracking-widest mt-1">Crea tu identidad escolar</p>
+            </div>
+            
+            <div class="glass p-5 rounded-[2rem] space-y-3">
+                <input type="text" id="std-name" class="input-ceut font-bold uppercase" placeholder="NOMBRE COMPLETO">
+                <input type="text" id="std-id" class="input-ceut font-bold uppercase" placeholder="MATRÍCULA">
                 
-                <!-- Registro de Alumno (Primera vez) -->
-                <div id="register-form" class="hidden space-y-4 py-2">
-                    <h2 class="text-lg font-black uppercase italic text-yellow-400">Registro de Perfil</h2>
-                    <p class="text-[10px] opacity-60 uppercase font-bold tracking-tight">Ingresa tus datos reales para que el docente te identifique en su lista.</p>
-                    <input type="text" id="std-name" class="w-full bg-white/5 border border-white/10 p-4 rounded-2xl font-bold focus:border-yellow-400 outline-none" placeholder="Nombre Completo">
-                    <input type="text" id="std-id" class="w-full bg-white/5 border border-white/10 p-4 rounded-2xl font-bold focus:border-yellow-400 outline-none" placeholder="Matrícula">
-                    <button onclick="saveProfile()" class="w-full bg-yellow-500 text-black font-black py-4 rounded-2xl uppercase italic active:scale-95 transition-all">Activar Mi Cuenta</button>
+                <div class="grid grid-cols-2 gap-3">
+                    <input type="text" id="std-grade" class="input-ceut font-bold uppercase" placeholder="GRADO">
+                    <input type="text" id="std-group" class="input-ceut font-bold uppercase" placeholder="GRUPO">
                 </div>
 
-                <!-- Perfil Activo -->
-                <div id="profile-active" class="hidden flex items-center justify-between">
-                    <div>
-                        <p class="text-[9px] font-black text-yellow-500 uppercase tracking-widest">Estudiante Registrado</p>
-                        <h3 id="display-name" class="font-black italic text-lg leading-none mt-1">---</h3>
-                        <p id="display-id" class="text-[10px] font-bold opacity-40 mt-1 uppercase">ID: ---</p>
-                    </div>
-                    <div class="w-12 h-12 bg-[#3b4ba4] rounded-2xl flex items-center justify-center border border-white/10">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-                    </div>
+                <select id="std-level" class="input-ceut select-ceut font-bold uppercase" onchange="toggleCareerField()">
+                    <option value="" disabled selected>NIVEL EDUCATIVO</option>
+                    <option value="PREPARATORIA">PREPARATORIA</option>
+                    <option value="LICENCIATURA ESCOLARIZADA">LICENCIATURA ESCOLARIZADA</option>
+                    <option value="LICENCIATURA MIXTA">LICENCIATURA MIXTA</option>
+                </select>
+
+                <div id="career-container" class="hidden">
+                    <input type="text" id="std-career" class="input-ceut font-bold uppercase" placeholder="CARRERA">
                 </div>
+
+                <div class="pt-2 border-t border-white/10 mt-2">
+                    <p class="text-[9px] font-black text-yellow-500 uppercase mb-2">Seguridad de la cuenta</p>
+                    <input type="password" id="std-pass" class="input-ceut font-bold" placeholder="CREAR CONTRASEÑA">
+                </div>
+
+                <button onclick="saveProfile()" id="btn-register" class="w-full bg-yellow-500 text-black font-black py-4 rounded-2xl uppercase italic active:scale-95 transition-all mt-4">
+                    Crear Cuenta y Folio
+                </button>
+            </div>
+            <button onclick="showLogin()" class="w-full text-[10px] font-bold opacity-40 uppercase">Volver al inicio</button>
+        </div>
+
+        <!-- PANEL PRINCIPAL (POST-LOGIN) -->
+        <div id="main-panel" class="hidden space-y-6 fade-in">
+            <!-- Tarjeta de Perfil -->
+            <div class="glass p-5 rounded-3xl flex items-center justify-between border-l-4 border-yellow-500">
+                <div class="flex-grow">
+                    <div class="flex items-center gap-2">
+                        <p class="text-[9px] font-black text-yellow-500 uppercase tracking-widest">Sesión Activa</p>
+                        <span id="display-folio" class="folio-badge text-[8px]">FOLIO: ---</span>
+                    </div>
+                    <h3 id="display-name" class="font-black italic text-lg leading-tight mt-1 uppercase">---</h3>
+                    <p id="display-info" class="text-[9px] font-bold opacity-40 uppercase mt-1 tracking-tighter">---</p>
+                </div>
+                <button onclick="handleLogout()" class="ml-4 p-2 bg-red-500/10 border border-red-500/20 rounded-xl">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2.5"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+                </button>
+            </div>
+
+            <!-- PIN Section -->
+            <div id="pin-section" class="glass p-8 rounded-[2.5rem] text-center border border-white/5">
+                <h2 class="text-sm font-black uppercase italic text-slate-400 mb-6 tracking-widest">Código de 6 Dígitos</h2>
+                <input type="text" id="pin-input" maxlength="6" class="input-ceut pin-input mb-6" placeholder="000000" inputmode="numeric">
+                <button onclick="validatePin()" id="btn-validate" class="w-full bg-white text-black font-black py-4 rounded-2xl uppercase italic active:scale-95 transition-all shadow-xl">
+                    Verificar Asistencia
+                </button>
             </div>
         </div>
 
-        <!-- Área de Escaneo -->
-        <div id="scanner-section" class="hidden space-y-6">
-            <div class="glass p-4 rounded-[2.5rem]">
-                <div id="reader"></div>
-            </div>
-            <div class="text-center">
-                <div class="inline-flex items-center gap-2 bg-green-500/10 text-green-400 px-4 py-2 rounded-full border border-green-500/20 mb-3">
-                    <div class="w-2 h-2 bg-green-400 rounded-full animate-ping"></div>
-                    <span class="text-[10px] font-black uppercase italic">Cámara Lista: Escanea el QR</span>
-                </div>
-            </div>
-        </div>
-
-        <!-- Ficha de Confirmación (Datos Precargados del QR) -->
-        <div id="confirmation-card" class="hidden animate-in slide-in-from-bottom duration-500">
+        <!-- Ficha de Clase Detectada -->
+        <div id="confirmation-card" class="hidden fade-in">
             <div class="bg-[#3b4ba4] p-8 rounded-[3rem] border-b-[10px] border-yellow-500 shadow-2xl relative overflow-hidden">
-                <div class="absolute top-0 right-0 p-4 opacity-10">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 10v6M2 10v6M6 4h12a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z"/><path d="M9 9h6v6H9z"/></svg>
-                </div>
-                
                 <h2 class="text-2xl font-black uppercase italic mb-6">Confirmar Clase</h2>
-                
                 <div class="space-y-4 mb-8">
                     <div class="bg-black/20 p-4 rounded-2xl border border-white/5">
-                        <p class="text-[9px] font-black text-yellow-500 uppercase tracking-widest mb-1">Materia Detectada</p>
+                        <p class="text-[9px] font-black text-yellow-500 uppercase tracking-widest mb-1">Materia</p>
                         <p id="conf-class-name" class="font-black italic text-lg leading-tight uppercase">---</p>
                     </div>
                     <div class="grid grid-cols-2 gap-3">
                         <div class="bg-black/20 p-4 rounded-2xl border border-white/5">
-                            <p class="text-[9px] font-black text-yellow-500 uppercase tracking-widest mb-1">Grupo</p>
-                            <p id="conf-class-group" class="font-black italic">---</p>
+                            <p class="text-[9px] font-black text-yellow-500 uppercase tracking-widest mb-1">Grupo Clase</p>
+                            <p id="conf-class-group" class="font-black italic uppercase">---</p>
                         </div>
                         <div class="bg-black/20 p-4 rounded-2xl border border-white/5">
-                            <p class="text-[9px] font-black text-yellow-500 uppercase tracking-widest mb-1">Docente ID</p>
-                            <p id="conf-prof-id" class="font-black italic text-[10px] truncate">---</p>
+                            <p class="text-[9px] font-black text-yellow-500 uppercase tracking-widest mb-1">Docente</p>
+                            <p id="conf-prof-name" class="font-black italic text-[10px] uppercase truncate">---</p>
                         </div>
                     </div>
                 </div>
-
-                <button id="btn-confirm" onclick="submitAttendance()" class="w-full bg-yellow-500 text-black font-black py-5 rounded-2xl uppercase italic shadow-xl hover:scale-[1.02] active:scale-95 transition-all flex items-center justify-center gap-3">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
-                    Registrar Asistencia
+                <button id="btn-confirm" onclick="submitAttendance()" class="w-full bg-yellow-500 text-black font-black py-5 rounded-2xl uppercase italic shadow-xl active:scale-95 transition-all">
+                    Confirmar Asistencia
                 </button>
-                <button onclick="cancelScan()" class="w-full mt-4 text-[10px] font-black uppercase italic opacity-40 hover:opacity-100 transition-all">Cancelar / Volver a Escanear</button>
+                <button onclick="resetPinView()" class="w-full mt-4 text-[10px] font-black uppercase italic opacity-40">Cancelar</button>
             </div>
         </div>
 
         <!-- Pantalla de Éxito -->
-        <div id="success-screen" class="hidden fixed inset-0 z-[100] flex items-center justify-center p-6 bg-[#000b21]/95 backdrop-blur-xl">
-            <div class="text-center animate-in zoom-in duration-300">
-                <div class="w-24 h-24 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-6 shadow-2xl shadow-green-500/20">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+        <div id="success-screen" class="hidden fixed inset-0 z-[100] flex items-center justify-center p-6 bg-[#000b21]/98 backdrop-blur-xl">
+            <div class="text-center fade-in">
+                <div class="w-20 h-20 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-6">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
                 </div>
-                <h2 class="text-3xl font-black uppercase italic mb-2">¡Asistencia Exitosa!</h2>
-                <p class="text-sm font-bold opacity-60 uppercase tracking-widest mb-10">Tu registro ha sido enviado a la nube CEUT</p>
-                <button onclick="location.reload()" class="bg-white text-black font-black px-10 py-4 rounded-full uppercase italic text-xs tracking-widest shadow-xl">Cerrar Sesión</button>
+                <h2 class="text-2xl font-black uppercase italic mb-2">¡Asistencia Lista!</h2>
+                <p class="text-[10px] font-bold opacity-40 uppercase tracking-widest mb-8">Registro guardado exitosamente</p>
+                <button onclick="location.reload()" class="bg-white text-black font-black px-10 py-3 rounded-full uppercase italic text-[10px]">Cerrar</button>
             </div>
         </div>
 
     </main>
 
     <footer class="py-10 opacity-20 text-center">
-        <p class="text-[10px] font-black uppercase tracking-[0.3em]">Sistema de Control Escolar CEUT 2026</p>
+        <p class="text-[10px] font-black uppercase tracking-[0.3em]">CEUT Digital 2026</p>
     </footer>
 
     <script>
-        // Configuración de Firebase
-        const firebaseConfig = JSON.parse(__firebase_config);
+        const firebaseConfig = {
+            apiKey: "AIzaSyCefP6qEqaCMpo8ZpUiLpN4e_-E4ZNTp94",
+            authDomain: "asistencias-ceut.firebaseapp.com",
+            projectId: "asistencias-ceut",
+            storageBucket: "asistencias-ceut.firebasestorage.app",
+            messagingSenderId: "130615246146",
+            appId: "1:130615246146:web:6ae2c17c828fb28a809cdb"
+        };
+
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
         const auth = firebase.auth();
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'ceut-asistencias-2026';
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'ceut-prod-v2';
 
-        let currentUser = null;
         let studentProfile = null;
-        let scannedData = null;
-        let html5QrCode = null;
+        let classData = null;
 
-        // Inicio de Aplicación
-        window.onload = async () => {
-            if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                await auth.signInWithCustomToken(__initial_auth_token);
+        window.onload = () => {
+            // Chequeamos si hay un Folio guardado en el dispositivo para auto-login
+            const savedFolio = localStorage.getItem('ceut_folio');
+            const savedPass = localStorage.getItem('ceut_pass');
+
+            if (savedFolio && savedPass) {
+                attemptAutoLogin(savedFolio, savedPass);
             } else {
-                await auth.signInAnonymously();
+                hideLoading();
+                showLogin();
             }
-
-            auth.onAuthStateChanged(async (user) => {
-                if (user) {
-                    currentUser = user;
-                    await loadProfile();
-                }
-            });
         };
 
-        async function loadProfile() {
-            const docRef = db.collection('artifacts').doc(appId).collection('users').doc(currentUser.uid).collection('profile').doc('data');
-            const snap = await docRef.get();
+        function showLoading() { document.getElementById('loading-screen').classList.remove('hidden'); }
+        function hideLoading() { document.getElementById('loading-screen').classList.add('hidden'); }
+        function showLogin() { 
+            document.getElementById('login-screen').classList.remove('hidden');
+            document.getElementById('register-screen').classList.add('hidden');
+            document.getElementById('main-panel').classList.add('hidden');
+        }
+        function showRegister() {
+            document.getElementById('login-screen').classList.add('hidden');
+            document.getElementById('register-screen').classList.remove('hidden');
+        }
 
-            document.getElementById('loading-state').classList.add('hidden');
-            
-            if (snap.exists) {
-                studentProfile = snap.data();
-                document.getElementById('display-name').innerText = studentProfile.name;
-                document.getElementById('display-id').innerText = `Matrícula: ${studentProfile.studentId}`;
-                document.getElementById('profile-active').classList.remove('hidden');
-                document.getElementById('scanner-section').classList.remove('hidden');
-                startScanner();
-            } else {
-                document.getElementById('register-form').classList.remove('hidden');
+        function toggleCareerField() {
+            const level = document.getElementById('std-level').value;
+            const careerContainer = document.getElementById('career-container');
+            careerContainer.classList.toggle('hidden', !level.includes("LICENCIATURA"));
+        }
+
+        // --- LÓGICA DE LOGIN ---
+        async function handleLogin() {
+            const folio = document.getElementById('login-folio').value.trim().toUpperCase();
+            const pass = document.getElementById('login-pass').value.trim();
+            const btn = document.getElementById('btn-login');
+
+            if (!folio || !pass) return alert("Ingresa tus credenciales.");
+
+            btn.disabled = true;
+            btn.innerText = "VERIFICANDO...";
+
+            try {
+                // Buscamos en la colección pública de perfiles por Folio
+                const query = await db.collection('artifacts').doc(appId)
+                    .collection('public').doc('data')
+                    .collection('students_registry')
+                    .where('folio', '==', folio)
+                    .get();
+
+                if (query.empty) throw new Error("Folio no encontrado.");
+                
+                const profile = query.docs[0].data();
+                if (profile.password !== pass) throw new Error("Contraseña incorrecta.");
+
+                // Guardamos en local para persistencia
+                localStorage.setItem('ceut_folio', folio);
+                localStorage.setItem('ceut_pass', pass);
+                
+                studentProfile = profile;
+                renderMainPanel();
+            } catch (e) {
+                alert(e.message);
+                btn.disabled = false;
+                btn.innerText = "Entrar al Portal";
             }
         }
 
-        async function saveProfile() {
-            const name = document.getElementById('std-name').value.trim();
-            const id = document.getElementById('std-id').value.trim();
-            if (!name || !id) return;
+        async function attemptAutoLogin(folio, pass) {
+            try {
+                const query = await db.collection('artifacts').doc(appId)
+                    .collection('public').doc('data')
+                    .collection('students_registry')
+                    .where('folio', '==', folio)
+                    .get();
 
-            await db.collection('artifacts').doc(appId).collection('users').doc(currentUser.uid).collection('profile').doc('data').set({
-                name,
-                studentId: id,
-                registeredAt: Date.now()
-            });
+                if (!query.empty) {
+                    const profile = query.docs[0].data();
+                    if (profile.password === pass) {
+                        studentProfile = profile;
+                        renderMainPanel();
+                        return;
+                    }
+                }
+                showLogin();
+            } catch (e) {
+                showLogin();
+            } finally {
+                hideLoading();
+            }
+        }
+
+        function renderMainPanel() {
+            document.getElementById('login-screen').classList.add('hidden');
+            document.getElementById('register-screen').classList.add('hidden');
+            document.getElementById('main-panel').classList.remove('hidden');
+            
+            document.getElementById('display-name').innerText = studentProfile.name;
+            document.getElementById('display-id').innerText = `ID: ${studentProfile.studentId}`;
+            document.getElementById('display-folio').innerText = `FOLIO: ${studentProfile.folio}`;
+            document.getElementById('display-info').innerText = `${studentProfile.level} | ${studentProfile.grade}° ${studentProfile.group}`;
+        }
+
+        function handleLogout() {
+            localStorage.removeItem('ceut_folio');
+            localStorage.removeItem('ceut_pass');
             location.reload();
         }
 
-        function startScanner() {
-            html5QrCode = new Html5Qrcode("reader");
-            const config = { fps: 15, qrbox: { width: 250, height: 250 } };
-            html5QrCode.start({ facingMode: "environment" }, config, onScanSuccess);
-        }
+        // --- LÓGICA DE REGISTRO ---
+        async function saveProfile() {
+            const fields = {
+                name: document.getElementById('std-name').value.trim().toUpperCase(),
+                studentId: document.getElementById('std-id').value.trim().toUpperCase(),
+                grade: document.getElementById('std-grade').value.trim().toUpperCase(),
+                group: document.getElementById('std-group').value.trim().toUpperCase(),
+                level: document.getElementById('std-level').value,
+                career: document.getElementById('std-career').value.trim().toUpperCase() || "N/A",
+                password: document.getElementById('std-pass').value.trim()
+            };
 
-        async function onScanSuccess(decodedText) {
+            if (Object.values(fields).some(v => !v)) return alert("Completa todos los campos.");
+
+            const btn = document.getElementById('btn-register');
+            btn.disabled = true;
+            btn.innerText = "CREANDO CUENTA...";
+
             try {
-                // El QR del maestro contiene: {profId, classId, token, ts}
-                const data = JSON.parse(decodedText);
-                
-                // Validar vigencia del QR (60 segundos)
-                const now = Date.now();
-                if ((now - data.ts) / 1000 > 60) {
-                    alert("El código QR ha expirado. Pide al maestro que muestre el nuevo código.");
-                    return;
-                }
+                const folio = `CEUT-${new Date().getFullYear().toString().slice(-2)}${Math.random().toString(36).substring(2, 7).toUpperCase()}`;
+                const profileData = { ...fields, folio, registeredAt: Date.now() };
 
-                scannedData = data;
-                await fetchClassInfo(data.profId, data.classId);
+                // Guardamos en una colección pública para permitir el login por Folio
+                await db.collection('artifacts').doc(appId)
+                    .collection('public').doc('data')
+                    .collection('students_registry')
+                    .add(profileData);
 
+                alert(`¡Registro Exitoso! Tu Folio es: ${folio}. Úsalo para entrar.`);
+                localStorage.setItem('ceut_folio', folio);
+                localStorage.setItem('ceut_pass', fields.password);
+                location.reload();
             } catch (e) {
-                console.error("Error al procesar QR:", e);
+                alert("Error al registrar. Intenta de nuevo.");
+                btn.disabled = false;
+                btn.innerText = "Crear Cuenta y Folio";
             }
         }
 
-        async function fetchClassInfo(profId, classId) {
-            // Detener escáner para mostrar ficha
-            if (html5QrCode) await html5QrCode.stop();
-            
-            // Buscar info de la clase para mostrarla al alumno (Pre-carga)
-            const classSnap = await db.collection('artifacts').doc(appId).collection('users').doc(profId).collection('clases').doc(classId).get();
-            
-            if (classSnap.exists) {
-                const c = classSnap.data();
-                document.getElementById('conf-class-name').innerText = c.name;
-                document.getElementById('conf-class-group').innerText = c.group;
-                document.getElementById('conf-prof-id').innerText = profId;
-                
-                // Guardamos info extra en scannedData para el registro final
-                scannedData.className = c.name;
-                scannedData.classGroup = c.group;
+        // --- VALIDACIÓN DE PIN ---
+        async function validatePin() {
+            const pin = document.getElementById('pin-input').value.trim();
+            const btn = document.getElementById('btn-validate');
+            if (pin.length !== 6) return alert("Código de 6 dígitos.");
 
-                document.getElementById('scanner-section').classList.add('hidden');
-                document.getElementById('confirmation-card').classList.remove('hidden');
-            } else {
-                alert("Error: Clase no encontrada en la base de datos.");
-                startScanner();
+            btn.disabled = true;
+            btn.innerText = "VALIDANDO...";
+
+            try {
+                const pinRef = db.collection('artifacts').doc(appId).collection('public').doc('data').collection('active_pins').doc(pin);
+                const snap = await pinRef.get();
+
+                if (snap.exists && snap.data().expiresAt > Date.now()) {
+                    classData = snap.data();
+                    document.getElementById('conf-class-name').innerText = classData.className;
+                    document.getElementById('conf-class-group').innerText = classData.group;
+                    document.getElementById('conf-prof-name').innerText = classData.profName || "DOCENTE ASIGNADO";
+                    
+                    document.getElementById('main-panel').classList.add('hidden');
+                    document.getElementById('confirmation-card').classList.remove('hidden');
+                } else {
+                    alert("Código inválido o expirado.");
+                    btn.disabled = false;
+                    btn.innerText = "Verificar Asistencia";
+                }
+            } catch (e) {
+                alert("Error de conexión.");
+                btn.disabled = false;
             }
         }
 
         async function submitAttendance() {
             const btn = document.getElementById('btn-confirm');
             btn.disabled = true;
-            btn.innerHTML = '<div class="w-5 h-5 border-2 border-black border-t-transparent rounded-full animate-spin"></div> Enviando...';
+            btn.innerText = "ENVIANDO...";
 
             try {
-                // Registrar asistencia en la colección pública (Regla 1)
                 await db.collection('artifacts').doc(appId).collection('public').doc('data').collection('asistencias').add({
-                    profId: scannedData.profId,
-                    classId: scannedData.classId,
-                    className: scannedData.className,
-                    classGroup: scannedData.classGroup,
-                    studentUid: currentUser.uid,
-                    studentName: studentProfile.name,
-                    studentId: studentProfile.studentId,
+                    ...studentProfile,
+                    password: "", // No guardamos la contraseña en el reporte de asistencia
+                    className: classData.className,
+                    classGroup: classData.group,
+                    profId: classData.profId,
                     ts: Date.now()
                 });
-
                 document.getElementById('success-screen').classList.remove('hidden');
-            } catch (err) {
-                console.error(err);
-                alert("Error al enviar asistencia. Inténtalo de nuevo.");
+            } catch (e) {
+                alert("Error al registrar.");
                 btn.disabled = false;
-                btn.innerHTML = 'Registrar Asistencia';
             }
         }
 
-        function cancelScan() {
+        function resetPinView() {
             document.getElementById('confirmation-card').classList.add('hidden');
-            document.getElementById('scanner-section').classList.remove('hidden');
-            startScanner();
+            document.getElementById('main-panel').classList.remove('hidden');
+            document.getElementById('pin-input').value = "";
+            document.getElementById('btn-validate').disabled = false;
+            document.getElementById('btn-validate').innerText = "Verificar Asistencia";
         }
     </script>
 </body>
