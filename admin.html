@@ -1,152 +1,197 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es-MX">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>CEUT | Consola de Control Total</title>
+    <title>CEUT | Consola de Control Administrativo</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
+    
     <!-- Librerías para Exportación -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
     
+    <!-- Firebase SDK (Compat) -->
+    <script src="https://www.gstatic.com/firebasejs/11.0.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/11.0.2/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/11.0.2/firebase-auth-compat.js"></script>
+
     <style>
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #000b21; color: white; overflow-x: hidden; }
-        .tiger-gradient { background: linear-gradient(135deg, #3b4ba4 0%, #1e296b 100%); }
-        .glass { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(15px); border: 1px solid rgba(255, 255, 255, 0.08); }
-        .input-ceut { background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(234, 179, 8, 0.2); border-radius: 0.75rem; padding: 10px 14px; color: white; width: 100%; font-size: 0.8rem; transition: all 0.3s; }
-        .input-ceut:focus { border-color: #eab308; outline: none; background: rgba(234, 179, 8, 0.1); }
-        .tab-active { border-bottom: 3px solid #eab308; color: #eab308; background: rgba(234, 179, 8, 0.05); }
-        .hidden { display: none !important; }
-        .fade-in { animation: fadeIn 0.4s ease forwards; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
-        
-        @media print {
-            .no-print { display: none !important; }
-            body { background: white; color: black; }
-            .glass { border: 1px solid #ddd; background: white; color: black; box-shadow: none; }
-            table { color: black !important; }
-            .tiger-gradient { background: #1e296b !important; -webkit-print-color-adjust: exact; }
+        :root {
+            --ceut-blue: #3b4ba4;
+            --ceut-blue-dark: #000b21;
+            --ceut-gold: #eab308;
         }
+
+        body { 
+            font-family: 'Plus Jakarta Sans', sans-serif; 
+            background-color: var(--ceut-blue-dark); 
+            color: white; 
+            min-height: 100vh;
+        }
+
+        .glass-card { 
+            background: rgba(255, 255, 255, 0.03); 
+            backdrop-filter: blur(20px); 
+            border: 1px solid rgba(255, 255, 255, 0.1); 
+        }
+
+        .tab-btn {
+            padding: 1rem;
+            font-size: 0.75rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            transition: all 0.3s;
+            border-bottom: 2px solid transparent;
+            opacity: 0.5;
+        }
+
+        .tab-btn.active {
+            opacity: 1;
+            color: var(--ceut-gold);
+            border-bottom-color: var(--ceut-gold);
+            background: rgba(234, 179, 8, 0.05);
+        }
+
+        .input-ceut { 
+            background: rgba(255, 255, 255, 0.05); 
+            border: 1px solid rgba(255, 255, 255, 0.1); 
+            border-radius: 0.5rem; 
+            color: white; 
+            padding: 0.6rem 1rem;
+            width: 100%;
+            font-size: 0.85rem;
+        }
+
+        .input-ceut:focus { border-color: var(--ceut-gold); outline: none; }
+
+        .btn-action {
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            font-size: 0.7rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.2s;
+        }
+
+        .btn-delete { color: #f87171; background: rgba(248, 113, 113, 0.1); }
+        .btn-delete:hover { background: #f87171; color: white; }
+
+        .btn-export { background: var(--ceut-gold); color: black; }
+
+        .status-badge {
+            padding: 0.25rem 0.5rem;
+            border-radius: 9999px;
+            font-size: 0.65rem;
+            font-weight: 900;
+            text-transform: uppercase;
+        }
+
+        .hidden { display: none !important; }
     </style>
 </head>
-<body class="min-h-screen pb-20">
+<body>
 
-    <!-- LOGIN (Igual al anterior por seguridad) -->
-    <div id="security-lock" class="fixed inset-0 z-[100] bg-[#000b21] flex flex-col items-center justify-center p-6 text-center">
-        <div class="mb-8 fade-in">
-            <img src="https://lh3.googleusercontent.com/d/17NobXQ3JbRnLGejZe4Mn2x-Jl45F4rPm" alt="CEUT Logo" class="w-48 mx-auto mb-6">
-            <div class="inline-flex items-center gap-2 px-4 py-2 bg-yellow-500/10 border border-yellow-500/20 rounded-full">
-                <i data-lucide="shield-check" class="w-4 h-4 text-yellow-500"></i>
-                <span class="text-[10px] font-black uppercase tracking-widest text-yellow-500">Acceso Maestro</span>
+    <!-- Pantalla de Bloqueo de Seguridad -->
+    <div id="auth-lock" class="fixed inset-0 z-50 bg-[#000b21] flex items-center justify-center p-6">
+        <div class="max-w-md w-full text-center">
+            <img src="https://lh3.googleusercontent.com/d/17NobXQ3JbRnLGejZe4Mn2x-Jl45F4rPm" class="w-32 mx-auto mb-8" alt="Logo">
+            <div class="glass-card p-8 rounded-3xl border-t-4 border-yellow-500">
+                <h2 class="text-xl font-black uppercase italic mb-6">Acceso <span class="text-yellow-500">Administrativo</span></h2>
+                <div class="space-y-4">
+                    <input type="email" id="admin-email" placeholder="CORREO@CEUT.EDU.MX" class="input-ceut">
+                    <input type="password" id="admin-pass" placeholder="••••••••" class="input-ceut">
+                    <button onclick="loginAdmin()" class="w-full py-4 bg-yellow-500 text-black font-black uppercase italic rounded-xl shadow-lg shadow-yellow-500/20">Desbloquear Consola</button>
+                </div>
+                <p class="mt-6 text-[9px] text-slate-500 uppercase tracking-widest">Uso exclusivo para personal autorizado CEUT</p>
             </div>
-        </div>
-        <div class="w-full max-w-sm space-y-4 fade-in">
-            <input type="email" id="email" placeholder="Correo" class="input-ceut">
-            <input type="password" id="password" placeholder="Contraseña" class="input-ceut">
-            <button id="login-btn" class="w-full bg-yellow-500 text-black py-4 rounded-xl font-black uppercase italic text-xs shadow-xl">Entrar al Sistema</button>
         </div>
     </div>
 
-    <!-- INTERFAZ ADMINISTRATIVA -->
-    <div id="admin-interface" class="hidden">
+    <!-- Panel Principal -->
+    <div id="admin-panel" class="hidden">
         <!-- Header -->
-        <nav class="w-full tiger-gradient p-4 border-b-2 border-yellow-500 sticky top-0 z-40 no-print">
+        <header class="bg-[#000d2b] border-b border-white/10 p-4 sticky top-0 z-40">
             <div class="max-w-7xl mx-auto flex justify-between items-center">
                 <div class="flex items-center gap-4">
-                    <img src="https://lh3.googleusercontent.com/d/17NobXQ3JbRnLGejZe4Mn2x-Jl45F4rPm" class="w-20">
-                    <h1 class="text-sm font-black uppercase italic hidden md:block">Consola de Control Total</h1>
+                    <img src="https://lh3.googleusercontent.com/d/17NobXQ3JbRnLGejZe4Mn2x-Jl45F4rPm" class="w-12">
+                    <div>
+                        <h1 class="text-sm font-black uppercase italic">Consola de <span class="text-yellow-500">Control</span></h1>
+                        <p id="admin-user-tag" class="text-[9px] opacity-50 font-bold uppercase"></p>
+                    </div>
                 </div>
-                <div class="flex gap-2">
-                    <button onclick="window.print()" class="p-2 glass rounded-lg hover:bg-white/10" title="Imprimir Vista">
-                        <i data-lucide="printer" class="w-5 h-5 text-blue-400"></i>
-                    </button>
-                    <button id="logout-btn" class="p-2 glass rounded-lg hover:bg-rose-500/10" title="Salir">
-                        <i data-lucide="log-out" class="w-5 h-5 text-rose-500"></i>
-                    </button>
-                </div>
+                <button onclick="logout()" class="p-2 bg-white/5 rounded-lg text-rose-500 hover:bg-rose-500/10">
+                    <i data-lucide="log-out" class="w-5 h-5"></i>
+                </button>
             </div>
-        </nav>
+        </header>
 
-        <main class="max-w-7xl mx-auto px-4 mt-6">
+        <main class="max-w-7xl mx-auto p-4 md:p-8">
             <!-- Estadísticas Rápidas -->
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6 no-print">
-                <div class="glass p-4 rounded-2xl border-b-4 border-blue-500">
-                    <p class="text-[8px] font-black uppercase text-slate-500">Asistencias Hoy</p>
-                    <h3 id="stat-attendance" class="text-2xl font-black">0</h3>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+                <div class="glass-card p-5 rounded-2xl border-l-4 border-blue-500">
+                    <p class="text-[8px] font-black text-slate-500 uppercase mb-1">Asistencias Hoy</p>
+                    <h3 id="stat-asistencias" class="text-2xl font-black">0</h3>
                 </div>
-                <div class="glass p-4 rounded-2xl border-b-4 border-yellow-500">
-                    <p class="text-[8px] font-black uppercase text-slate-500">Alumnos Base</p>
-                    <h3 id="stat-students" class="text-2xl font-black">0</h3>
+                <div class="glass-card p-5 rounded-2xl border-l-4 border-yellow-500">
+                    <p class="text-[8px] font-black text-slate-500 uppercase mb-1">Total Alumnos</p>
+                    <h3 id="stat-alumnos" class="text-2xl font-black">0</h3>
                 </div>
-                <div class="glass p-4 rounded-2xl border-b-4 border-purple-500">
-                    <p class="text-[8px] font-black uppercase text-slate-500">Clases Activas</p>
-                    <h3 id="stat-classes" class="text-2xl font-black">0</h3>
+                <div class="glass-card p-5 rounded-2xl border-l-4 border-green-500">
+                    <p class="text-[8px] font-black text-slate-500 uppercase mb-1">Docentes Activos</p>
+                    <h3 id="stat-docentes" class="text-2xl font-black">0</h3>
                 </div>
-                <div class="glass p-4 rounded-2xl border-b-4 border-green-500">
-                    <p class="text-[8px] font-black uppercase text-slate-500">Sistema</p>
-                    <h3 class="text-xs font-black text-green-400 uppercase italic">Online</h3>
+                <div class="glass-card p-5 rounded-2xl border-l-4 border-purple-500">
+                    <p class="text-[8px] font-black text-slate-500 uppercase mb-1">Clases en Vivo</p>
+                    <h3 id="stat-clases" class="text-2xl font-black">0</h3>
                 </div>
             </div>
 
-            <!-- Navegación de Tablas -->
-            <div class="flex gap-1 mb-4 no-print overflow-x-auto">
-                <button onclick="switchTab('asistencias')" id="tab-asistencias" class="px-6 py-3 rounded-t-xl text-[10px] font-black uppercase italic transition-all tab-active">Asistencias</button>
-                <button onclick="switchTab('alumnos')" id="tab-alumnos" class="px-6 py-3 rounded-t-xl text-[10px] font-black uppercase italic transition-all">Alumnos Registrados</button>
-                <button onclick="switchTab('clases')" id="tab-clases" class="px-6 py-3 rounded-t-xl text-[10px] font-black uppercase italic transition-all">Docentes/Materias</button>
-            </div>
-
-            <!-- Contenedor de Datos -->
-            <div class="glass rounded-b-2xl rounded-tr-2xl overflow-hidden shadow-2xl">
-                <div class="p-4 border-b border-white/5 flex flex-col md:flex-row justify-between gap-4 no-print">
-                    <div class="relative flex-grow max-w-md">
+            <!-- Navegación y Buscador -->
+            <div class="flex flex-col md:flex-row justify-between items-end gap-4 mb-6">
+                <div class="flex bg-white/5 p-1 rounded-xl w-full md:w-auto">
+                    <button onclick="changeTab('asistencias')" id="tab-asistencias" class="tab-btn flex-1 md:flex-none active">Asistencias</button>
+                    <button onclick="changeTab('alumnos')" id="tab-alumnos" class="tab-btn flex-1 md:flex-none">Alumnos</button>
+                    <button onclick="changeTab('docentes')" id="tab-docentes" class="tab-btn flex-1 md:flex-none">Docentes</button>
+                </div>
+                <div class="flex gap-2 w-full md:w-auto">
+                    <div class="relative flex-grow">
                         <i data-lucide="search" class="absolute left-3 top-2.5 w-4 h-4 text-slate-500"></i>
-                        <input type="text" id="global-search" placeholder="Buscar por nombre, folio o materia..." class="input-ceut pl-10">
+                        <input type="text" id="table-search" placeholder="Buscar registros..." class="input-ceut pl-10">
                     </div>
-                    <div class="flex gap-2">
-                        <button onclick="exportToCSV()" class="bg-white/5 hover:bg-white/10 px-4 py-2 rounded-xl text-[9px] font-black uppercase flex items-center gap-2 border border-white/10">
-                            <i data-lucide="file-text" class="w-4 h-4"></i> CSV
-                        </button>
-                        <button onclick="exportToPDF()" class="bg-rose-600/80 hover:bg-rose-600 px-4 py-2 rounded-xl text-[9px] font-black uppercase flex items-center gap-2 transition-all">
-                            <i data-lucide="file-down" class="w-4 h-4"></i> Descargar PDF
-                        </button>
-                    </div>
+                    <button onclick="exportToPDF()" class="btn-action btn-export">
+                        <i data-lucide="file-down" class="w-4 h-4"></i> PDF
+                    </button>
                 </div>
+            </div>
 
+            <!-- Tabla de Datos -->
+            <div class="glass-card rounded-2xl overflow-hidden">
                 <div class="overflow-x-auto">
-                    <table id="main-table" class="w-full text-left">
-                        <thead id="table-head" class="bg-white/5 text-[9px] font-black uppercase text-slate-500">
-                            <!-- Dinámico -->
+                    <table class="w-full text-left">
+                        <thead id="table-head" class="bg-white/5 border-b border-white/10 text-[9px] font-black uppercase text-slate-500">
+                            <!-- Inyectado dinámicamente -->
                         </thead>
-                        <tbody id="table-body" class="text-[10px] font-bold uppercase italic">
-                            <!-- Dinámico -->
+                        <tbody id="table-body" class="divide-y divide-white/5 text-[10px] font-bold uppercase italic">
+                            <!-- Inyectado dinámicamente -->
                         </tbody>
                     </table>
+                </div>
+                <div id="loading-state" class="p-20 text-center flex flex-col items-center opacity-30">
+                    <i data-lucide="refresh-cw" class="w-10 h-10 animate-spin mb-4"></i>
+                    <p class="text-xs font-black uppercase">Cargando base de datos...</p>
                 </div>
             </div>
         </main>
     </div>
 
-    <!-- MODAL DE EDICIÓN -->
-    <div id="edit-modal" class="fixed inset-0 z-[100] hidden flex items-center justify-center p-4 bg-black/90 backdrop-blur-sm">
-        <div class="glass max-w-lg w-full p-6 rounded-3xl border border-yellow-500/30">
-            <h3 class="text-lg font-black uppercase italic mb-6 text-yellow-500">Editor de Registro</h3>
-            <div id="edit-fields" class="space-y-4 grid grid-cols-1 md:grid-cols-2 gap-4">
-                <!-- Inputs dinámicos aquí -->
-            </div>
-            <div class="flex gap-3 mt-8">
-                <button onclick="closeEdit()" class="flex-1 py-3 bg-white/5 rounded-xl font-black uppercase text-[10px]">Cancelar</button>
-                <button id="save-edit-btn" class="flex-1 py-3 bg-yellow-500 text-black rounded-xl font-black uppercase text-[10px]">Guardar Cambios</button>
-            </div>
-        </div>
-    </div>
-
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js";
-        import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-auth.js";
-        import { getFirestore, collection, doc, onSnapshot, updateDoc, deleteDoc, query } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-firestore.js";
-
+    <script>
+        // Configuración de Firebase
         const firebaseConfig = {
             apiKey: "AIzaSyCefP6qEqaCMpo8ZpUiLpN4e_-E4ZNTp94",
             authDomain: "asistencias-ceut.firebaseapp.com",
@@ -156,246 +201,212 @@
             appId: "1:130615246146:web:6ae2c17c828fb28a809cdb"
         };
 
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'ceut-prod-v2';
-        const AUTHORIZED_EMAIL = "carlos.aguilar@ceut.edu.mx";
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+        const auth = firebase.auth();
+        const appId = 'ceut-prod-v2';
 
-        let currentView = 'asistencias'; // asistencias | alumnos | clases
-        let rawData = [];
-        let editDocId = null;
+        let currentTab = 'asistencias';
+        let currentData = [];
+        let unsubscribe = null;
 
-        lucide.createIcons();
-
-        // Autenticación
-        onAuthStateChanged(auth, (user) => {
-            if (user && user.email === AUTHORIZED_EMAIL) {
-                document.getElementById('security-lock').classList.add('hidden');
-                document.getElementById('admin-interface').classList.remove('hidden');
-                initListeners();
+        // Manejo de Autenticación
+        auth.onAuthStateChanged(user => {
+            if (user) {
+                document.getElementById('auth-lock').classList.add('hidden');
+                document.getElementById('admin-panel').classList.remove('hidden');
+                document.getElementById('admin-user-tag').innerText = `Sesión: ${user.email}`;
+                loadData();
+                initStats();
             } else {
-                document.getElementById('security-lock').classList.remove('hidden');
-                document.getElementById('admin-interface').classList.add('hidden');
+                document.getElementById('auth-lock').classList.remove('hidden');
+                document.getElementById('admin-panel').classList.add('hidden');
             }
+            lucide.createIcons();
         });
 
-        document.getElementById('login-btn').onclick = async () => {
-            const email = document.getElementById('email').value;
-            const pass = document.getElementById('password').value;
-            try { await signInWithEmailAndPassword(auth, email, pass); } catch (e) { alert("Acceso Denegado"); }
-        };
-
-        document.getElementById('logout-btn').onclick = () => signOut(auth);
-
-        // Listeners Globales
-        function initListeners() {
-            // Listener Asistencias
-            onSnapshot(collection(db, 'artifacts', appId, 'public', 'data', 'asistencias'), (snap) => {
-                if (currentView === 'asistencias') updateUI(snap, 'asistencias');
-                document.getElementById('stat-attendance').innerText = snap.size;
-            });
-
-            // Listener Alumnos
-            onSnapshot(collection(db, 'artifacts', appId, 'public', 'data', 'students_registry'), (snap) => {
-                if (currentView === 'alumnos') updateUI(snap, 'alumnos');
-                document.getElementById('stat-students').innerText = snap.size;
-            });
-
-            // Listener Clases (PINs Activos y Maestros)
-            onSnapshot(collection(db, 'artifacts', appId, 'public', 'data', 'active_pins'), (snap) => {
-                if (currentView === 'clases') updateUI(snap, 'clases');
-                document.getElementById('stat-classes').innerText = snap.size;
-            });
+        async function loginAdmin() {
+            const email = document.getElementById('admin-email').value;
+            const pass = document.getElementById('admin-pass').value;
+            try {
+                await auth.signInWithEmailAndPassword(email, pass);
+            } catch (e) {
+                alert("Credenciales incorrectas o sin privilegios de administrador.");
+            }
         }
 
-        window.switchTab = (view) => {
-            currentView = view;
-            document.querySelectorAll('[id^="tab-"]').forEach(el => el.classList.remove('tab-active'));
-            document.getElementById(`tab-${view}`).classList.add('tab-active');
-            initListeners(); // Recargar vista actual
-        };
+        function logout() {
+            auth.signOut();
+        }
 
-        function updateUI(snap, type) {
+        // Cambio de pestañas
+        function changeTab(tab) {
+            currentTab = tab;
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById(`tab-${tab}`).classList.add('active');
+            loadData();
+        }
+
+        // Carga de Datos en tiempo real
+        function loadData() {
+            if (unsubscribe) unsubscribe();
+            document.getElementById('loading-state').classList.remove('hidden');
+            document.getElementById('table-body').innerHTML = "";
+
+            let collectionName = '';
+            if (currentTab === 'asistencias') collectionName = 'asistencias';
+            if (currentTab === 'alumnos') collectionName = 'students_registry';
+            if (currentTab === 'docentes') collectionName = 'teachers_registry';
+
+            unsubscribe = db.collection('artifacts').doc(appId).collection('public').doc('data')
+                .collection(collectionName)
+                .onSnapshot(snap => {
+                    document.getElementById('loading-state').classList.add('hidden');
+                    currentData = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                    renderTable();
+                });
+        }
+
+        function renderTable() {
             const head = document.getElementById('table-head');
             const body = document.getElementById('table-body');
-            rawData = [];
-            snap.forEach(d => rawData.push({ id: d.id, ...d.data() }));
+            const term = document.getElementById('table-search').value.toLowerCase();
 
-            // Ordenar por tiempo si existe
-            rawData.sort((a, b) => (b.ts || 0) - (a.ts || 0));
+            const filtered = currentData.filter(item => 
+                JSON.stringify(item).toLowerCase().includes(term)
+            );
 
             body.innerHTML = "";
-            
-            if (type === 'asistencias') {
-                head.innerHTML = `<tr><th class="p-4">Fecha/Hora</th><th class="p-4">Alumno</th><th class="p-4">Clase/Docente</th><th class="p-4 text-right">Control</th></tr>`;
-                rawData.forEach(r => {
-                    const row = document.createElement('tr');
-                    row.className = "border-b border-white/5 hover:bg-white/5";
-                    row.innerHTML = `
-                        <td class="p-4">
-                            <span class="text-white">${new Date(r.ts).toLocaleDateString()}</span><br>
-                            <span class="text-slate-500 text-[8px]">${new Date(r.ts).toLocaleTimeString()}</span>
-                        </td>
-                        <td class="p-4">
-                            <span class="text-yellow-500">${r.folio || 'S/F'}</span><br>${r.studentName}
-                        </td>
-                        <td class="p-4">
-                            <span class="text-blue-400">${r.className}</span><br>
-                            <span class="text-[8px] opacity-40">MAESTRO ID: ${r.profId}</span>
-                        </td>
-                        <td class="p-4 text-right">
-                            <button onclick="deleteDocById('asistencias', '${r.id}')" class="text-rose-500 hover:scale-110 p-2"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
-                        </td>
+
+            if (currentTab === 'asistencias') {
+                head.innerHTML = `<tr><th class="p-4">Fecha</th><th class="p-4">Alumno/Folio</th><th class="p-4">Materia</th><th class="p-4">Docente</th><th class="p-4">Acciones</th></tr>`;
+                filtered.sort((a,b) => b.ts - a.ts).forEach(item => {
+                    body.innerHTML += `
+                        <tr class="hover:bg-white/5 transition-colors">
+                            <td class="p-4">${new Date(item.ts).toLocaleString()}</td>
+                            <td class="p-4"><span class="text-yellow-500">${item.folio}</span><br>${item.studentName}</td>
+                            <td class="p-4">${item.className}</td>
+                            <td class="p-4 opacity-60">${item.profName}</td>
+                            <td class="p-4">
+                                <button onclick="deleteRecord('asistencias', '${item.id}')" class="btn-action btn-delete">
+                                    <i data-lucide="trash-2" class="w-3 h-3"></i> Borrar
+                                </button>
+                            </td>
+                        </tr>
                     `;
-                    body.appendChild(row);
                 });
-            } else if (type === 'alumnos') {
-                head.innerHTML = `<tr><th class="p-4">Folio</th><th class="p-4">Nombre Alumno</th><th class="p-4">Nivel/Carrera</th><th class="p-4 text-right">Control</th></tr>`;
-                rawData.forEach(r => {
-                    const row = document.createElement('tr');
-                    row.className = "border-b border-white/5 hover:bg-white/5";
-                    row.innerHTML = `
-                        <td class="p-4 font-mono text-yellow-500">${r.folio}</td>
-                        <td class="p-4">${r.name}<br><span class="text-[8px] opacity-40">MATRICULA: ${r.studentId}</span></td>
-                        <td class="p-4">${r.level}<br><span class="text-[8px] text-blue-400">${r.career}</span></td>
-                        <td class="p-4 text-right flex justify-end gap-2">
-                            <button onclick="openEdit('students_registry', '${r.id}')" class="text-blue-400 p-2"><i data-lucide="edit-3" class="w-4 h-4"></i></button>
-                            <button onclick="deleteDocById('students_registry', '${r.id}')" class="text-rose-500 p-2"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
-                        </td>
+            } else if (currentTab === 'alumnos') {
+                head.innerHTML = `<tr><th class="p-4">Folio</th><th class="p-4">Nombre</th><th class="p-4">Carrera</th><th class="p-4">Email</th><th class="p-4">Acciones</th></tr>`;
+                filtered.forEach(item => {
+                    body.innerHTML += `
+                        <tr class="hover:bg-white/5 transition-colors">
+                            <td class="p-4 font-black text-yellow-500">${item.folio}</td>
+                            <td class="p-4">${item.name}</td>
+                            <td class="p-4 text-blue-400">${item.career}</td>
+                            <td class="p-4 opacity-50 lowercase font-normal">${item.email}</td>
+                            <td class="p-4">
+                                <button onclick="deleteRecord('students_registry', '${item.id}')" class="btn-action btn-delete">
+                                    <i data-lucide="trash-2" class="w-3 h-3"></i> Baja
+                                </button>
+                            </td>
+                        </tr>
                     `;
-                    body.appendChild(row);
                 });
-            } else if (type === 'clases') {
-                head.innerHTML = `<tr><th class="p-4">PIN</th><th class="p-4">Materia</th><th class="p-4">Docente</th><th class="p-4 text-right">Control</th></tr>`;
-                rawData.forEach(r => {
-                    const row = document.createElement('tr');
-                    row.className = "border-b border-white/5 hover:bg-white/5";
-                    row.innerHTML = `
-                        <td class="p-4 font-mono text-green-400 text-lg">${r.id}</td>
-                        <td class="p-4">${r.className}<br><span class="text-[8px] opacity-40">GRUPO: ${r.group}</span></td>
-                        <td class="p-4">${r.profName || 'ASIGNADO'}</td>
-                        <td class="p-4 text-right">
-                             <button onclick="deleteDocById('active_pins', '${r.id}')" class="text-rose-500 p-2"><i data-lucide="x-circle" class="w-4 h-4"></i></button>
-                        </td>
+            } else if (currentTab === 'docentes') {
+                head.innerHTML = `<tr><th class="p-4">ID Docente</th><th class="p-4">Nombre</th><th class="p-4">Email</th><th class="p-4">Acciones</th></tr>`;
+                filtered.forEach(item => {
+                    body.innerHTML += `
+                        <tr class="hover:bg-white/5 transition-colors">
+                            <td class="p-4 font-black text-yellow-500">${item.id}</td>
+                            <td class="p-4">${item.nombre}</td>
+                            <td class="p-4 opacity-50 lowercase font-normal">${item.email}</td>
+                            <td class="p-4">
+                                <button onclick="deleteRecord('teachers_registry', '${item.id}')" class="btn-action btn-delete">
+                                    <i data-lucide="trash-2" class="w-3 h-3"></i> Revocar
+                                </button>
+                            </td>
+                        </tr>
                     `;
-                    body.appendChild(row);
                 });
             }
             lucide.createIcons();
         }
 
-        // --- FUNCIONES DE CONTROL ---
-
-        window.deleteDocById = async (col, id) => {
-            if (!confirm("¿Eliminar este registro permanentemente de la base de datos?")) return;
+        async function deleteRecord(col, id) {
+            if (!confirm("¿Está seguro de eliminar este registro? Esta acción no se puede deshacer.")) return;
             try {
-                await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', col, id));
-            } catch (e) { alert("Error al eliminar"); }
-        };
+                await db.collection('artifacts').doc(appId).collection('public').doc('data')
+                        .collection(col).doc(id).delete();
+            } catch (e) {
+                alert("Error al eliminar el registro.");
+            }
+        }
 
-        window.openEdit = (col, id) => {
-            const data = rawData.find(x => x.id === id);
-            if (!data) return;
-            editDocId = { col, id };
-            const container = document.getElementById('edit-fields');
-            container.innerHTML = "";
-
-            // Generar inputs para campos editables
-            const exclude = ['id', 'ts', 'registeredAt', 'password'];
-            Object.keys(data).forEach(key => {
-                if (exclude.includes(key)) return;
-                container.innerHTML += `
-                    <div>
-                        <label class="text-[8px] font-black uppercase text-slate-500 ml-1">${key}</label>
-                        <input type="text" id="edit-${key}" value="${data[key]}" class="input-ceut mt-1">
-                    </div>
-                `;
-            });
-
-            document.getElementById('edit-modal').classList.remove('hidden');
-        };
-
-        window.closeEdit = () => {
-            document.getElementById('edit-modal').classList.add('hidden');
-            editDocId = null;
-        };
-
-        document.getElementById('save-edit-btn').onclick = async () => {
-            if (!editDocId) return;
-            const updates = {};
-            const inputs = document.querySelectorAll('#edit-fields input');
-            inputs.forEach(inp => {
-                const key = inp.id.replace('edit-', '');
-                updates[key] = inp.value.toUpperCase();
-            });
-
-            try {
-                await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', editDocId.col, editDocId.id), updates);
-                closeEdit();
-            } catch (e) { alert("Error al guardar"); }
-        };
-
-        // --- EXPORTACIÓN ---
-
-        window.exportToCSV = () => {
-            if (rawData.length === 0) return;
-            let csv = "\uFEFF";
-            const keys = Object.keys(rawData[0]).filter(k => k !== 'id');
-            csv += keys.join(",") + "\n";
-            rawData.forEach(row => {
-                csv += keys.map(k => `"${row[k] || ''}"`).join(",") + "\n";
-            });
-            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-            const link = document.createElement('a');
-            link.href = URL.createObjectURL(blob);
-            link.download = `CEUT_${currentView}_${new Date().toISOString().split('T')[0]}.csv`;
-            link.click();
-        };
-
-        window.exportToPDF = () => {
-            const { jsPDF } = window.jspdf;
-            const doc = new jsPDF();
+        function initStats() {
+            const root = db.collection('artifacts').doc(appId).collection('public').doc('data');
             
-            doc.setFontSize(18);
-            doc.text(`REPORTE CEUT - ${currentView.toUpperCase()}`, 14, 20);
-            doc.setFontSize(10);
-            doc.text(`Generado el: ${new Date().toLocaleString()}`, 14, 28);
+            // Stats Asistencias Hoy
+            const startOfToday = new Date().setHours(0,0,0,0);
+            root.collection('asistencias').where('ts', '>=', startOfToday).onSnapshot(snap => {
+                document.getElementById('stat-asistencias').innerText = snap.size;
+            });
 
-            const tableHeaders = Object.keys(rawData[0]).filter(k => k !== 'id' && k !== 'password');
-            const tableData = rawData.map(row => tableHeaders.map(h => row[h] || ''));
+            // Stats Alumnos
+            root.collection('students_registry').onSnapshot(snap => {
+                document.getElementById('stat-alumnos').innerText = snap.size;
+            });
+
+            // Stats Docentes
+            root.collection('teachers_registry').onSnapshot(snap => {
+                document.getElementById('stat-docentes').innerText = snap.size;
+            });
+
+            // Stats Clases Activas
+            root.collection('active_pins').onSnapshot(snap => {
+                document.getElementById('stat-clases').innerText = snap.size;
+            });
+        }
+
+        // Exportar a PDF usando jsPDF
+        function exportToPDF() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF('l', 'mm', 'a4');
+            
+            doc.setFillColor(0, 11, 33);
+            doc.rect(0, 0, 297, 30, 'F');
+            
+            doc.setTextColor(255, 255, 255);
+            doc.setFontSize(20);
+            doc.text("CEUT - REPORTE DE " + currentTab.toUpperCase(), 14, 20);
+            
+            doc.setFontSize(10);
+            doc.text("FECHA DE EMISIÓN: " + new Date().toLocaleString(), 230, 20);
+
+            const headers = currentTab === 'asistencias' ? 
+                [['FECHA', 'FOLIO', 'ALUMNO', 'MATERIA', 'DOCENTE']] : 
+                currentTab === 'alumnos' ? 
+                [['FOLIO', 'NOMBRE', 'CARRERA', 'EMAIL']] : 
+                [['ID', 'NOMBRE', 'EMAIL']];
+
+            const rows = currentData.map(item => {
+                if (currentTab === 'asistencias') return [new Date(item.ts).toLocaleString(), item.folio, item.studentName, item.className, item.profName];
+                if (currentTab === 'alumnos') return [item.folio, item.name, item.career, item.email];
+                if (currentTab === 'docentes') return [item.id, item.nombre, item.email];
+            });
 
             doc.autoTable({
-                head: [tableHeaders.map(h => h.toUpperCase())],
-                body: tableData,
-                startY: 35,
+                head: headers,
+                body: rows,
+                startY: 40,
                 theme: 'grid',
-                headStyles: { fillColor: [30, 41, 107] },
+                headStyles: { fillColor: [59, 75, 164] },
                 styles: { fontSize: 8 }
             });
 
-            doc.save(`CEUT_REPORTE_${currentView.toUpperCase()}.pdf`);
-        };
+            doc.save(`CEUT_Reporte_${currentTab}_${Date.now()}.pdf`);
+        }
 
-        // Buscador Global
-        document.getElementById('global-search').oninput = (e) => {
-            const term = e.target.value.toLowerCase();
-            const filtered = rawData.filter(row => 
-                Object.values(row).some(val => String(val).toLowerCase().includes(term))
-            );
-            // Re-renderizar temporalmente con los filtrados (manual)
-            const body = document.getElementById('table-body');
-            body.innerHTML = "";
-            // ... lógica de renderizado igual a updateUI pero usando 'filtered' ...
-            // (Para brevedad, llamamos a una mini versión del render)
-            filtered.forEach(r => {
-                const tr = document.createElement('tr');
-                tr.className = "border-b border-white/5 hover:bg-white/5";
-                tr.innerHTML = `<td class="p-4" colspan="4">${r.name || r.className || r.id} - ${r.folio || ''}</td>`;
-                body.appendChild(tr);
-            });
-        };
-
+        document.getElementById('table-search').oninput = renderTable;
     </script>
 </body>
 </html>
