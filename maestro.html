@@ -54,7 +54,7 @@
     <!-- MODAL QR -->
     <div id="modal-qr" class="fixed inset-0 bg-slate-950/90 backdrop-blur-xl z-[10000] hidden items-center justify-center p-4">
         <div class="bg-white rounded-[3rem] p-8 max-w-sm w-full text-center shadow-2xl">
-            <h3 id="qr-class-name" class="text-xl font-black mb-1 uppercase tracking-tighter italic">MATERIA</h3>
+            <h3 id="qr-class-name" class="text-xl font-black mb-1 uppercase tracking-tighter italic text-slate-900">MATERIA</h3>
             <p id="qr-class-info" class="text-[9px] font-bold text-slate-400 mb-6 uppercase tracking-widest italic">GRADO - GRUPO</p>
             <div id="qrcode" class="qr-container mb-6 flex justify-center"></div>
             <div class="bg-slate-50 p-4 rounded-2xl border border-slate-100 mb-6">
@@ -72,14 +72,25 @@
 
     <!-- VISTA AUTH -->
     <section id="view-auth" class="view-section active p-8 items-center justify-center bg-slate-50">
-        <div class="w-full max-w-sm">
-            <a href="index.html" class="mb-10 text-[10px] font-black text-slate-400 uppercase flex items-center gap-3 decoration-none">
+        <div class="w-full max-w-sm text-center">
+            <img src="https://lh3.googleusercontent.com/d/17NobXQ3JbRnLGejZe4Mn2x-Jl45F4rPm" class="w-20 mx-auto mb-8 drop-shadow-xl" alt="Logo CEUT">
+            
+            <a href="index.html" class="mb-10 text-[10px] font-black text-slate-400 uppercase flex items-center justify-center gap-3 decoration-none hover:text-blue-600 transition-colors">
                 <i data-lucide="arrow-left" class="w-4 h-4"></i> VOLVER AL MENÚ
             </a>
-            <h2 class="text-3xl font-black mb-6 uppercase text-slate-900 tracking-tighter italic">DOCENTES CEUT</h2>
-            <div class="space-y-4">
-                <input type="email" id="authEmail" placeholder="correo@ceut.edu.mx" class="input-ceut">
-                <input type="password" id="authPass" placeholder="CONTRASEÑA" class="input-ceut">
+            
+            <h2 class="text-3xl font-black mb-2 uppercase text-slate-900 tracking-tighter italic">Portal Docente</h2>
+            <p class="text-[10px] font-bold text-slate-400 mb-8 uppercase tracking-[0.2em]">Gestión de Asistencia en la Nube</p>
+            
+            <div class="space-y-4 text-left">
+                <div class="space-y-1">
+                    <label class="text-[10px] font-black text-slate-400 uppercase ml-2 italic">Correo Institucional</label>
+                    <input type="email" id="authEmail" placeholder="docente@ceut.edu.mx" class="input-ceut">
+                </div>
+                <div class="space-y-1">
+                    <label class="text-[10px] font-black text-slate-400 uppercase ml-2 italic">Contraseña de Acceso</label>
+                    <input type="password" id="authPass" placeholder="••••••••" class="input-ceut">
+                </div>
                 <button id="btn-submit-auth" class="btn-primary mt-6 py-5 italic tracking-tighter">INGRESAR A CONSOLA</button>
             </div>
         </div>
@@ -87,40 +98,83 @@
 
     <!-- PANEL DOCENTE PRINCIPAL -->
     <section id="view-teacher" class="view-section p-6 bg-slate-50 overflow-y-auto">
-        <header class="flex justify-between items-center mb-8">
+        <header class="flex justify-between items-center mb-8 max-w-6xl mx-auto w-full">
             <div class="flex items-center gap-4">
-                <img src="https://lh3.googleusercontent.com/d/17NobXQ3JbRnLGejZe4Mn2x-Jl45F4rPm" class="w-10" alt="Logo">
+                <div class="bg-white p-2 rounded-2xl shadow-sm border border-slate-100">
+                    <img src="https://lh3.googleusercontent.com/d/17NobXQ3JbRnLGejZe4Mn2x-Jl45F4rPm" class="w-10" alt="Logo">
+                </div>
                 <div>
                     <p id="prof-name" class="text-sm font-black uppercase text-slate-900 leading-none">Cargando...</p>
-                    <span class="text-blue-600 text-[9px] font-black uppercase tracking-widest italic">Panel de Control Docente</span>
+                    <span class="text-blue-600 text-[9px] font-black uppercase tracking-widest italic">Consola de Control Docente</span>
                 </div>
             </div>
-            <button onclick="handleLogout()" class="text-rose-500 p-2"><i data-lucide="log-out"></i></button>
+            <div class="flex gap-3">
+                <a href="index.html" class="p-3 bg-white border border-slate-200 rounded-2xl text-slate-400 hover:text-blue-600 transition-colors">
+                    <i data-lucide="home" class="w-5 h-5"></i>
+                </a>
+                <button onclick="handleLogout()" class="text-rose-500 bg-rose-50 p-3 rounded-2xl hover:bg-rose-100 transition-colors">
+                    <i data-lucide="log-out" class="w-5 h-5"></i>
+                </button>
+            </div>
         </header>
 
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-            <div class="lg:col-span-4 card-glass p-8 h-fit">
-                <h3 class="text-xs font-black uppercase text-slate-400 mb-6 tracking-widest flex items-center gap-2 italic">
-                    <i data-lucide="plus" class="w-4 h-4"></i> NUEVA CLASE
-                </h3>
-                <div class="space-y-3">
-                    <input type="text" id="classMat" placeholder="NOMBRE MATERIA" class="input-ceut uppercase">
-                    <select id="classLev" class="input-ceut">
-                        <option value="">NIVEL</option>
-                        <option value="PREPARATORIA">PREPARATORIA</option>
-                        <option value="LICENCIATURA">LICENCIATURA</option>
-                    </select>
-                    <div class="grid grid-cols-2 gap-3">
-                        <input type="text" id="classDeg" placeholder="GRADO" class="input-ceut uppercase">
-                        <input type="text" id="classGru" placeholder="GRUPO" class="input-ceut uppercase">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 max-w-6xl mx-auto w-full">
+            <!-- Columna Izquierda: Nueva Clase -->
+            <div class="lg:col-span-4 space-y-6">
+                <div class="card-glass p-8 h-fit border-t-4 border-blue-600">
+                    <h3 class="text-xs font-black uppercase text-slate-900 mb-6 tracking-widest flex items-center gap-2 italic">
+                        <i data-lucide="plus-circle" class="w-4 h-4 text-blue-600"></i> Apertura de Clase
+                    </h3>
+                    <div class="space-y-4">
+                        <div class="space-y-1">
+                            <label class="text-[9px] font-black text-slate-400 uppercase ml-2 italic">Nombre de la Materia</label>
+                            <input type="text" id="classMat" placeholder="EJ. PSICOPEDAGOGÍA II" class="input-ceut uppercase">
+                        </div>
+                        <div class="space-y-1">
+                            <label class="text-[9px] font-black text-slate-400 uppercase ml-2 italic">Nivel Académico</label>
+                            <select id="classLev" class="input-ceut">
+                                <option value="">SELECCIONAR NIVEL</option>
+                                <option value="PREPARATORIA">PREPARATORIA</option>
+                                <option value="LICENCIATURA">LICENCIATURA</option>
+                                <option value="POSGRADO">POSGRADO</option>
+                            </select>
+                        </div>
+                        <div class="grid grid-cols-2 gap-3">
+                            <div class="space-y-1">
+                                <label class="text-[9px] font-black text-slate-400 uppercase ml-2 italic">Grado</label>
+                                <input type="text" id="classDeg" placeholder="4TO" class="input-ceut uppercase">
+                            </div>
+                            <div class="space-y-1">
+                                <label class="text-[9px] font-black text-slate-400 uppercase ml-2 italic">Grupo</label>
+                                <input type="text" id="classGru" placeholder="A" class="input-ceut uppercase">
+                            </div>
+                        </div>
+                        <button onclick="createNewClass()" class="btn-primary py-4 mt-4 italic shadow-blue-200">
+                            INICIAR PASE DE LISTA
+                        </button>
                     </div>
-                    <button onclick="createNewClass()" class="btn-primary py-4 mt-4 italic">ABRIR PASE DE LISTA</button>
+                </div>
+
+                <div class="bg-blue-900 rounded-[2.5rem] p-8 text-white relative overflow-hidden">
+                    <i data-lucide="shield-check" class="absolute -right-4 -bottom-4 w-32 h-32 text-white/5 rotate-12"></i>
+                    <h4 class="text-xs font-black uppercase tracking-widest mb-2 italic">Recordatorio de Seguridad</h4>
+                    <p class="text-[10px] text-blue-200 font-bold uppercase leading-relaxed">
+                        El sistema valida la posición GPS de los alumnos. Asegúrese de que su ubicación sea correcta al abrir la clase.
+                    </p>
                 </div>
             </div>
 
-            <div class="lg:col-span-8 card-glass p-8">
-                <h3 class="text-xs font-black uppercase text-slate-400 mb-6 tracking-widest italic">MATERIAS ACTIVAS</h3>
-                <div id="teacher-classes-list" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+            <!-- Columna Derecha: Clases Activas -->
+            <div class="lg:col-span-8">
+                <div class="card-glass p-8 min-h-[400px]">
+                    <div class="flex justify-between items-center mb-8">
+                        <h3 class="text-xs font-black uppercase text-slate-400 tracking-widest italic">Sesiones en Curso</h3>
+                        <span class="text-[9px] font-black text-blue-600 bg-blue-50 px-4 py-1 rounded-full uppercase">Sincronización Cloud</span>
+                    </div>
+                    <div id="teacher-classes-list" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <!-- Clases cargadas dinámicamente -->
+                    </div>
+                </div>
             </div>
         </div>
     </section>
@@ -130,7 +184,6 @@
         import { getFirestore, doc, setDoc, getDoc, collection, onSnapshot, query, where, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
         import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
 
-        // Configuración de Firebase - Asegúrate de que estos valores coincidan con tu consola
         const firebaseConfig = {
             apiKey: "AIzaSyCefP6qEqaCMpo8ZpUiLpN4e_-E4ZNTp94",
             authDomain: "asistencias-ceut.firebaseapp.com",
@@ -145,28 +198,25 @@
         const auth = getAuth(app);
         const appId = 'ceut_asistencias_v1';
 
-        let currentUser = null;
         let myClasses = [];
 
-        // GPS
         const getCoords = () => new Promise((res, rej) => {
             navigator.geolocation.getCurrentPosition(p => res({ lat: p.coords.latitude, lng: p.coords.longitude }), e => rej(e), { enableHighAccuracy: true });
         });
 
-        // Crear Clase
         window.createNewClass = async () => {
             const mat = document.getElementById('classMat').value.trim();
             const lev = document.getElementById('classLev').value;
             const deg = document.getElementById('classDeg').value.trim();
             const gru = document.getElementById('classGru').value.trim();
 
-            if(!mat || !lev) return showToast("⚠️ DATOS INCOMPLETOS");
+            if(!mat || !lev) return showToast("⚠️ COMPLETE LOS DATOS");
 
             try {
-                showToast("📍 VALIDANDO GPS...");
+                showToast("📍 VALIDANDO POSICIÓN...");
                 const coords = await getCoords();
                 const classId = `CLS-${Math.random().toString(36).substr(2, 6).toUpperCase()}`;
-                const otp = Math.floor(100000 + Math.random() * 900000).toString(); // Código numérico de respaldo
+                const otp = Math.floor(100000 + Math.random() * 900000).toString();
                 
                 await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'classes', classId), {
                     id: classId,
@@ -181,81 +231,84 @@
                     isOpen: true,
                     createdAt: Date.now()
                 });
-                showToast("✅ CLASE ABIERTA");
+                showToast("✅ CLASE CREADA EXITOSAMENTE");
                 document.getElementById('classMat').value = "";
             } catch(e) {
-                showToast("❌ ACTIVA EL GPS");
+                showToast("❌ EL GPS ES OBLIGATORIO");
             }
         };
 
-        // QR
         window.openQR = (id) => {
             const c = myClasses.find(x => x.id === id);
             document.getElementById('qr-class-name').innerText = c.name;
             document.getElementById('qr-class-info').innerText = `${c.level} | ${c.degree}-${c.group}`;
-            
             const qrdiv = document.getElementById('qrcode');
             qrdiv.innerHTML = "";
-            
-            // Generamos el QR con el ID de la clase
-            new QRCode(qrdiv, { 
-                text: id, 
-                width: 200, 
-                height: 200, 
-                colorDark: "#1e40af",
-                correctLevel : QRCode.CorrectLevel.H
-            });
-            
+            new QRCode(qrdiv, { text: id, width: 220, height: 220, colorDark: "#0f172a", correctLevel: QRCode.CorrectLevel.H });
             document.getElementById('modal-qr').classList.replace('hidden', 'flex');
         };
 
         window.closeQRModal = () => document.getElementById('modal-qr').classList.replace('flex', 'hidden');
 
-        // Render
         function renderClasses(classes) {
             myClasses = classes;
             const container = document.getElementById('teacher-classes-list');
             if(classes.length === 0) {
-                container.innerHTML = `<p class="col-span-full text-center py-10 text-slate-300 italic font-bold uppercase text-[10px]">No tienes clases activas</p>`;
+                container.innerHTML = `<div class="col-span-full text-center py-20"><i data-lucide="layers" class="w-12 h-12 text-slate-200 mx-auto mb-4"></i><p class="text-slate-300 italic font-bold uppercase text-[10px]">No hay sesiones activas en este momento</p></div>`;
+                lucide.createIcons();
                 return;
             }
-            container.innerHTML = classes.map(c => `
-                <div class="p-6 bg-slate-900 rounded-[2rem] text-white">
-                    <h4 class="font-black italic uppercase text-sm">${c.name}</h4>
-                    <p class="text-[9px] text-slate-400 mb-4 uppercase font-bold">${c.level} | ${c.degree}-${c.group}</p>
-                    <div class="bg-white/5 p-3 rounded-xl mb-4 text-center">
-                         <p class="text-[8px] text-slate-500 uppercase font-bold">Código Numérico (OTP)</p>
-                         <p class="text-xl font-black tracking-[0.3em] text-blue-400">${c.otp || '---'}</p>
-                    </div>
-                    <div class="flex justify-between items-center border-t border-white/10 pt-4">
-                        <span class="text-[9px] font-bold text-slate-500 uppercase">ID: ${c.id}</span>
-                        <button onclick="openQR('${c.id}')" class="bg-blue-600 p-2.5 rounded-xl transition-transform active:scale-90">
-                            <i data-lucide="qr-code" class="w-4 h-4 text-white"></i>
-                        </button>
+            container.innerHTML = classes.sort((a,b) => b.createdAt - a.createdAt).map(c => `
+                <div class="p-6 bg-slate-900 rounded-[2.2rem] text-white shadow-xl shadow-slate-200 relative overflow-hidden group">
+                    <div class="relative z-10">
+                        <div class="flex justify-between items-start mb-4">
+                            <span class="bg-blue-600/20 text-blue-400 text-[8px] font-black px-3 py-1 rounded-full uppercase tracking-widest">${c.level}</span>
+                            <span class="text-[8px] font-black text-slate-500 uppercase tracking-widest">ID: ${c.id}</span>
+                        </div>
+                        <h4 class="font-black italic uppercase text-lg leading-tight mb-1">${c.name}</h4>
+                        <p class="text-[9px] text-slate-400 mb-6 uppercase font-bold tracking-widest">${c.degree} GRADO - GRUPO ${c.group}</p>
+                        
+                        <div class="bg-white/5 backdrop-blur-sm p-4 rounded-2xl mb-6 text-center border border-white/5">
+                             <p class="text-[8px] text-slate-500 uppercase font-black mb-1 tracking-widest">CÓDIGO DE RESPALDO (OTP)</p>
+                             <p class="text-2xl font-black tracking-[0.4em] text-blue-400">${c.otp || '---'}</p>
+                        </div>
+
+                        <div class="flex gap-3">
+                            <button onclick="openQR('${c.id}')" class="flex-1 bg-white text-slate-900 py-3 rounded-xl font-black text-[10px] uppercase flex items-center justify-center gap-2 transition-all hover:bg-blue-50">
+                                <i data-lucide="qr-code" class="w-4 h-4"></i> Mostrar QR
+                            </button>
+                            <button onclick="deleteClass('${c.id}')" class="bg-rose-500/10 text-rose-500 p-3 rounded-xl hover:bg-rose-500 hover:text-white transition-all">
+                                <i data-lucide="trash-2" class="w-4 h-4"></i>
+                            </button>
+                        </div>
                     </div>
                 </div>
             `).join('');
             lucide.createIcons();
         }
 
-        // Auth
+        window.deleteClass = async (id) => {
+            if(confirm("¿Desea cerrar y eliminar esta sesión de asistencia?")) {
+                await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'classes', id));
+                showToast("🗑️ SESIÓN ELIMINADA");
+            }
+        };
+
         document.getElementById('btn-submit-auth').onclick = async () => {
             const email = document.getElementById('authEmail').value;
             const pass = document.getElementById('authPass').value;
             if(!email || !pass) return showToast("⚠️ INGRESA TUS DATOS");
             try {
                 await signInWithEmailAndPassword(auth, email, pass);
-            } catch(e) { showToast("❌ ACCESO DENEGADO"); }
+            } catch(e) { showToast("❌ CREDENCIALES INCORRECTAS"); }
         };
 
         onAuthStateChanged(auth, async (u) => {
             if(u) {
                 const snap = await getDoc(doc(db, 'artifacts', appId, 'users', u.uid, 'profile', 'info'));
                 document.getElementById('prof-name').innerText = snap.exists() ? snap.data().name : u.email.split('@')[0].toUpperCase();
-                
                 const q = query(collection(db, 'artifacts', appId, 'public', 'data', 'classes'), where("teacherId", "==", u.uid));
-                onSnapshot(q, s => renderClasses(s.docs.map(d => d.data())), (err) => console.error(err));
-                
+                onSnapshot(q, s => renderClasses(s.docs.map(d => d.data())));
                 document.getElementById('view-auth').classList.remove('active');
                 document.getElementById('view-teacher').classList.add('active');
             } else {
