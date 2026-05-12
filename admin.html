@@ -2,172 +2,73 @@
 <html lang="es-MX">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>CEUT | Consola de Control Administrativo</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CEUT | Admin</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
-    
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
-
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
     <style>
-        :root {
-            --ceut-blue: #3b4ba4;
-            --ceut-blue-dark: #000b21;
-            --ceut-gold: #eab308;
-        }
-
-        body { 
-            font-family: 'Plus Jakarta Sans', sans-serif; 
-            background-color: var(--ceut-blue-dark); 
-            color: white; 
-            min-height: 100vh;
-        }
-
-        .glass-card { 
-            background: rgba(255, 255, 255, 0.03); 
-            backdrop-filter: blur(20px); 
-            border: 1px solid rgba(255, 255, 255, 0.1); 
-        }
-
-        .tab-btn {
-            padding: 1rem;
-            font-size: 0.75rem;
-            font-weight: 800;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            transition: all 0.3s;
-            border-bottom: 2px solid transparent;
-            opacity: 0.5;
-        }
-
-        .tab-btn.active {
-            opacity: 1;
-            color: var(--ceut-gold);
-            border-bottom-color: var(--ceut-gold);
-            background: rgba(234, 179, 8, 0.05);
-        }
-
-        .input-ceut { 
-            background: rgba(255, 255, 255, 0.05); 
-            border: 1px solid rgba(255, 255, 255, 0.1); 
-            border-radius: 0.5rem; 
-            color: white; 
-            padding: 0.6rem 1rem;
-            width: 100%;
-        }
-
-        .input-ceut:focus { border-color: var(--ceut-gold); outline: none; }
-
-        .btn-action {
-            padding: 0.5rem 1rem;
-            border-radius: 0.5rem;
-            font-size: 0.7rem;
-            font-weight: 800;
-            text-transform: uppercase;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .btn-delete { color: #f87171; background: rgba(248, 113, 113, 0.1); }
-        .btn-delete:hover { background: #f87171; color: white; }
-
-        .btn-export { background: var(--ceut-gold); color: black; }
-
-        .hidden { display: none !important; }
+        :root { --ceut-blue-dark: #000b21; --ceut-blue-light: #1e1b4b; --ceut-gold: #eab308; }
+        body { background: var(--ceut-blue-dark); font-family: 'Plus Jakarta Sans', sans-serif; color: white; min-height: 100vh; }
+        .glass { background: rgba(255,255,255,0.03); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.1); }
     </style>
 </head>
-<body>
+<body class="p-6">
+    <div class="max-w-6xl mx-auto">
+        <header class="flex justify-between items-center mb-8">
+            <div class="flex items-center gap-4">
+                <i data-lucide="shield-check" class="text-red-500 w-8 h-8"></i>
+                <h1 class="text-xl font-black uppercase italic">Panel <span class="text-red-500">Administrativo</span></h1>
+            </div>
+            <a href="index.html" class="text-[10px] uppercase font-bold opacity-50 hover:opacity-100 italic">Cerrar Sesión</a>
+        </header>
 
-    <!-- Security Lock Screen -->
-    <div id="auth-lock" class="fixed inset-0 z-50 bg-[#000b21] flex items-center justify-center p-6">
-        <div class="max-w-md w-full text-center">
-            <img src="https://lh3.googleusercontent.com/d/17NobXQ3JbRnLGejZe4Mn2x-Jl45F4rPm" class="w-32 mx-auto mb-8">
-            <div class="glass-card p-8 rounded-3xl border-t-4 border-yellow-500">
-                <h2 class="text-xl font-black uppercase italic mb-6">Acceso <span class="text-yellow-500">Administrativo</span></h2>
-                <div class="space-y-4">
-                    <input type="email" id="admin-email" placeholder="CORREO@CEUT.EDU.MX" class="input-ceut">
-                    <input type="password" id="admin-pass" placeholder="••••••••" class="input-ceut">
-                    <button id="login-btn" class="w-full py-4 bg-yellow-500 text-black font-black uppercase italic rounded-xl">Desbloquear Consola</button>
-                </div>
-                <p id="auth-status" class="mt-4 text-[10px] uppercase font-bold opacity-40"></p>
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+            <div class="glass p-6 rounded-2xl">
+                <p class="text-[10px] uppercase opacity-50 mb-1">Docentes Registrados</p>
+                <h3 id="count-profs" class="text-3xl font-black">0</h3>
+            </div>
+            <div class="glass p-6 rounded-2xl">
+                <p class="text-[10px] uppercase opacity-50 mb-1">Materias Activas</p>
+                <h3 id="count-classes" class="text-3xl font-black">0</h3>
+            </div>
+            <div class="glass p-6 rounded-2xl">
+                <p class="text-[10px] uppercase opacity-50 mb-1">Asistencias Totales</p>
+                <h3 id="count-logs" class="text-3xl font-black">0</h3>
+            </div>
+            <div class="glass p-6 rounded-2xl border-red-500/30 bg-red-500/5">
+                <p class="text-[10px] uppercase text-red-400 mb-1 font-bold">Estado del Servidor</p>
+                <h3 class="text-xs font-black text-green-500">EN LÍNEA</h3>
+            </div>
+        </div>
+
+        <div class="glass rounded-3xl overflow-hidden">
+            <div class="p-6 border-b border-white/10 flex justify-between items-center">
+                <h2 class="text-sm font-black uppercase italic">Directorio de Docentes</h2>
+                <input type="text" placeholder="BUSCAR POR FOLIO..." class="bg-white/5 border border-white/10 rounded-lg px-4 py-2 text-[10px] uppercase">
+            </div>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left text-[11px]">
+                    <thead class="bg-white/5 uppercase text-yellow-500">
+                        <tr>
+                            <th class="p-4">Folio</th>
+                            <th class="p-4">Nombre del Docente</th>
+                            <th class="p-4">Correo Institucional</th>
+                            <th class="p-4">Materias</th>
+                            <th class="p-4">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="prof-table-body">
+                        <!-- Carga dinamica -->
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>
 
-    <!-- Main Panel -->
-    <div id="admin-panel" class="hidden">
-        <header class="bg-[#000d2b] border-b border-white/10 p-4 sticky top-0 z-40">
-            <div class="max-w-7xl mx-auto flex justify-between items-center">
-                <div class="flex items-center gap-4">
-                    <img src="https://lh3.googleusercontent.com/d/17NobXQ3JbRnLGejZe4Mn2x-Jl45F4rPm" class="w-12">
-                    <div>
-                        <h1 class="text-sm font-black uppercase italic">Consola de <span class="text-yellow-500">Control</span></h1>
-                        <p id="admin-user-tag" class="text-[9px] opacity-50 font-bold uppercase"></p>
-                    </div>
-                </div>
-                <button id="logout-btn" class="p-2 bg-white/5 rounded-lg text-rose-500"><i data-lucide="log-out"></i></button>
-            </div>
-        </header>
-
-        <main class="max-w-7xl mx-auto p-4 md:p-8">
-            <!-- Stats -->
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-                <div class="glass-card p-5 rounded-2xl border-l-4 border-blue-500">
-                    <p class="text-[8px] font-black text-slate-500 uppercase">Asistencias Hoy</p>
-                    <h3 id="stat-asistencias" class="text-2xl font-black">0</h3>
-                </div>
-                <div class="glass-card p-5 rounded-2xl border-l-4 border-yellow-500">
-                    <p class="text-[8px] font-black text-slate-500 uppercase">Total Alumnos</p>
-                    <h3 id="stat-alumnos" class="text-2xl font-black">0</h3>
-                </div>
-                <div class="glass-card p-5 rounded-2xl border-l-4 border-green-500">
-                    <p class="text-[8px] font-black text-slate-500 uppercase">Docentes Activos</p>
-                    <h3 id="stat-docentes" class="text-2xl font-black">0</h3>
-                </div>
-                <div class="glass-card p-5 rounded-2xl border-l-4 border-purple-500">
-                    <p class="text-[8px] font-black text-slate-500 uppercase">Pines Activos</p>
-                    <h3 id="stat-clases" class="text-2xl font-black">0</h3>
-                </div>
-            </div>
-
-            <!-- Nav -->
-            <div class="flex flex-col md:flex-row justify-between items-end gap-4 mb-6">
-                <div class="flex bg-white/5 p-1 rounded-xl w-full md:w-auto overflow-x-auto">
-                    <button id="tab-asistencias" class="tab-btn flex-1 md:flex-none active">Asistencias</button>
-                    <button id="tab-alumnos" class="tab-btn flex-1 md:flex-none">Alumnos</button>
-                    <button id="tab-docentes" class="tab-btn flex-1 md:flex-none">Docentes</button>
-                </div>
-                <div class="flex gap-2 w-full md:w-auto">
-                    <input type="text" id="table-search" placeholder="Buscar..." class="input-ceut">
-                    <button id="export-btn" class="btn-action btn-export"><i data-lucide="file-down" class="w-4 h-4"></i> PDF</button>
-                </div>
-            </div>
-
-            <!-- Table -->
-            <div class="glass-card rounded-2xl overflow-hidden min-h-[300px]">
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left">
-                        <thead id="table-head" class="bg-white/5 border-b border-white/10 text-[9px] font-black uppercase text-slate-500"></thead>
-                        <tbody id="table-body" class="divide-y divide-white/5 text-[10px] font-bold uppercase italic"></tbody>
-                    </table>
-                </div>
-                <div id="loading-state" class="p-20 text-center flex flex-col items-center opacity-30">
-                    <i data-lucide="refresh-cw" class="animate-spin mb-4"></i>
-                    <p class="text-xs">Sincronizando con base de datos...</p>
-                </div>
-            </div>
-        </main>
-    </div>
-
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js";
-        import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut, signInWithCustomToken, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-auth.js";
-        import { getFirestore, collection, doc, onSnapshot, deleteDoc } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-firestore.js";
-
-        // CONFIGURACIÓN DE FIREBASE (ASISTENCIAS-CEUT)
+    <script>
         const firebaseConfig = {
             apiKey: "AIzaSyCefP6qEqaCMpo8ZpUiLpN4e_-E4ZNTp94",
             authDomain: "asistencias-ceut.firebaseapp.com",
@@ -176,236 +77,37 @@
             messagingSenderId: "130615246146",
             appId: "1:130615246146:web:6ae2c17c828fb28a809cdb"
         };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+        const appId = 'ceut-dynamic-v2';
 
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'ceut-prod-v2';
-        
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
-
-        let currentTab = 'asistencias';
-        let currentData = [];
-        let unsubscribers = [];
-
-        // UI Refs
-        const authLock = document.getElementById('auth-lock');
-        const adminPanel = document.getElementById('admin-panel');
-        const loginBtn = document.getElementById('login-btn');
-        const logoutBtn = document.getElementById('logout-btn');
-        const tableBody = document.getElementById('table-body');
-        const tableHead = document.getElementById('table-head');
-        const loadingState = document.getElementById('loading-state');
-        const searchInput = document.getElementById('table-search');
-        const authStatus = document.getElementById('auth-status');
-
-        // Helper for Firestore Paths (RULE 1)
-        const getColRef = (name) => collection(db, 'artifacts', appId, 'public', 'data', name);
-
-        // Exponential Backoff Helper
-        async function withRetry(fn, retries = 5, delay = 1000) {
-            try { return await fn(); } catch (err) {
-                if (retries <= 0) throw err;
-                await new Promise(r => setTimeout(r, delay));
-                return withRetry(fn, retries - 1, delay * 2);
-            }
-        }
-
-        // Logic (RULE 3: Auth Before Queries)
-        const initAuth = async () => {
-            authStatus.innerText = "Preparando entorno seguro...";
-            try {
-                // RULE: Always check for custom token but handle failures gracefully
-                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                    try {
-                        await signInWithCustomToken(auth, __initial_auth_token);
-                    } catch (tokenErr) {
-                        // Fallback on token mismatch or other token errors
-                        console.warn("Falling back to anonymous auth due to token issue:", tokenErr.code);
-                        await signInAnonymously(auth);
-                    }
-                } else {
-                    await signInAnonymously(auth);
-                }
-            } catch (e) {
-                console.error("Critical Auth init error:", e);
-                // Last ditch effort to ensure session exists
-                try { await signInAnonymously(auth); } catch(lastErr) {}
-            }
-        };
-
-        initAuth();
-
-        onAuthStateChanged(auth, (user) => {
-            if (user) {
-                // If it's an email user, we assume it's the admin
-                if (user.email) {
-                    authLock.classList.add('hidden');
-                    adminPanel.classList.remove('hidden');
-                    document.getElementById('admin-user-tag').innerText = user.email;
-                    startDataSync();
-                } else {
-                    // If anonymous, show lock screen but allow login
-                    authLock.classList.remove('hidden');
-                    adminPanel.classList.add('hidden');
-                    clearUnsubscribers();
-                }
-            } else {
-                authLock.classList.remove('hidden');
-                adminPanel.classList.add('hidden');
-                clearUnsubscribers();
-            }
-            lucide.createIcons();
-        });
-
-        loginBtn.onclick = async () => {
-            const email = document.getElementById('admin-email').value;
-            const pass = document.getElementById('admin-pass').value;
-            if(!email || !pass) return;
-            try { 
-                loginBtn.disabled = true;
-                loginBtn.innerText = "AUTENTICANDO...";
-                await signInWithEmailAndPassword(auth, email, pass); 
-            } catch (e) { 
-                alert("ACCESO DENEGADO: Credenciales de administrador no válidas."); 
-            } finally {
-                loginBtn.disabled = false;
-                loginBtn.innerText = "Desbloquear Consola";
-            }
-        };
-
-        logoutBtn.onclick = async () => {
-            await signOut(auth);
-            // Re-auth anonymously to keep the engine ready for next login
-            await signInAnonymously(auth);
-        };
-
-        function clearUnsubscribers() {
-            unsubscribers.forEach(un => un());
-            unsubscribers = [];
-        }
-
-        function startDataSync() {
-            // Guard: Must be authenticated and have an email (admin context)
-            if (!auth.currentUser || !auth.currentUser.email) return;
-            clearUnsubscribers();
-
-            const today = new Date().setHours(0,0,0,0);
+        async function loadAdminData() {
+            const profsSnap = await db.collection('artifacts').doc(appId).collection('public').doc('teachers').collection('profiles').get();
+            document.getElementById('count-profs').innerText = profsSnap.size;
             
-            // Real-time Stats Sync
-            const stats = [
-                { id: 'stat-asistencias', col: 'asistencias', filter: (d) => (d.data().ts || 0) >= today },
-                { id: 'stat-alumnos', col: 'students_registry' },
-                { id: 'stat-docentes', col: 'teachers_registry' },
-                { id: 'stat-clases', col: 'active_pins' }
-            ];
+            const tbody = document.getElementById('prof-table-body');
+            tbody.innerHTML = '';
 
-            stats.forEach(stat => {
-                const unsub = onSnapshot(getColRef(stat.col), s => {
-                    const val = stat.filter ? s.docs.filter(stat.filter).length : s.size;
-                    document.getElementById(stat.id).innerText = val;
-                }, e => console.error(`Permisos insuficientes para ${stat.col}`));
-                unsubscribers.push(unsub);
+            profsSnap.forEach(doc => {
+                const p = doc.data();
+                const row = document.createElement('tr');
+                row.className = "border-b border-white/5 hover:bg-white/5 transition";
+                row.innerHTML = `
+                    <td class="p-4 font-bold text-yellow-500">${p.folio}</td>
+                    <td class="p-4 uppercase">${p.name}</td>
+                    <td class="p-4 opacity-60">${p.email}</td>
+                    <td class="p-4">
+                        <button class="bg-blue-500/20 text-blue-400 px-3 py-1 rounded text-[9px] font-bold uppercase">Ver Clases</button>
+                    </td>
+                    <td class="p-4">
+                        <button class="text-red-500 hover:scale-110 transition"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+                    </td>
+                `;
+                tbody.appendChild(row);
             });
-
-            syncTable();
-        }
-
-        function syncTable() {
-            if (!auth.currentUser || !auth.currentUser.email) return;
-            loadingState.classList.remove('hidden');
-            tableBody.innerHTML = "";
-            
-            let colName = currentTab === 'asistencias' ? 'asistencias' : 
-                          currentTab === 'alumnos' ? 'students_registry' : 'teachers_registry';
-
-            const unsub = onSnapshot(getColRef(colName), snap => {
-                loadingState.classList.add('hidden');
-                currentData = snap.docs.map(d => ({ _id: d.id, ...d.data() }));
-                render();
-            }, err => {
-                console.error("Table sync error:", err);
-                loadingState.innerHTML = `<div class="p-8 text-rose-500 font-black uppercase text-[10px]">Error: Permisos de lectura denegados para esta colección</div>`;
-            });
-            unsubscribers.push(unsub);
-        }
-
-        function render() {
-            const term = searchInput.value.toLowerCase();
-            const filtered = currentData.filter(i => JSON.stringify(i).toLowerCase().includes(term));
-            
-            tableBody.innerHTML = "";
-            if (currentTab === 'asistencias') {
-                tableHead.innerHTML = `<tr><th class="p-4">Fecha</th><th class="p-4">Folio / Estudiante</th><th class="p-4">Materia</th><th class="p-4">Acciones</th></tr>`;
-                filtered.sort((a,b) => (b.ts||0)-(a.ts||0)).forEach(item => {
-                    tableBody.innerHTML += `
-                        <tr class="hover:bg-white/5 transition-colors">
-                            <td class="p-4 opacity-70">${item.ts ? new Date(item.ts).toLocaleString() : '---'}</td>
-                            <td class="p-4"><span class="text-yellow-500 font-black">${item.folio || '---'}</span><br>${item.studentName || '---'}</td>
-                            <td class="p-4">${item.className || '---'}</td>
-                            <td class="p-4"><button onclick="window.delRec('asistencias', '${item._id}')" class="btn-delete">Borrar</button></td>
-                        </tr>`;
-                });
-            } else if (currentTab === 'alumnos') {
-                tableHead.innerHTML = `<tr><th class="p-4">Folio</th><th class="p-4">Nombre</th><th class="p-4">Carrera</th><th class="p-4">Acciones</th></tr>`;
-                filtered.forEach(item => {
-                    tableBody.innerHTML += `
-                        <tr class="hover:bg-white/5 transition-colors">
-                            <td class="p-4 text-yellow-500 font-black">${item.folio || '---'}</td>
-                            <td class="p-4">${item.name || '---'}</td>
-                            <td class="p-4 text-blue-400">${item.career || '---'}</td>
-                            <td class="p-4"><button onclick="window.delRec('students_registry', '${item._id}')" class="btn-delete">Dar de Baja</button></td>
-                        </tr>`;
-                });
-            } else if (currentTab === 'docentes') {
-                tableHead.innerHTML = `<tr><th class="p-4">Identificador</th><th class="p-4">Nombre Completo</th><th class="p-4">Email Inst.</th><th class="p-4">Acciones</th></tr>`;
-                filtered.forEach(item => {
-                    tableBody.innerHTML += `
-                        <tr class="hover:bg-white/5 transition-colors">
-                            <td class="p-4 text-yellow-500 font-black">${item.id || item._id}</td>
-                            <td class="p-4">${item.nombre || '---'}</td>
-                            <td class="p-4 opacity-60 lowercase font-normal italic">${item.email || '---'}</td>
-                            <td class="p-4"><button onclick="window.delRec('teachers_registry', '${item._id}')" class="btn-delete">Eliminar</button></td>
-                        </tr>`;
-                });
-            }
             lucide.createIcons();
         }
-
-        window.delRec = async (col, id) => {
-            if (!confirm("ADVERTENCIA: Esta acción es irreversible. ¿Eliminar registro?")) return;
-            try {
-                const docRef = doc(db, 'artifacts', appId, 'public', 'data', col, id);
-                await withRetry(() => deleteDoc(docRef));
-            } catch (e) { alert("ERROR DE SEGURIDAD: Solo administradores autorizados pueden eliminar datos."); }
-        };
-
-        const tabs = ['asistencias', 'alumnos', 'docentes'];
-        tabs.forEach(t => {
-            document.getElementById(`tab-${t}`).onclick = () => {
-                if (currentTab === t) return;
-                currentTab = t;
-                tabs.forEach(id => document.getElementById(`tab-${id}`).classList.remove('active'));
-                document.getElementById(`tab-${t}`).classList.add('active');
-                syncTable();
-            };
-        });
-
-        searchInput.oninput = render;
-
-        document.getElementById('export-btn').onclick = () => {
-            if (!currentData.length) return;
-            const { jsPDF } = window.jspdf;
-            const docPdf = new jsPDF('l', 'mm', 'a4');
-            docPdf.text("CEUT | REPORTE ADMINISTRATIVO - " + currentTab.toUpperCase(), 14, 15);
-            docPdf.autoTable({
-                head: [Object.keys(currentData[0] || {}).filter(k => !k.startsWith('_'))],
-                body: currentData.map(item => Object.keys(item).filter(k => !k.startsWith('_')).map(k => item[k])),
-                startY: 20,
-                styles: { fontSize: 8, font: 'helvetica' },
-                headStyles: { fillColor: [59, 75, 164] }
-            });
-            docPdf.save(`Reporte_CEUT_${currentTab}_${new Date().toISOString().split('T')[0]}.pdf`);
-        };
+        loadAdminData();
     </script>
 </body>
 </html>
