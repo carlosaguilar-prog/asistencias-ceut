@@ -2,278 +2,75 @@
 <html lang="es-MX">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>CEUT | Sistema Tigre</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CEUT | Sistema Central</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Plus+Jakarta+Sans:wght@400;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
         :root {
-            --ceut-blue: #3b4ba4;
+            --ceut-blue-dark: #000b21;
+            --ceut-blue-light: #1e1b4b;
             --ceut-gold: #eab308;
-            --ceut-dark: #000b21;
         }
-        
         body { 
-            background-color: var(--ceut-dark); 
+            background: radial-gradient(circle at center, var(--ceut-blue-light), var(--ceut-blue-dark));
             font-family: 'Plus Jakarta Sans', sans-serif; 
-            color: white; 
-            margin: 0;
-            overflow-x: hidden;
-            width: 100%;
+            color: white; min-height: 100vh;
+            display: flex; align-items: center; justify-content: center;
         }
-        
-        @keyframes revealUp {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
+        .menu-card {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
         }
-
-        @keyframes pulseBackground {
-            0% { opacity: 0.03; transform: scale(1); }
-            50% { opacity: 0.06; transform: scale(1.05); }
-            100% { opacity: 0.03; transform: scale(1); }
-        }
-
-        .bg-institutional {
-            background-color: var(--ceut-dark);
-            background-image: 
-                linear-gradient(45deg, var(--ceut-blue) 25%, transparent 25%), 
-                linear-gradient(-45deg, var(--ceut-blue) 25%, transparent 25%), 
-                linear-gradient(45deg, transparent 75%, var(--ceut-blue) 75%), 
-                linear-gradient(-45deg, transparent 75%, var(--ceut-blue) 75%);
-            background-size: 60px 60px;
-            position: fixed;
-            inset: 0;
-            z-index: -1;
-            animation: pulseBackground 8s ease-in-out infinite;
-        }
-
-        .stripe-gold {
-            background: var(--ceut-gold);
-            height: 8px;
-            width: 100%;
-            position: sticky;
-            top: 0;
-            z-index: 100;
-        }
-
-        .heavy-title {
-            font-family: 'Archivo Black', sans-serif;
-            text-transform: uppercase;
-            line-height: 0.9;
-            letter-spacing: -0.05em;
-        }
-
-        .card-institutional {
-            background: var(--ceut-blue);
-            border-bottom: 12px solid var(--ceut-gold);
-            transition: all 0.4s;
-            cursor: pointer;
-        }
-
-        .card-institutional:hover {
-            transform: translateY(-5px);
-            background: #2d3a82;
-        }
-
-        .btn-gold-solid {
-            background: var(--ceut-gold);
-            color: black;
-            font-weight: 900;
-            text-transform: uppercase;
-            transition: all 0.3s;
-        }
-
-        .view-section {
-            display: none;
-            width: 100%;
-            animation: revealUp 0.5s ease-out forwards;
-        }
-
-        .view-section.active {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-
-        .input-ceut {
-            background: rgba(255,255,255,0.05);
-            border: 2px solid rgba(255,255,255,0.1);
-            color: white;
-            padding: 1rem;
-            width: 100%;
-            border-radius: 12px;
-            outline: none;
-        }
-
-        .input-ceut:focus {
+        .menu-card:hover {
+            transform: translateY(-10px);
             border-color: var(--ceut-gold);
+            background: rgba(234, 179, 8, 0.05);
         }
     </style>
 </head>
-<body class="flex flex-col min-h-screen" id="app-body">
-    <div class="bg-institutional"></div>
-    <div class="stripe-gold"></div>
+<body class="p-6">
+    <div class="max-w-5xl w-full">
+        <div class="text-center mb-12">
+            <img src="https://lh3.googleusercontent.com/d/17NobXQ3JbRnLGejZe4Mn2x-Jl45F4rPm" class="w-24 mx-auto mb-6" alt="Logo">
+            <h1 class="text-4xl font-black uppercase italic italic tracking-tighter">Sistema Integral <span class="text-yellow-500">CEUT</span></h1>
+            <p class="opacity-50 text-sm mt-2 uppercase tracking-[0.3em]">Seleccione su portal de acceso</p>
+        </div>
 
-    <nav class="w-full py-10 flex flex-col items-center bg-[#000b21] border-b border-white/10 z-50">
-        <img src="https://lh3.googleusercontent.com/d/17NobXQ3JbRnLGejZe4Mn2x-Jl45F4rPm" 
-             class="w-48 cursor-pointer" alt="LOGO" onclick="showView('home')">
-        <h2 class="text-[10px] font-black tracking-[1em] text-[#eab308] uppercase mt-4">Centro Universitario Tehuacán</h2>
-    </nav>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <!-- Admin -->
+            <a href="admin.html" class="menu-card p-8 rounded-3xl text-center group">
+                <div class="w-16 h-16 bg-red-500/20 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition">
+                    <i data-lucide="shield-check" class="w-8 h-8 text-red-500"></i>
+                </div>
+                <h2 class="text-xl font-bold uppercase italic italic mb-2">Administrativo</h2>
+                <p class="text-[10px] opacity-40 uppercase">Control de usuarios y reportes generales</p>
+            </a>
 
-    <main class="flex-grow flex flex-col items-center px-4 py-12">
+            <!-- Docente -->
+            <a href="docente.html" class="menu-card p-8 rounded-3xl text-center group">
+                <div class="w-16 h-16 bg-yellow-500/20 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition">
+                    <i data-lucide="graduation-cap" class="w-8 h-8 text-yellow-500"></i>
+                </div>
+                <h2 class="text-xl font-bold uppercase italic italic mb-2 text-yellow-500">Docente</h2>
+                <p class="text-[10px] opacity-40 uppercase">Gestión de clases y pase de lista</p>
+            </a>
+
+            <!-- Alumno -->
+            <a href="alumno.html" class="menu-card p-8 rounded-3xl text-center group">
+                <div class="w-16 h-16 bg-blue-500/20 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition">
+                    <i data-lucide="user" class="w-8 h-8 text-blue-500"></i>
+                </div>
+                <h2 class="text-xl font-bold uppercase italic italic mb-2 text-blue-400">Alumno</h2>
+                <p class="text-[10px] opacity-40 uppercase">Registro de asistencia y datos</p>
+            </a>
+        </div>
         
-        <!-- INICIO -->
-        <section id="view-home" class="view-section active max-w-6xl">
-            <div class="text-center mb-16">
-                <h1 class="heavy-title text-6xl md:text-8xl mb-4">SISTEMA <span class="text-[#eab308]">TIGRE</span></h1>
-                <p class="font-black tracking-widest text-[#eab308] italic">EXCELENCIA Y MEJORA CONTINUA</p>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 w-full">
-                <div onclick="showView('alumno')" class="card-institutional p-8 rounded-xl text-center">
-                    <i data-lucide="user-check" class="w-12 h-12 mx-auto mb-4"></i>
-                    <h3 class="text-2xl font-black italic mb-4 uppercase">Alumnos</h3>
-                    <div class="btn-gold-solid py-3 rounded-lg text-sm">Entrar</div>
-                </div>
-                <div onclick="showView('maestro')" class="card-institutional p-8 rounded-xl text-center">
-                    <i data-lucide="presentation" class="w-12 h-12 mx-auto mb-4 text-[#eab308]"></i>
-                    <h3 class="text-2xl font-black italic mb-4 uppercase">Docentes</h3>
-                    <div class="btn-gold-solid py-3 rounded-lg text-sm">Acceder</div>
-                </div>
-                <div onclick="showView('admin')" class="card-institutional p-8 rounded-xl text-center">
-                    <i data-lucide="shield-check" class="w-12 h-12 mx-auto mb-4"></i>
-                    <h3 class="text-2xl font-black italic mb-4 uppercase">Dirección</h3>
-                    <div class="btn-gold-solid py-3 rounded-lg text-sm">Panel Control</div>
-                </div>
-            </div>
-        </section>
-
-        <!-- PORTAL ALUMNO -->
-        <section id="view-alumno" class="view-section max-w-md">
-            <div class="bg-[#3b4ba4]/30 backdrop-blur-md p-8 rounded-3xl border border-white/10 w-full">
-                <button onclick="showView('home')" class="mb-4 text-[#eab308] flex items-center gap-2 font-bold uppercase text-xs">
-                    <i data-lucide="arrow-left" class="w-4 h-4"></i> Volver
-                </button>
-                <h2 class="heavy-title text-4xl text-[#eab308] mb-6">REGISTRO</h2>
-                <p class="text-[10px] uppercase font-bold mb-4 opacity-70">Escanee su credencial o ingrese matrícula</p>
-                <input type="text" id="input-folio" class="input-ceut text-2xl font-black mb-4 text-center tracking-tighter" placeholder="MATRÍCULA">
-                <button onclick="registrarAsistencia()" class="btn-gold-solid w-full py-4 rounded-xl shadow-lg shadow-yellow-500/10">Registrar Entrada</button>
-            </div>
-        </section>
-
-        <!-- PORTAL MAESTRO -->
-        <section id="view-maestro" class="view-section max-w-md">
-            <div class="bg-[#1a237e]/40 backdrop-blur-md p-8 rounded-3xl border border-white/10 w-full">
-                <button onclick="showView('home')" class="mb-4 text-[#eab308] flex items-center gap-2 font-bold uppercase text-xs">
-                    <i data-lucide="arrow-left" class="w-4 h-4"></i> Volver
-                </button>
-                <h2 class="heavy-title text-4xl mb-6">DOCENTES</h2>
-                <input type="text" id="m-user" class="input-ceut mb-4" placeholder="Usuario Institucional">
-                <input type="password" id="m-pass" class="input-ceut mb-4" placeholder="Contraseña">
-                <button onclick="loginDocente()" class="btn-gold-solid w-full py-4 rounded-xl">Iniciar Sesión</button>
-                <p class="mt-4 text-[9px] text-center opacity-40">Portal exclusivo para personal académico CEUT</p>
-            </div>
-        </section>
-
-        <!-- PORTAL ADMIN (DIRECCIÓN) -->
-        <section id="view-admin" class="view-section max-w-md">
-            <div class="bg-[#000b21]/95 backdrop-blur-md p-8 rounded-3xl border-2 border-yellow-500/30 w-full text-center relative overflow-hidden">
-                <div class="absolute top-0 left-0 w-full h-1 bg-yellow-500 animate-pulse"></div>
-                <i data-lucide="shield-check" class="w-12 h-12 text-yellow-500 mx-auto mb-4"></i>
-                <h2 class="heavy-title text-3xl mb-2">DIRECCIÓN</h2>
-                <p class="text-[9px] font-black uppercase text-yellow-500/70 tracking-[0.3em] mb-6">Acceso Restringido</p>
-                
-                <input type="email" id="a-user" class="input-ceut mb-4 text-sm" placeholder="correo@ceut.edu.mx">
-                <input type="password" id="a-pass" class="input-ceut mb-4" placeholder="••••••••">
-                
-                <button onclick="loginAdmin()" class="btn-gold-solid w-full py-4 rounded-xl text-black hover:bg-white">
-                    Verificar Identidad
-                </button>
-                
-                <button onclick="showView('home')" class="mt-6 text-[10px] font-bold uppercase opacity-40 hover:opacity-100 transition-opacity">
-                    Cancelar Acceso
-                </button>
-            </div>
-        </section>
-
-    </main>
-
-    <!-- NOTIFICACIONES (TOAST) -->
-    <div id="toast" class="fixed bottom-10 left-1/2 -translate-x-1/2 bg-white text-black px-8 py-4 rounded-xl font-black uppercase italic text-[11px] shadow-2xl opacity-0 translate-y-10 transition-all duration-500 pointer-events-none z-[200] flex items-center gap-3">
-        <i data-lucide="info" class="w-4 h-4"></i>
-        <span id="toast-text">MENSAJE</span>
+        <p class="text-center mt-16 text-[9px] opacity-30 uppercase tracking-widest font-bold">Centro Universitario de Tehuacán © 2024</p>
     </div>
-
-    <script>
-        lucide.createIcons();
-
-        function showView(id) {
-            document.querySelectorAll('.view-section').forEach(s => s.classList.remove('active'));
-            document.getElementById(`view-${id}`).classList.add('active');
-            window.scrollTo(0,0);
-        }
-
-        function notify(msg, type = 'info') {
-            const t = document.getElementById('toast');
-            const txt = document.getElementById('toast-text');
-            txt.innerText = msg;
-            
-            // Estilos por tipo
-            t.style.background = type === 'error' ? '#f87171' : (type === 'success' ? '#fbbf24' : '#ffffff');
-            t.style.color = type === 'error' || type === 'success' ? '#000' : '#000';
-
-            t.classList.remove('opacity-0', 'translate-y-10');
-            t.classList.add('opacity-100', 'translate-y-0');
-            
-            setTimeout(() => {
-                t.classList.add('opacity-0', 'translate-y-10');
-                t.classList.remove('opacity-100', 'translate-y-0');
-            }, 4000);
-        }
-
-        // LÓGICA DE REGISTRO DE ALUMNOS
-        function registrarAsistencia() {
-            const folio = document.getElementById('input-folio').value.trim();
-            if(folio.length >= 4) {
-                notify(`BIENVENIDO TIGRE [${folio}] - ACCESO REGISTRADO`, 'success');
-                document.getElementById('input-folio').value = "";
-                // Aquí podrías disparar el audio de "Bienvenido Tigre" si lo deseas
-            } else {
-                notify("MATRÍCULA NO VÁLIDA O INCOMPLETA", "error");
-            }
-        }
-
-        // ACCESO DOCENTE
-        function loginDocente() {
-            const u = document.getElementById('m-user').value;
-            const p = document.getElementById('m-pass').value;
-            // Clave genérica para demo docente
-            if(u === 'maestro' && p === 'tigre2024') {
-                notify("ACCESO DOCENTE AUTORIZADO", "success");
-            } else {
-                notify("ERROR: USUARIO O CLAVE INCORRECTA", "error");
-            }
-        }
-
-        // ACCESO DIRECCIÓN (CON TUS CREDENCIALES)
-        function loginAdmin() {
-            const u = document.getElementById('a-user').value.toLowerCase().trim();
-            const p = document.getElementById('a-pass').value;
-            
-            const adminEmail = "carlos.aguilar@ceut.edu.mx";
-            const adminPass = "Jcas1015#";
-
-            if(u === adminEmail && p === adminPass) {
-                notify("IDENTIDAD CONFIRMADA: BIENVENIDO MTRO. CARLOS AGUILAR", "success");
-                // Aquí redirigirías a la consola administrativa real
-                setTimeout(() => {
-                    console.log("Iniciando Consola de Control Administrativo...");
-                }, 1500);
-            } else {
-                notify("FALLO DE AUTENTICACIÓN: ACCESO DENEGADO", "error");
-            }
-        }
-    </script>
+    <script>lucide.createIcons();</script>
 </body>
 </html>
