@@ -1,199 +1,282 @@
 <!DOCTYPE html>
-<html lang="es-MX">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>CEUT | Registro de Asistencia</title>
+    <title>CEUT | Portal Estudiante</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
-    <!-- Firebase SDK -->
-    <script src="https://www.gstatic.com/firebasejs/11.0.2/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/11.0.2/firebase-firestore-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/11.0.2/firebase-auth-compat.js"></script>
-    
+    <script src="https://unpkg.com/html5-qrcode"></script>
     <style>
-        :root {
-            --ceut-blue: #3b4ba4;
-            --ceut-blue-dark: #000b21;
-            --ceut-gold: #eab308;
+        :root { 
+            --ceut-yellow: #f5b800; 
+            --ceut-blue: #3b489d;   
+            --ceut-dark: #0f172a;
+            --ceut-bg-gradient: radial-gradient(circle at top right, #3b489d, #1e293b, #020617);
         }
-        
+
         body { 
-            background-color: var(--ceut-blue-dark); 
-            font-family: 'Plus Jakarta Sans', sans-serif; 
-            color: white; 
+            background: var(--ceut-bg-gradient);
+            background-attachment: fixed;
             min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0;
-        }
-
-        .glass-card { 
-            background: rgba(255, 255, 255, 0.03); 
-            backdrop-filter: blur(20px); 
-            border: 1px solid rgba(255, 255, 255, 0.1); 
-            border-radius: 2rem; 
-        }
-
-        .input-ceut { 
-            background: rgba(255, 255, 255, 0.05); 
-            border: 1px solid rgba(234, 179, 8, 0.2); 
-            border-radius: 0.75rem; 
-            color: white; 
-            padding: 0.8rem 1rem;
-            width: 100%;
-            font-size: 0.9rem;
-        }
-
-        .input-ceut:focus {
-            border-color: var(--ceut-gold);
-            outline: none;
-            background: rgba(234, 179, 8, 0.1);
-        }
-
-        .btn-gold { 
-            background: linear-gradient(135deg, #fef08a, var(--ceut-gold), #ca8a04); 
-            color: #000b21; 
-            font-weight: 800; 
-            text-transform: uppercase;
-            transition: all 0.2s;
-        }
-
-        .btn-gold:active { transform: scale(0.98); }
-
-        .hidden { display: none !important; }
-        
-        select.input-ceut option {
-            background-color: var(--ceut-blue-dark);
+            font-family: 'Plus Jakarta Sans', sans-serif; 
             color: white;
+            -webkit-tap-highlight-color: transparent; 
         }
 
-        .divider { border-top: 1px solid rgba(255, 255, 255, 0.1); margin: 1.5rem 0; }
-
-        /* Animación para el folio generado */
-        .folio-badge {
-            background: rgba(234, 179, 8, 0.1);
-            border: 1px dashed var(--ceut-gold);
-            padding: 1rem;
-            border-radius: 1rem;
-            font-family: monospace;
-            color: var(--ceut-gold);
-            font-size: 1.2rem;
-            font-weight: 900;
+        .glass-card {
+            background: rgba(15, 23, 42, 0.7);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-top: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 2.5rem;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
         }
+
+        .input-ceut, .select-ceut { 
+            width: 100%; 
+            padding: 0.9rem 1.1rem; 
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 14px; 
+            font-size: 13px; 
+            font-weight: 500; 
+            color: white;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .select-ceut option { background: #0f172a; color: white; }
+
+        .input-ceut:focus, .select-ceut:focus { 
+            background: rgba(255, 255, 255, 0.08);
+            border-color: var(--ceut-yellow); 
+            outline: none; 
+            box-shadow: 0 0 15px rgba(245, 184, 0, 0.2);
+        }
+
+        .btn-primary { 
+            background: linear-gradient(135deg, var(--ceut-yellow), #d9a300);
+            color: #020617; 
+            padding: 1rem; 
+            border-radius: 16px; 
+            font-weight: 800; 
+            font-size: 11px; 
+            text-transform: uppercase; 
+            letter-spacing: 0.1em;
+            border: none; 
+            cursor: pointer; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            gap: 10px; 
+            box-shadow: 0 10px 20px -5px rgba(245, 184, 0, 0.3); 
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            transform: translateY(-2px);
+            filter: brightness(1.1);
+        }
+
+        .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        .status-badge {
+            background: rgba(245, 184, 0, 0.1);
+            color: var(--ceut-yellow);
+            border: 1px solid rgba(245, 184, 0, 0.2);
+            font-size: 9px;
+            font-weight: 800;
+            text-transform: uppercase;
+            padding: 4px 12px;
+            border-radius: 999px;
+        }
+
+        #reader { 
+            width: 100%; 
+            border-radius: 20px; 
+            overflow: hidden; 
+            border: 1px solid rgba(255, 255, 255, 0.1) !important; 
+        }
+
+        .accent-text { color: var(--ceut-yellow); }
     </style>
 </head>
-<body class="p-6">
-
-    <div class="max-w-md w-full glass-card p-8 border-t-8 border-white relative overflow-hidden">
+<body class="p-4 md:p-10">
+    <div id="app" class="max-w-lg mx-auto">
         
-        <!-- PANTALLA 0: LOGIN -->
-        <div id="step-login" class="hidden">
-            <div class="text-center mb-6">
-                <img src="https://lh3.googleusercontent.com/d/17NobXQ3JbRnLGejZe4Mn2x-Jl45F4rPm" class="w-24 mx-auto mb-4">
-                <h2 class="text-2xl font-black uppercase italic">Acceso <span class="text-yellow-500">Tigre</span></h2>
-                <p class="text-[10px] opacity-60 uppercase tracking-widest">Portal del Alumno</p>
+        <!-- PANTALLA DE CARGA -->
+        <div id="loading-screen" class="min-h-[80vh] flex flex-col items-center justify-center space-y-6">
+            <div class="relative flex items-center justify-center">
+                <div class="h-16 w-16 rounded-full border-[3px] border-white/5"></div>
+                <div class="absolute h-16 w-16 rounded-full border-[3px] border-t-[#f5b800] animate-spin"></div>
             </div>
-            <div class="space-y-4">
-                <input type="text" id="login-folio" placeholder="FOLIO ASIGNADO (E.G. CEUT-2024-XXXX)" class="input-ceut uppercase">
-                <input type="password" id="login-pass" placeholder="CONTRASEÑA" class="input-ceut">
-                <button onclick="intentarLogin()" class="btn-gold w-full py-4 rounded-xl">Entrar al Portal</button>
-                <div class="divider"></div>
-                <button onclick="cambiarVista('registro')" class="text-[10px] font-bold text-blue-400 uppercase w-full">¿Eres nuevo? Regístrate aquí</button>
-            </div>
+            <p class="text-[9px] font-black text-white/30 uppercase tracking-[0.4em]">Iniciando Sesión Segura</p>
         </div>
 
-        <!-- PANTALLA 1: REGISTRO ÚNICO (FOLIO AUTOMÁTICO) -->
-        <div id="step-registro" class="hidden">
-            <div class="text-center mb-6">
-                <h2 class="text-2xl font-black uppercase italic">Registro <span class="text-yellow-500">Único</span></h2>
-                <p class="text-[10px] opacity-60 uppercase tracking-widest">Tu folio se generará automáticamente</p>
-            </div>
-
-            <div class="space-y-3 overflow-y-auto max-h-[60vh] pr-2">
-                <input type="text" id="reg-nombre" placeholder="NOMBRE COMPLETO" class="input-ceut uppercase">
-                <input type="text" id="reg-carrera" placeholder="CARRERA / ESPECIALIDAD" class="input-ceut uppercase">
-                
-                <div class="grid grid-cols-2 gap-3">
-                    <input type="text" id="reg-grado" placeholder="GRADO" class="input-ceut">
-                    <input type="text" id="reg-grupo" placeholder="GRUPO" class="input-ceut uppercase">
-                </div>
-
-                <select id="reg-nivel" class="input-ceut">
-                    <option value="">NIVEL EDUCATIVO...</option>
-                    <option value="PREPARATORIA">PREPARATORIA</option>
-                    <option value="LICENCIATURA">LICENCIATURA</option>
-                    <option value="MAESTRIA">MAESTRÍA</option>
-                </select>
-
-                <select id="reg-modalidad" class="input-ceut">
-                    <option value="">MODALIDAD...</option>
-                    <option value="ESCOLARIZADA">ESCOLARIZADA</option>
-                    <option value="MIXTA">MIXTA</option>
-                </select>
-
-                <div class="pt-2">
-                    <label class="text-[8px] font-bold uppercase ml-2 opacity-40">Crea una Contraseña de Acceso</label>
-                    <input type="password" id="reg-pass" placeholder="MÍNIMO 6 CARACTERES" class="input-ceut mt-1">
-                </div>
-
-                <button id="btn-registrar-final" onclick="guardarPerfil()" class="btn-gold w-full py-4 rounded-xl mt-4 shadow-lg">Generar Folio y Registrar</button>
-                <button onclick="cambiarVista('login')" class="text-[10px] font-bold text-slate-500 uppercase w-full py-2">Volver al inicio</button>
-            </div>
-        </div>
-
-        <!-- PANTALLA 1.5: MOSTRAR FOLIO GENERADO -->
-        <div id="step-folio-result" class="hidden text-center">
-            <i data-lucide="award" class="w-16 h-16 mx-auto text-yellow-500 mb-4"></i>
-            <h2 class="text-xl font-black uppercase italic">¡Registro Completado!</h2>
-            <p class="text-[10px] opacity-60 uppercase mb-6">Guarda tu folio para futuros accesos</p>
-            
-            <div class="folio-badge mb-6" id="generated-folio-display">CEUT-2024-XXXX</div>
-            
-            <p class="text-[10px] text-slate-400 mb-8 italic">Este folio junto con tu contraseña te permitirán entrar desde cualquier dispositivo.</p>
-            
-            <button onclick="continuarAPaseLista()" class="btn-gold w-full py-4 rounded-xl">Ir al Pase de Lista</button>
-        </div>
-
-        <!-- PANTALLA 2: PASE DE LISTA -->
-        <div id="step-asistencia" class="hidden text-center">
-            <div class="mb-6">
-                <i data-lucide="user-check" class="w-12 h-12 mx-auto text-yellow-500 mb-2"></i>
-                <h3 id="display-alumno-nombre" class="text-lg font-black uppercase italic">BIENVENIDO</h3>
-                <p id="display-alumno-info" class="text-[9px] opacity-50 uppercase"></p>
-                <p id="display-alumno-carrera" class="text-[8px] text-blue-400 font-bold uppercase mt-1"></p>
-            </div>
-
-            <div class="space-y-6">
-                <div class="text-left">
-                    <label class="text-[10px] font-bold uppercase ml-2 opacity-60">Código de Clase (6 dígitos)</label>
-                    <input type="text" id="input-codigo" maxlength="6" placeholder="000000" 
-                           class="input-ceut w-full p-4 text-center text-4xl font-black tracking-[0.4em] mt-1 border-2">
+        <!-- SECCIÓN DE AUTENTICACIÓN / REGISTRO -->
+        <div id="auth-section" class="hidden min-h-[90vh] flex items-center justify-center no-print">
+            <div class="glass-card p-8 md:p-10 w-full">
+                <div class="text-center mb-8">
+                    <img src="https://lh3.googleusercontent.com/d/17NobXQ3JbRnLGejZe4Mn2x-Jl45F4rPm" class="w-24 mx-auto mb-6 drop-shadow-[0_0_20px_rgba(245,184,0,0.2)]" alt="CEUT">
+                    <h2 class="text-2xl font-black italic uppercase tracking-tighter text-white">Portal Estudiante</h2>
+                    <p class="text-[10px] font-bold accent-text uppercase tracking-[0.2em]">Registro y Acceso Único</p>
                 </div>
                 
-                <button onclick="registrarAsistencia()" class="btn-gold w-full py-4 rounded-xl shadow-lg">
-                    Confirmar Asistencia
+                <!-- LOGIN FORM -->
+                <div id="login-form" class="space-y-4">
+                    <div class="space-y-1">
+                        <label class="text-[9px] font-black text-white/30 uppercase ml-1 tracking-widest">Correo Institucional</label>
+                        <input type="email" id="email" placeholder="estudiante@ceut.edu.mx" class="input-ceut">
+                    </div>
+                    <div class="space-y-1">
+                        <label class="text-[9px] font-black text-white/30 uppercase ml-1 tracking-widest">Contraseña</label>
+                        <input type="password" id="pass" placeholder="••••••••" class="input-ceut">
+                    </div>
+                    <button id="login-btn" class="btn-primary w-full mt-4">Entrar al Sistema</button>
+                    <button onclick="toggleView('reg')" class="w-full text-[9px] font-black text-white/20 uppercase mt-4 hover:text-[#f5b800] transition-colors tracking-widest text-center block">¿Eres nuevo? Regístrate aquí</button>
+                </div>
+
+                <!-- REGISTRO FORM -->
+                <div id="reg-form" class="hidden space-y-4 max-h-[65vh] overflow-y-auto pr-2">
+                    <div class="space-y-4">
+                        <div class="space-y-1">
+                            <label class="text-[9px] font-black accent-text uppercase ml-1 tracking-widest">Nombre Completo</label>
+                            <input type="text" id="reg-name" placeholder="JUAN PÉREZ LÓPEZ" class="input-ceut uppercase">
+                        </div>
+                        
+                        <div class="grid grid-cols-2 gap-3">
+                            <div class="space-y-1">
+                                <label class="text-[9px] font-black text-white/30 uppercase ml-1">Nivel</label>
+                                <select id="reg-level" class="select-ceut" onchange="toggleCareerField()">
+                                    <option value="PREPARATORIA">PREPARATORIA</option>
+                                    <option value="LICENCIATURA">LICENCIATURA</option>
+                                    <option value="POSGRADO">POSGRADO</option>
+                                </select>
+                            </div>
+                            <div class="space-y-1">
+                                <label class="text-[9px] font-black text-white/30 uppercase ml-1">Modalidad</label>
+                                <select id="reg-mode" class="select-ceut">
+                                    <option value="ESCOLARIZADA">ESCOLARIZADA</option>
+                                    <option value="MIXTA">MIXTA</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div id="career-container" class="hidden space-y-1">
+                            <label class="text-[9px] font-black text-white/30 uppercase ml-1">Carrera</label>
+                            <input type="text" id="reg-career" placeholder="EJ. DERECHO" class="input-ceut uppercase">
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-3">
+                            <div class="space-y-1">
+                                <label class="text-[9px] font-black text-white/30 uppercase ml-1">Grado</label>
+                                <input type="text" id="reg-grade" placeholder="1ero" class="input-ceut uppercase">
+                            </div>
+                            <div class="space-y-1">
+                                <label class="text-[9px] font-black text-white/30 uppercase ml-1">Grupo</label>
+                                <input type="text" id="reg-group" placeholder="A" class="input-ceut uppercase">
+                            </div>
+                        </div>
+
+                        <div class="space-y-1">
+                            <label class="text-[9px] font-black text-white/30 uppercase ml-1">Correo</label>
+                            <input type="email" id="reg-email" placeholder="correo@ceut.edu.mx" class="input-ceut">
+                        </div>
+
+                        <div class="space-y-1">
+                            <label class="text-[9px] font-black text-white/30 uppercase ml-1">Contraseña</label>
+                            <input type="password" id="reg-pass" placeholder="Mínimo 6 caracteres" class="input-ceut">
+                        </div>
+                    </div>
+                    <button id="reg-btn" class="btn-primary w-full mt-6">Finalizar Registro</button>
+                    <button onclick="toggleView('login')" class="w-full text-[9px] font-black text-white/20 uppercase mt-4 text-center block italic">Volver al Inicio</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- DASHBOARD PRINCIPAL -->
+        <div id="dashboard" class="hidden">
+            <header class="flex justify-between items-center mb-8 pt-4">
+                <div class="flex items-center gap-4">
+                    <div class="h-14 w-14 rounded-2xl bg-gradient-to-br from-[#f5b800] to-[#d9a300] flex items-center justify-center shadow-lg">
+                        <i data-lucide="user" class="text-[#020617] w-7 h-7"></i>
+                    </div>
+                    <div>
+                        <h1 id="std-name" class="text-lg font-black italic uppercase text-white leading-none mb-1">Cargando...</h1>
+                        <div class="flex flex-col">
+                            <span id="std-folio" class="accent-text text-[10px] font-black uppercase tracking-wider italic">FOLIO: ---</span>
+                            <span id="std-meta" class="text-white/30 text-[9px] font-bold uppercase tracking-widest">---</span>
+                        </div>
+                    </div>
+                </div>
+                <button onclick="logout()" class="text-white/20 bg-white/5 p-4 rounded-xl border border-white/10 hover:text-rose-400">
+                    <i data-lucide="log-out"></i>
                 </button>
-                
-                <button onclick="cerrarSesionLocal()" class="text-[9px] uppercase opacity-30 hover:opacity-100 transition-opacity">
-                    Cerrar Sesión (${JSON.parse(sessionStorage.getItem('ceut_active_user'))?.folio || ''})
-                </button>
-            </div>
-        </div>
+            </header>
 
-        <!-- PANTALLA 3: ÉXITO -->
-        <div id="step-exito" class="hidden text-center py-10">
-            <i data-lucide="check-circle" class="w-20 h-20 mx-auto text-green-500 mb-4"></i>
-            <h3 class="text-2xl font-black uppercase italic">¡ASISTENCIA REGISTRADA!</h3>
-            <p class="text-sm opacity-70 mt-2">Se ha enviado el registro al docente.</p>
-            <button onclick="location.reload()" class="btn-gold px-12 py-4 rounded-xl mt-8 text-xs">Aceptar</button>
+            <!-- REGISTRO DE ASISTENCIA -->
+            <div id="action-card" class="glass-card p-8 mb-8 relative overflow-hidden">
+                <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-[#f5b800] to-transparent"></div>
+                
+                <!-- PASO 1: Ingreso de Código -->
+                <div id="step-1">
+                    <h3 class="text-[10px] font-black text-white uppercase tracking-[0.25em] mb-6 flex items-center gap-2">
+                        <i data-lucide="key" class="w-4 h-4 accent-text"></i> Código de Clase (6 Dígitos)
+                    </h3>
+                    
+                    <div class="flex gap-2">
+                        <input type="text" id="joinId" maxlength="6" placeholder="EJ. 123456" class="input-ceut uppercase text-center font-black text-lg tracking-[0.3em]">
+                        <button onclick="manualLoad()" class="bg-white text-slate-900 px-6 rounded-xl font-black text-[10px] uppercase hover:bg-[#f5b800] transition-colors">CARGAR</button>
+                    </div>
+
+                    <div class="mt-8">
+                        <p class="text-[8px] font-black text-white/20 uppercase tracking-[0.4em] text-center mb-4">O escanea el código QR</p>
+                        <div id="reader"></div>
+                    </div>
+                </div>
+
+                <!-- PASO 2: Confirmación de Datos -->
+                <div id="step-2" class="hidden py-4 text-center animate-in fade-in slide-in-from-bottom-4 duration-500">
+                    <div class="bg-white/5 p-8 rounded-[2rem] mb-6 border border-white/10">
+                        <div class="inline-block p-3 rounded-full bg-[#f5b800]/20 mb-4">
+                            <i data-lucide="book-open" class="accent-text w-6 h-6"></i>
+                        </div>
+                        <h4 id="pre-class-name" class="font-black text-xl italic uppercase text-white mb-1">Materia...</h4>
+                        <p id="pre-teacher-name" class="text-[10px] font-bold text-[#f5b800] uppercase tracking-widest">Docente...</p>
+                    </div>
+
+                    <button id="reg-action-btn" onclick="confirmAttendance()" class="btn-primary w-full py-5 text-xs">
+                        Registrar mi Asistencia
+                    </button>
+                    
+                    <button onclick="resetSteps()" class="w-full text-[10px] font-bold text-white/20 uppercase mt-6 tracking-widest flex items-center justify-center gap-2">
+                        <i data-lucide="x-circle" class="w-3 h-3"></i> Cancelar Registro
+                    </button>
+                </div>
+            </div>
+
+            <!-- HISTORIAL RECIENTE -->
+            <div class="glass-card p-8">
+                <h3 class="text-[10px] font-black text-white/40 uppercase tracking-[0.2em] italic mb-6">Asistencias de Hoy</h3>
+                <div id="history" class="space-y-3">
+                    <!-- Dinámico -->
+                </div>
+            </div>
+            
+            <footer class="mt-10 mb-10 text-center opacity-20">
+                <p class="text-[8px] font-black text-white uppercase tracking-[0.6em]">CEUT Institutional Node v5.0</p>
+            </footer>
         </div>
     </div>
 
-    <script>
-        // Configuración Firebase
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getFirestore, doc, setDoc, getDoc, updateDoc, arrayUnion, onSnapshot, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+
+        // CONFIGURACIÓN FIREBASE
         const firebaseConfig = {
             apiKey: "AIzaSyCefP6qEqaCMpo8ZpUiLpN4e_-E4ZNTp94",
             authDomain: "asistencias-ceut.firebaseapp.com",
@@ -203,170 +286,233 @@
             appId: "1:130615246146:web:6ae2c17c828fb28a809cdb"
         };
 
-        firebase.initializeApp(firebaseConfig);
-        const db = firebase.firestore();
-        const appId = 'ceut-prod-v2';
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'ceut_asistencias_v1';
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const auth = getAuth(app);
 
-        window.onload = () => {
-            const perfilSesion = sessionStorage.getItem('ceut_active_user');
-            if (perfilSesion) {
-                mostrarPaseLista(JSON.parse(perfilSesion));
-            } else {
-                cambiarVista('login');
+        let userProfile = null;
+        let selectedClass = null;
+        let scanner = null;
+        let unsubscribeProfile = null;
+
+        // --- UTILIDADES ---
+        const generateFolio = () => `CEUT-${Math.random().toString(36).substring(2, 6).toUpperCase()}`;
+        const getLoc = () => new Promise((res, rej) => navigator.geolocation.getCurrentPosition(p => res({lat: p.coords.latitude, lng: p.coords.longitude}), e => rej(e), {enableHighAccuracy: true, timeout: 8000}));
+        const calcDist = (p1, p2) => {
+            const R = 6371e3;
+            const dLat = (p2.lat-p1.lat) * Math.PI/180;
+            const dLon = (p2.lng-p1.lng) * Math.PI/180;
+            const a = Math.sin(dLat/2)**2 + Math.cos(p1.lat * Math.PI/180) * Math.cos(p2.lat * Math.PI/180) * Math.sin(dLon/2)**2;
+            return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+        };
+
+        // --- GESTIÓN DE SESIÓN ---
+        onAuthStateChanged(auth, async (user) => {
+            document.getElementById('loading-screen').classList.add('hidden');
+            if (user) {
+                const snap = await getDoc(doc(db, 'artifacts', appId, 'users', user.uid, 'profile', 'info'));
+                if (snap.exists()) {
+                    userProfile = snap.data();
+                    setupDashboard();
+                } else { showAuthUI(); }
+            } else { showAuthUI(); }
+        });
+
+        function showAuthUI() {
+            document.getElementById('auth-section').classList.remove('hidden');
+            document.getElementById('dashboard').classList.add('hidden');
+            if(scanner) { try { scanner.clear(); } catch(e){} scanner = null; }
+        }
+
+        function setupDashboard() {
+            document.getElementById('auth-section').classList.add('hidden');
+            document.getElementById('dashboard').classList.remove('hidden');
+            document.getElementById('std-name').innerText = userProfile.name;
+            document.getElementById('std-folio').innerText = `FOLIO: ${userProfile.folio}`;
+            document.getElementById('std-meta').innerText = `${userProfile.nivel} | ${userProfile.grado}${userProfile.grupo}`;
+            
+            initScanner();
+            
+            if (unsubscribeProfile) unsubscribeProfile();
+            unsubscribeProfile = onSnapshot(doc(db, 'artifacts', appId, 'users', auth.currentUser.uid, 'profile', 'info'), (s) => {
+                if(s.exists()) {
+                    userProfile = s.data();
+                    renderHistory(userProfile.asistencias || []);
+                }
+            });
+            lucide.createIcons();
+        }
+
+        // --- AUTH LOGIC ---
+        document.getElementById('login-btn').onclick = async () => {
+            const email = document.getElementById('email').value, pass = document.getElementById('pass').value;
+            if(!email || !pass) return alert("Ingresa tus credenciales.");
+            try { await signInWithEmailAndPassword(auth, email, pass); } catch(e) { alert("Usuario o contraseña incorrectos."); }
+        };
+
+        document.getElementById('reg-btn').onclick = async () => {
+            const name = document.getElementById('reg-name').value.toUpperCase();
+            const level = document.getElementById('reg-level').value;
+            const email = document.getElementById('reg-email').value;
+            const pass = document.getElementById('reg-pass').value;
+
+            if(!name || !email || !pass) return alert("Completa los datos obligatorios.");
+
+            try {
+                const res = await createUserWithEmailAndPassword(auth, email, pass);
+                const newProfile = {
+                    uid: res.user.uid,
+                    name, 
+                    nivel: level,
+                    modalidad: document.getElementById('reg-mode').value,
+                    carrera: document.getElementById('reg-career').value.toUpperCase(),
+                    grado: document.getElementById('reg-grade').value.toUpperCase(),
+                    grupo: document.getElementById('reg-group').value.toUpperCase(),
+                    email, 
+                    folio: generateFolio(),
+                    role: 'student',
+                    asistencias: [],
+                    createdAt: Date.now()
+                };
+                await setDoc(doc(db, 'artifacts', appId, 'users', res.user.uid, 'profile', 'info'), newProfile);
+                userProfile = newProfile;
+            } catch(e) { alert("Error: " + e.message); }
+        };
+
+        // --- LÓGICA DE ASISTENCIA ---
+        window.manualLoad = async () => {
+            const otp = document.getElementById('joinId').value.trim();
+            if(otp.length < 6) return alert("Ingresa un código de 6 dígitos.");
+
+            // Buscar la clase abierta con ese OTP
+            const q = query(
+                collection(db, 'artifacts', appId, 'public', 'data', 'classes'), 
+                where("otp", "==", otp), 
+                where("isOpen", "==", true)
+            );
+            
+            const snap = await getDocs(q);
+            if(snap.empty) return alert("Código no encontrado o clase ya cerrada por el docente.");
+
+            const classDoc = snap.docs[0];
+            await loadClass(classDoc.id);
+        };
+
+        async function loadClass(cid) {
+            const s = await getDoc(doc(db, 'artifacts', appId, 'public', 'data', 'classes', cid));
+            if(!s.exists()) return;
+
+            selectedClass = { id: s.id, ...s.data() };
+            
+            // Cargar datos en la UI
+            document.getElementById('pre-class-name').innerText = selectedClass.name;
+            document.getElementById('pre-teacher-name').innerText = `DOCENTE: ${selectedClass.teacherName}`;
+            
+            // Cambiar de vista
+            document.getElementById('step-1').classList.add('hidden');
+            document.getElementById('step-2').classList.remove('hidden');
+            
+            if(scanner) { try { scanner.clear(); } catch(e){} scanner = null; }
+            lucide.createIcons();
+        }
+
+        window.confirmAttendance = async () => {
+            const btn = document.getElementById('reg-action-btn');
+            btn.disabled = true;
+            btn.innerHTML = '<i data-lucide="loader" class="w-4 h-4 animate-spin"></i> PROCESANDO...';
+            lucide.createIcons();
+
+            try {
+                // 1. Evitar duplicados
+                if(userProfile.asistencias.includes(selectedClass.id)) {
+                    throw new Error("Ya registraste asistencia en esta sesión.");
+                }
+
+                // 2. Geocerca (150 metros)
+                const loc = await getLoc();
+                const dist = calcDist(loc, selectedClass.coords);
+                if(dist > 150) throw new Error("Debes estar en las instalaciones del plantel.");
+
+                // 3. Registrar en Perfil del Alumno
+                await updateDoc(doc(db, 'artifacts', appId, 'users', auth.currentUser.uid, 'profile', 'info'), {
+                    asistencias: arrayUnion(selectedClass.id)
+                });
+
+                // 4. Registrar en Lista de la Clase
+                await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'classes', selectedClass.id), {
+                    [`presentStudents.${auth.currentUser.uid}`]: {
+                        name: userProfile.name,
+                        folio: userProfile.folio,
+                        carrera: userProfile.carrera || 'Bachillerato',
+                        timestamp: Date.now()
+                    }
+                });
+
+                alert("¡ASISTENCIA REGISTRADA EXITOSAMENTE!");
+                resetSteps();
+            } catch(e) { 
+                alert(e.message); 
+                btn.disabled = false; 
+                btn.innerText = "Registrar mi Asistencia";
+                lucide.createIcons();
             }
+        };
+
+        window.resetSteps = () => {
+            selectedClass = null;
+            document.getElementById('joinId').value = "";
+            document.getElementById('step-1').classList.remove('hidden');
+            document.getElementById('step-2').classList.add('hidden');
+            initScanner();
             lucide.createIcons();
         };
 
-        function cambiarVista(vista) {
-            document.getElementById('step-login').classList.add('hidden');
-            document.getElementById('step-registro').classList.add('hidden');
-            document.getElementById('step-asistencia').classList.add('hidden');
-            document.getElementById('step-folio-result').classList.add('hidden');
-            
-            if(vista === 'login') document.getElementById('step-login').classList.remove('hidden');
-            if(vista === 'registro') document.getElementById('step-registro').classList.remove('hidden');
-            
-            lucide.createIcons();
+        // --- SCANNER QR ---
+        function initScanner() {
+            if(scanner) return;
+            scanner = new Html5QrcodeScanner("reader", { fps: 10, qrbox: 200 });
+            scanner.render(async (text) => {
+                await loadClass(text); // El QR debe contener el ID del documento
+            });
         }
 
-        // Función para generar folio único
-        function generarFolio() {
-            const year = new Date().getFullYear();
-            const random = Math.floor(1000 + Math.random() * 9000); // 4 dígitos aleatorios
-            return `CEUT-${year}-${random}`;
-        }
+        // --- UI HELPERS ---
+        window.toggleView = (view) => {
+            document.getElementById('login-form').classList.toggle('hidden', view === 'reg');
+            document.getElementById('reg-form').classList.toggle('hidden', view === 'login');
+        };
 
-        async function intentarLogin() {
-            const folio = document.getElementById('login-folio').value.trim().toUpperCase();
-            const pass = document.getElementById('login-pass').value;
+        window.toggleCareerField = () => {
+            const val = document.getElementById('reg-level').value;
+            document.getElementById('career-container').classList.toggle('hidden', val === 'PREPARATORIA');
+        };
 
-            if(!folio || !pass) return alert("Completa los datos de acceso.");
+        window.logout = () => signOut(auth);
 
-            try {
-                const studentDoc = await db.collection('artifacts').doc(appId).collection('public').doc('data')
-                                         .collection('students_registry').doc(folio).get();
-
-                if(!studentDoc.exists) return alert("El folio no existe en el sistema.");
-
-                const data = studentDoc.data();
-                if(data.password === pass) {
-                    sessionStorage.setItem('ceut_active_user', JSON.stringify(data));
-                    mostrarPaseLista(data);
-                } else {
-                    alert("Contraseña incorrecta.");
+        async function renderHistory(ids) {
+            const container = document.getElementById('history');
+            if(!ids.length) { container.innerHTML = '<p class="text-center py-6 opacity-20 text-[9px]">SIN REGISTROS HOY</p>'; return; }
+            
+            let html = "";
+            for (const id of ids.reverse().slice(0, 3)) {
+                const s = await getDoc(doc(db, 'artifacts', appId, 'public', 'data', 'classes', id));
+                if(s.exists()) {
+                    const c = s.data();
+                    html += `
+                        <div class="p-4 bg-white/5 border border-white/5 rounded-2xl flex justify-between items-center">
+                            <div>
+                                <h4 class="font-black text-[10px] uppercase italic">${c.name}</h4>
+                                <p class="text-[8px] opacity-40 uppercase font-bold mt-1">${new Date(c.createdAt).toLocaleTimeString()}</p>
+                            </div>
+                            <div class="status-badge">LISTO</div>
+                        </div>`;
                 }
-            } catch (e) {
-                alert("Error de conexión.");
             }
+            container.innerHTML = html;
         }
 
-        async function guardarPerfil() {
-            const pass = document.getElementById('reg-pass').value;
-            const nombre = document.getElementById('reg-nombre').value.trim().toUpperCase();
-            const carrera = document.getElementById('reg-carrera').value.trim().toUpperCase();
-            const nivel = document.getElementById('reg-nivel').value;
-
-            if (!nombre || !carrera || !nivel || pass.length < 6) {
-                alert("Completa todos los campos correctamente (Contraseña min. 6 caracteres).");
-                return;
-            }
-
-            document.getElementById('btn-registrar-final').disabled = true;
-            document.getElementById('btn-registrar-final').innerText = "Generando...";
-
-            const nuevoFolio = generarFolio();
-
-            const perfil = {
-                nombre: nombre,
-                folio: nuevoFolio,
-                carrera: carrera,
-                grado: document.getElementById('reg-grado').value.trim(),
-                grupo: document.getElementById('reg-grupo').value.trim().toUpperCase(),
-                nivel: nivel,
-                modalidad: document.getElementById('reg-modalidad').value,
-                password: pass,
-                registradoEl: new Date().getTime()
-            };
-
-            try {
-                // Guardar en la base de datos usando el nuevo Folio como ID de documento
-                await db.collection('artifacts').doc(appId).collection('public').doc('data')
-                        .collection('students_registry').doc(nuevoFolio).set(perfil);
-                
-                sessionStorage.setItem('ceut_active_user', JSON.stringify(perfil));
-                
-                // Mostrar pantalla de folio generado
-                document.getElementById('step-registro').classList.add('hidden');
-                document.getElementById('step-folio-result').classList.remove('hidden');
-                document.getElementById('generated-folio-display').innerText = nuevoFolio;
-                lucide.createIcons();
-                
-            } catch (e) {
-                alert("Error al crear cuenta. Intenta de nuevo.");
-                document.getElementById('btn-registrar-final').disabled = false;
-                document.getElementById('btn-registrar-final').innerText = "Generar Folio y Registrar";
-            }
-        }
-
-        function continuarAPaseLista() {
-            const perfil = JSON.parse(sessionStorage.getItem('ceut_active_user'));
-            mostrarPaseLista(perfil);
-        }
-
-        function mostrarPaseLista(perfil) {
-            document.getElementById('step-login').classList.add('hidden');
-            document.getElementById('step-registro').classList.add('hidden');
-            document.getElementById('step-folio-result').classList.add('hidden');
-            document.getElementById('step-asistencia').classList.remove('hidden');
-            
-            document.getElementById('display-alumno-nombre').innerText = perfil.nombre;
-            document.getElementById('display-alumno-carrera').innerText = perfil.carrera;
-            document.getElementById('display-alumno-info').innerText = 
-                `${perfil.nivel} | ${perfil.modalidad} | ${perfil.grado}° ${perfil.grupo}`;
-            
-            lucide.createIcons();
-        }
-
-        async function registrarAsistencia() {
-            const codigo = document.getElementById('input-codigo').value.trim();
-            const perfil = JSON.parse(sessionStorage.getItem('ceut_active_user'));
-
-            if (codigo.length !== 6) return alert("Código inválido.");
-
-            try {
-                const pinDoc = await db.collection('artifacts').doc(appId).collection('public').doc('data')
-                                     .collection('active_pins').doc(codigo).get();
-
-                if (!pinDoc.exists) return alert("EL CÓDIGO NO EXISTE O YA EXPIRÓ.");
-
-                const claseData = pinDoc.data();
-
-                await db.collection('artifacts').doc(appId).collection('public').doc('data')
-                      .collection('asistencias').add({
-                          folio: perfil.folio,
-                          studentName: perfil.nombre,
-                          studentCareer: perfil.carrera,
-                          studentLevel: perfil.nivel,
-                          grade: perfil.grado,
-                          group: perfil.grupo,
-                          className: claseData.className,
-                          profId: claseData.profId,
-                          ts: Date.now()
-                      });
-
-                document.getElementById('step-asistencia').classList.add('hidden');
-                document.getElementById('step-exito').classList.remove('hidden');
-                lucide.createIcons();
-
-            } catch (error) {
-                alert("Error al registrar asistencia.");
-            }
-        }
-
-        function cerrarSesionLocal() {
-            sessionStorage.removeItem('ceut_active_user');
-            location.reload();
-        }
+        lucide.createIcons();
     </script>
 </body>
 </html>
