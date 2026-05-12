@@ -3,111 +3,74 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CEUT | Admin</title>
+    <title>CEUT | Sistema Central</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
     <style>
-        :root { --ceut-blue-dark: #000b21; --ceut-blue-light: #1e1b4b; --ceut-gold: #eab308; }
-        body { background: var(--ceut-blue-dark); font-family: 'Plus Jakarta Sans', sans-serif; color: white; min-height: 100vh; }
-        .glass { background: rgba(255,255,255,0.03); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.1); }
+        :root {
+            --ceut-blue-dark: #000b21;
+            --ceut-blue-light: #1e1b4b;
+            --ceut-gold: #eab308;
+        }
+        body { 
+            background: radial-gradient(circle at center, var(--ceut-blue-light), var(--ceut-blue-dark));
+            font-family: 'Plus Jakarta Sans', sans-serif; 
+            color: white; min-height: 100vh;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .menu-card {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+        .menu-card:hover {
+            transform: translateY(-10px);
+            border-color: var(--ceut-gold);
+            background: rgba(234, 179, 8, 0.05);
+        }
     </style>
 </head>
 <body class="p-6">
-    <div class="max-w-6xl mx-auto">
-        <header class="flex justify-between items-center mb-8">
-            <div class="flex items-center gap-4">
-                <i data-lucide="shield-check" class="text-red-500 w-8 h-8"></i>
-                <h1 class="text-xl font-black uppercase italic">Panel <span class="text-red-500">Administrativo</span></h1>
-            </div>
-            <a href="index.html" class="text-[10px] uppercase font-bold opacity-50 hover:opacity-100 italic">Cerrar Sesión</a>
-        </header>
-
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-            <div class="glass p-6 rounded-2xl">
-                <p class="text-[10px] uppercase opacity-50 mb-1">Docentes Registrados</p>
-                <h3 id="count-profs" class="text-3xl font-black">0</h3>
-            </div>
-            <div class="glass p-6 rounded-2xl">
-                <p class="text-[10px] uppercase opacity-50 mb-1">Materias Activas</p>
-                <h3 id="count-classes" class="text-3xl font-black">0</h3>
-            </div>
-            <div class="glass p-6 rounded-2xl">
-                <p class="text-[10px] uppercase opacity-50 mb-1">Asistencias Totales</p>
-                <h3 id="count-logs" class="text-3xl font-black">0</h3>
-            </div>
-            <div class="glass p-6 rounded-2xl border-red-500/30 bg-red-500/5">
-                <p class="text-[10px] uppercase text-red-400 mb-1 font-bold">Estado del Servidor</p>
-                <h3 class="text-xs font-black text-green-500">EN LÍNEA</h3>
-            </div>
+    <div class="max-w-5xl w-full">
+        <div class="text-center mb-12">
+            <img src="https://lh3.googleusercontent.com/d/17NobXQ3JbRnLGejZe4Mn2x-Jl45F4rPm" class="w-24 mx-auto mb-6" alt="Logo">
+            <h1 class="text-4xl font-black uppercase italic italic tracking-tighter">Sistema Integral <span class="text-yellow-500">CEUT</span></h1>
+            <p class="opacity-50 text-sm mt-2 uppercase tracking-[0.3em]">Seleccione su portal de acceso</p>
         </div>
 
-        <div class="glass rounded-3xl overflow-hidden">
-            <div class="p-6 border-b border-white/10 flex justify-between items-center">
-                <h2 class="text-sm font-black uppercase italic">Directorio de Docentes</h2>
-                <input type="text" placeholder="BUSCAR POR FOLIO..." class="bg-white/5 border border-white/10 rounded-lg px-4 py-2 text-[10px] uppercase">
-            </div>
-            <div class="overflow-x-auto">
-                <table class="w-full text-left text-[11px]">
-                    <thead class="bg-white/5 uppercase text-yellow-500">
-                        <tr>
-                            <th class="p-4">Folio</th>
-                            <th class="p-4">Nombre del Docente</th>
-                            <th class="p-4">Correo Institucional</th>
-                            <th class="p-4">Materias</th>
-                            <th class="p-4">Acciones</th>
-                        </tr>
-                    </thead>
-                    <tbody id="prof-table-body">
-                        <!-- Carga dinamica -->
-                    </tbody>
-                </table>
-            </div>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <!-- Admin -->
+            <a href="admin.html" class="menu-card p-8 rounded-3xl text-center group">
+                <div class="w-16 h-16 bg-red-500/20 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition">
+                    <i data-lucide="shield-check" class="w-8 h-8 text-red-500"></i>
+                </div>
+                <h2 class="text-xl font-bold uppercase italic italic mb-2">Administrativo</h2>
+                <p class="text-[10px] opacity-40 uppercase">Control de usuarios y reportes generales</p>
+            </a>
+
+            <!-- Docente -->
+            <a href="docente.html" class="menu-card p-8 rounded-3xl text-center group">
+                <div class="w-16 h-16 bg-yellow-500/20 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition">
+                    <i data-lucide="graduation-cap" class="w-8 h-8 text-yellow-500"></i>
+                </div>
+                <h2 class="text-xl font-bold uppercase italic italic mb-2 text-yellow-500">Docente</h2>
+                <p class="text-[10px] opacity-40 uppercase">Gestión de clases y pase de lista</p>
+            </a>
+
+            <!-- Alumno -->
+            <a href="alumno.html" class="menu-card p-8 rounded-3xl text-center group">
+                <div class="w-16 h-16 bg-blue-500/20 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition">
+                    <i data-lucide="user" class="w-8 h-8 text-blue-500"></i>
+                </div>
+                <h2 class="text-xl font-bold uppercase italic italic mb-2 text-blue-400">Alumno</h2>
+                <p class="text-[10px] opacity-40 uppercase">Registro de asistencia y datos</p>
+            </a>
         </div>
+        
+        <p class="text-center mt-16 text-[9px] opacity-30 uppercase tracking-widest font-bold">Centro Universitario de Tehuacán © 2024</p>
     </div>
-
-    <script>
-        const firebaseConfig = {
-            apiKey: "AIzaSyCefP6qEqaCMpo8ZpUiLpN4e_-E4ZNTp94",
-            authDomain: "asistencias-ceut.firebaseapp.com",
-            projectId: "asistencias-ceut",
-            storageBucket: "asistencias-ceut.firebasestorage.app",
-            messagingSenderId: "130615246146",
-            appId: "1:130615246146:web:6ae2c17c828fb28a809cdb"
-        };
-        firebase.initializeApp(firebaseConfig);
-        const db = firebase.firestore();
-        const appId = 'ceut-dynamic-v2';
-
-        async function loadAdminData() {
-            const profsSnap = await db.collection('artifacts').doc(appId).collection('public').doc('teachers').collection('profiles').get();
-            document.getElementById('count-profs').innerText = profsSnap.size;
-            
-            const tbody = document.getElementById('prof-table-body');
-            tbody.innerHTML = '';
-
-            profsSnap.forEach(doc => {
-                const p = doc.data();
-                const row = document.createElement('tr');
-                row.className = "border-b border-white/5 hover:bg-white/5 transition";
-                row.innerHTML = `
-                    <td class="p-4 font-bold text-yellow-500">${p.folio}</td>
-                    <td class="p-4 uppercase">${p.name}</td>
-                    <td class="p-4 opacity-60">${p.email}</td>
-                    <td class="p-4">
-                        <button class="bg-blue-500/20 text-blue-400 px-3 py-1 rounded text-[9px] font-bold uppercase">Ver Clases</button>
-                    </td>
-                    <td class="p-4">
-                        <button class="text-red-500 hover:scale-110 transition"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
-                    </td>
-                `;
-                tbody.appendChild(row);
-            });
-            lucide.createIcons();
-        }
-        loadAdminData();
-    </script>
+    <script>lucide.createIcons();</script>
 </body>
 </html>
