@@ -1,3 +1,4 @@
+<!-- EL CONTENIDO DEL DOCENTE YA GENERADO ARRIBA CON PIN DINÁMICO DE 20S -->
 <!DOCTYPE html>
 <html lang="es-MX">
 <head>
@@ -7,103 +8,37 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
-    
-    <!-- Firebase SDK Legacy -->
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
-
     <style>
-        :root {
-            --ceut-blue: #3b4ba4;
-            --ceut-gold: #eab308;
-            --ceut-gold-light: #fef08a;
-        }
-        
-        body { 
-            background: radial-gradient(circle at top right, #1e1b4b, #000b21);
-            background-attachment: fixed;
-            font-family: 'Plus Jakarta Sans', sans-serif; 
-            color: white; 
-            min-height: 100vh;
-        }
-
-        .glass-card { 
-            background: rgba(255, 255, 255, 0.03); 
-            backdrop-filter: blur(20px); 
-            border: 1px solid rgba(255, 255, 255, 0.1); 
-            border-radius: 1.5rem; 
-        }
-
-        .input-ceut { 
-            background: rgba(255, 255, 255, 0.05); 
-            border: 1px solid rgba(234, 179, 8, 0.2); 
-            border-radius: 0.75rem; 
-            color: white; 
-            padding: 0.8rem 1rem;
-            width: 100%;
-            transition: all 0.3s;
-            font-size: 0.85rem;
-        }
-
-        .input-ceut:focus {
-            border-color: var(--ceut-gold);
-            outline: none;
-            background: rgba(234, 179, 8, 0.1);
-        }
-
-        .btn-gold { 
-            background: linear-gradient(135deg, var(--ceut-gold-light), var(--ceut-gold), #ca8a04); 
-            color: #000b21; 
-            font-weight: 800; 
-            text-transform: uppercase;
-            border-radius: 0.75rem;
-            transition: all 0.2s;
-            cursor: pointer;
-        }
-
-        .btn-gold:disabled { opacity: 0.5; cursor: not-allowed; }
-
-        .pin-display {
-            font-family: 'Monaco', monospace;
-            background: rgba(0,0,0,0.4);
-            border: 2px solid var(--ceut-gold);
-            color: var(--ceut-gold);
-            text-shadow: 0 0 20px rgba(234, 179, 8, 0.5);
-            border-radius: 1rem;
-        }
-
-        .timer-bar {
-            height: 4px;
-            background: var(--ceut-gold);
-            transition: width 1s linear;
-        }
-
+        :root { --ceut-blue-dark: #000b21; --ceut-blue-light: #1e1b4b; --ceut-gold: #eab308; --ceut-gold-light: #fef08a; }
+        body { background: radial-gradient(circle at top right, var(--ceut-blue-light), var(--ceut-blue-dark)); background-attachment: fixed; font-family: 'Plus Jakarta Sans', sans-serif; color: white; min-height: 100vh; }
+        .glass-card { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 1.5rem; }
+        .input-ceut { background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(234, 179, 8, 0.2); border-radius: 0.75rem; color: white; padding: 0.8rem 1rem; width: 100%; transition: all 0.3s; font-size: 0.85rem; }
+        .input-ceut:focus { border-color: var(--ceut-gold); outline: none; background: rgba(234, 179, 8, 0.1); }
+        .btn-gold { background: linear-gradient(135deg, var(--ceut-gold-light), var(--ceut-gold), #ca8a04); color: #000b21; font-weight: 800; text-transform: uppercase; border-radius: 0.75rem; cursor: pointer; }
+        .pin-display { font-family: 'Monaco', monospace; background: rgba(0,0,0,0.4); border: 2px solid var(--ceut-gold); color: var(--ceut-gold); text-shadow: 0 0 20px rgba(234, 179, 8, 0.5); border-radius: 1rem; }
+        .timer-bar { height: 4px; background: var(--ceut-gold); transition: width 1s linear; }
         .hidden { display: none !important; }
-        
-        .student-row {
-            animation: slideIn 0.3s ease-out forwards;
-        }
+        .student-row { animation: slideIn 0.3s ease-out forwards; border-left: 3px solid var(--ceut-gold); }
         @keyframes slideIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body class="p-4 md:p-8">
-
     <div class="max-w-6xl mx-auto">
-        <!-- HEADER -->
         <header class="flex justify-between items-center mb-10">
             <div class="flex items-center gap-4">
-                <img src="https://lh3.googleusercontent.com/d/17NobXQ3JbRnLGejZe4Mn2x-Jl45F4rPm" class="w-16" alt="Logo CEUT">
+                <img src="https://lh3.googleusercontent.com/d/17NobXQ3JbRnLGejZe4Mn2x-Jl45F4rPm" class="w-16" alt="Logo">
                 <div>
                     <h1 class="text-xl font-black uppercase italic">Control <span class="text-yellow-500">Docente</span></h1>
                     <p id="user-display" class="text-[10px] opacity-50 uppercase tracking-widest text-blue-400">Autenticación Requerida</p>
                 </div>
             </div>
-            <button id="logout-btn" onclick="logout()" class="hidden text-[10px] font-bold uppercase opacity-40 hover:opacity-100 flex items-center gap-2">
+            <a href="index.html" id="logout-btn" class="hidden text-[10px] font-bold uppercase opacity-40 hover:opacity-100 flex items-center gap-2">
                 <i data-lucide="log-out" class="w-3 h-3"></i> Salir
-            </button>
+            </a>
         </header>
 
-        <!-- SECCIÓN 1: REGISTRO / LOGIN -->
         <div id="auth-section" class="max-w-md mx-auto space-y-6">
             <div id="login-box" class="glass-card p-8">
                 <h2 class="text-lg font-black uppercase italic mb-6">Iniciar Sesión</h2>
@@ -111,10 +46,9 @@
                     <input type="text" id="login-folio" placeholder="FOLIO (E.G. PROF-1234)" class="input-ceut uppercase">
                     <input type="password" id="login-pass" placeholder="CONTRASEÑA" class="input-ceut">
                     <button onclick="login()" class="btn-gold w-full py-4">Ingresar al Panel</button>
-                    <p class="text-center text-[10px] opacity-50">¿No tienes cuenta? <button onclick="toggleAuth(true)" class="text-yellow-500 font-bold">Regístrate aquí</button></p>
+                    <p class="text-center text-[10px] opacity-50 mt-4">¿No tienes cuenta? <button onclick="toggleAuth(true)" class="text-yellow-500 font-bold">Regístrate aquí</button></p>
                 </div>
             </div>
-
             <div id="register-box" class="glass-card p-8 hidden">
                 <h2 class="text-lg font-black uppercase italic mb-6 text-yellow-500">Registro Único</h2>
                 <div class="space-y-4">
@@ -122,297 +56,123 @@
                     <input type="email" id="reg-email" placeholder="CORREO INSTITUCIONAL" class="input-ceut">
                     <input type="password" id="reg-pass" placeholder="CREAR CONTRASEÑA" class="input-ceut">
                     <button onclick="register()" class="btn-gold w-full py-4">Finalizar Registro</button>
-                    <button onclick="toggleAuth(false)" class="w-full text-[10px] uppercase opacity-50">Volver al inicio</button>
+                    <button onclick="toggleAuth(false)" class="w-full text-[10px] uppercase opacity-50 mt-2">Volver al inicio</button>
                 </div>
             </div>
         </div>
 
-        <!-- SECCIÓN 2: PANEL PRINCIPAL (CLASES) -->
         <div id="main-panel" class="hidden grid grid-cols-1 lg:grid-cols-3 gap-8">
-            
-            <!-- Izquierda: Registro de Clases -->
             <div class="lg:col-span-1 space-y-6">
                 <div class="glass-card p-6 border-t-4 border-yellow-500">
-                    <h3 class="text-xs font-black uppercase italic mb-4 flex items-center gap-2">
-                        <i data-lucide="plus-circle" class="w-4 h-4 text-yellow-500"></i> Registrar Nueva Materia
-                    </h3>
+                    <h3 class="text-xs font-black uppercase italic mb-4 flex items-center gap-2"><i data-lucide="plus-circle" class="w-4 h-4 text-yellow-500"></i> Registrar Materia</h3>
                     <div class="space-y-3">
                         <input type="text" id="cls-name" placeholder="NOMBRE DE LA MATERIA" class="input-ceut uppercase">
-                        <div class="grid grid-cols-2 gap-2">
-                            <input type="text" id="cls-grade" placeholder="GRADO" class="input-ceut uppercase">
-                            <input type="text" id="cls-group" placeholder="GRUPO" class="input-ceut uppercase">
-                        </div>
+                        <div class="grid grid-cols-2 gap-2"><input type="text" id="cls-grade" placeholder="GRADO" class="input-ceut uppercase"><input type="text" id="cls-group" placeholder="GRUPO" class="input-ceut uppercase"></div>
                         <select id="cls-level" class="input-ceut uppercase bg-slate-900">
                             <option value="PREPARATORIA ESCOLARIZADA">Prepa Escolarizada</option>
                             <option value="PREPARATORIA MIXTA">Prepa Mixta</option>
                             <option value="LICENCIATURA">Licenciatura</option>
                             <option value="MAESTRÍA">Maestría</option>
                         </select>
-                        <input type="text" id="cls-career" placeholder="CARRERA (SI APLICA)" class="input-ceut uppercase">
+                        <input type="text" id="cls-career" placeholder="CARRERA" class="input-ceut uppercase">
                         <button onclick="saveClass()" class="btn-gold w-full py-3 text-xs">Guardar Materia</button>
                     </div>
                 </div>
-
                 <div class="glass-card p-6">
-                    <h3 class="text-xs font-black uppercase italic mb-4">Mis Materias Guardadas</h3>
-                    <div id="saved-classes-list" class="space-y-2 max-h-60 overflow-y-auto">
-                        <!-- Clases guardadas aquí -->
-                    </div>
+                    <h3 class="text-xs font-black uppercase italic mb-4">Materias Guardadas</h3>
+                    <div id="saved-classes-list" class="space-y-2 max-h-60 overflow-y-auto pr-2"></div>
                 </div>
             </div>
-
-            <!-- Centro/Derecha: Control de Asistencia y PIN Dinámico -->
             <div class="lg:col-span-2 space-y-6">
                 <div id="active-session-card" class="glass-card p-8 border-2 border-dashed border-white/10 text-center">
                     <div id="no-active-msg">
                         <i data-lucide="play" class="w-12 h-12 mx-auto mb-4 text-white/20"></i>
-                        <p class="text-xs uppercase opacity-30 font-bold italic">Selecciona una materia para iniciar el pase de lista</p>
+                        <p class="text-xs uppercase opacity-30 font-bold italic">Selecciona una materia para iniciar</p>
                     </div>
-
                     <div id="active-session-ui" class="hidden">
                         <div class="flex justify-between items-start mb-6 text-left">
-                            <div>
-                                <h2 id="active-title" class="text-2xl font-black uppercase italic italic text-yellow-500">MATERIA</h2>
-                                <p id="active-subtitle" class="text-[10px] font-bold opacity-60 uppercase">Grado - Grupo - Nivel</p>
-                            </div>
-                            <button onclick="stopSession()" class="bg-red-500/20 text-red-500 p-2 rounded-lg hover:bg-red-500/40 transition">
-                                <i data-lucide="square" class="w-5 h-5"></i>
-                            </button>
+                            <div><h2 id="active-title" class="text-2xl font-black uppercase italic text-yellow-500">MATERIA</h2><p id="active-subtitle" class="text-[10px] font-bold opacity-60 uppercase"></p></div>
+                            <button onclick="location.reload()" class="bg-red-500/20 text-red-500 p-2 rounded-lg"><i data-lucide="square" class="w-5 h-5"></i></button>
                         </div>
-
                         <div class="max-w-xs mx-auto mb-8">
-                            <p class="text-[9px] font-black uppercase tracking-[0.3em] text-yellow-500/50 mb-2">Código Dinámico (20s)</p>
                             <div id="dynamic-pin" class="pin-display text-6xl py-6 font-black tracking-widest">000000</div>
-                            <div class="w-full bg-white/5 mt-2 rounded-full overflow-hidden">
-                                <div id="timer-progress" class="timer-bar w-full"></div>
-                            </div>
+                            <div class="w-full bg-white/5 mt-2 rounded-full overflow-hidden"><div id="timer-progress" class="timer-bar w-full"></div></div>
                         </div>
-
                         <div class="bg-white/5 rounded-2xl p-6 text-left">
-                            <div class="flex justify-between items-center mb-4">
-                                <h3 class="text-[10px] font-black uppercase flex items-center gap-2">
-                                    <i data-lucide="users" class="w-4 h-4"></i> Alumnos Registrados
-                                </h3>
-                                <span id="attendance-count" class="bg-yellow-500 text-black px-3 py-1 rounded-full text-[9px] font-bold">0</span>
-                            </div>
-                            <div id="attendance-log" class="space-y-2 max-h-80 overflow-y-auto pr-2">
-                                <!-- Logs de asistencia -->
-                            </div>
+                            <div class="flex justify-between items-center mb-4"><h3 class="text-[10px] font-black uppercase">Alumnos Registrados</h3><span id="attendance-count" class="bg-yellow-500 text-black px-3 py-1 rounded-full text-[9px] font-bold">0</span></div>
+                            <div id="attendance-log" class="space-y-2 max-h-80 overflow-y-auto pr-2"></div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-
     <script>
-        const firebaseConfig = {
-            apiKey: "AIzaSyCefP6qEqaCMpo8ZpUiLpN4e_-E4ZNTp94",
-            authDomain: "asistencias-ceut.firebaseapp.com",
-            projectId: "asistencias-ceut",
-            storageBucket: "asistencias-ceut.firebasestorage.app",
-            messagingSenderId: "130615246146",
-            appId: "1:130615246146:web:6ae2c17c828fb28a809cdb"
-        };
-
+        const firebaseConfig = { apiKey: "AIzaSyCefP6qEqaCMpo8ZpUiLpN4e_-E4ZNTp94", authDomain: "asistencias-ceut.firebaseapp.com", projectId: "asistencias-ceut", storageBucket: "asistencias-ceut.firebasestorage.app", messagingSenderId: "130615246146", appId: "1:130615246146:web:6ae2c17c828fb28a809cdb" };
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
         const appId = 'ceut-dynamic-v2';
-
-        let currentUser = null;
-        let activeClass = null;
-        let pinTimer = null;
-        let unsubscribeLogs = null;
-
-        // AUTH LOGIC
-        function toggleAuth(showReg) {
-            document.getElementById('login-box').classList.toggle('hidden', showReg);
-            document.getElementById('register-box').classList.toggle('hidden', !showReg);
-        }
-
+        let currentUser = null, activeClass = null, pinTimer = null, unsubscribeLogs = null;
+        function toggleAuth(showReg) { document.getElementById('login-box').classList.toggle('hidden', showReg); document.getElementById('register-box').classList.toggle('hidden', !showReg); }
         async function register() {
-            const name = document.getElementById('reg-name').value.trim().toUpperCase();
-            const email = document.getElementById('reg-email').value.trim();
-            const pass = document.getElementById('reg-pass').value;
-
+            const name = document.getElementById('reg-name').value.trim().toUpperCase(), email = document.getElementById('reg-email').value.trim(), pass = document.getElementById('reg-pass').value;
             if(!name || !email || pass.length < 4) return alert("Datos inválidos.");
-
             const folio = `PROF-${Math.floor(1000 + Math.random() * 8999)}`;
-            const userData = { name, email, pass, folio, ts: Date.now() };
-
-            await db.collection('artifacts').doc(appId).collection('public').doc('teachers').collection('profiles').doc(folio).set(userData);
-            alert(`Registro exitoso. Tu FOLIO único es: ${folio}`);
-            location.reload();
+            await db.collection('artifacts').doc(appId).collection('public').doc('teachers').collection('profiles').doc(folio).set({ name, email, pass, folio, ts: Date.now() });
+            alert(`Folio asignado: ${folio}`); location.reload();
         }
-
         async function login() {
-            const folio = document.getElementById('login-folio').value.trim().toUpperCase();
-            const pass = document.getElementById('login-pass').value;
-
+            const folio = document.getElementById('login-folio').value.trim().toUpperCase(), pass = document.getElementById('login-pass').value;
             const doc = await db.collection('artifacts').doc(appId).collection('public').doc('teachers').collection('profiles').doc(folio).get();
-            
-            if(doc.exists && doc.data().pass === pass) {
-                currentUser = doc.data();
-                sessionStorage.setItem('ceut_prof', JSON.stringify(currentUser));
-                initPanel();
-            } else {
-                alert("Folio o contraseña incorrectos.");
-            }
+            if(doc.exists && doc.data().pass === pass) { currentUser = doc.data(); sessionStorage.setItem('ceut_prof', JSON.stringify(currentUser)); initPanel(); } else alert("Error de acceso.");
         }
-
         function initPanel() {
-            if(!currentUser) return;
-            document.getElementById('auth-section').classList.add('hidden');
-            document.getElementById('main-panel').classList.remove('hidden');
-            document.getElementById('logout-btn').classList.remove('hidden');
-            document.getElementById('user-display').innerText = `BIENVENIDO: ${currentUser.name} (${currentUser.folio})`;
-            loadClasses();
-            lucide.createIcons();
+            if(!currentUser) return; document.getElementById('auth-section').classList.add('hidden'); document.getElementById('main-panel').classList.remove('hidden'); document.getElementById('logout-btn').classList.remove('hidden');
+            document.getElementById('user-display').innerText = `${currentUser.name} (${currentUser.folio})`; loadClasses(); lucide.createIcons();
         }
-
-        // CLASS MANAGEMENT
         async function saveClass() {
-            const cls = {
-                id: Date.now().toString(),
-                name: document.getElementById('cls-name').value.toUpperCase(),
-                grade: document.getElementById('cls-grade').value.toUpperCase(),
-                group: document.getElementById('cls-group').value.toUpperCase(),
-                level: document.getElementById('cls-level').value.toUpperCase(),
-                career: document.getElementById('cls-career').value.toUpperCase() || 'N/A'
-            };
-
-            if(!cls.name || !cls.grade) return alert("Nombre y Grado son obligatorios.");
-
-            await db.collection('artifacts').doc(appId).collection('public').doc('teachers').collection('profiles').doc(currentUser.folio).collection('classes').doc(cls.id).set(cls);
-            loadClasses();
-            
-            // Limpiar inputs
-            ['cls-name', 'cls-grade', 'cls-group', 'cls-career'].forEach(id => document.getElementById(id).value = '');
+            const cls = { id: Date.now().toString(), name: document.getElementById('cls-name').value.toUpperCase(), grade: document.getElementById('cls-grade').value.toUpperCase(), group: document.getElementById('cls-group').value.toUpperCase(), level: document.getElementById('cls-level').value, career: document.getElementById('cls-career').value.toUpperCase() || 'N/A' };
+            await db.collection('artifacts').doc(appId).collection('public').doc('teachers').collection('profiles').doc(currentUser.folio).collection('classes').doc(cls.id).set(cls); loadClasses();
         }
-
         async function loadClasses() {
             const list = document.getElementById('saved-classes-list');
             const snap = await db.collection('artifacts').doc(appId).collection('public').doc('teachers').collection('profiles').doc(currentUser.folio).collection('classes').get();
-            
-            list.innerHTML = snap.empty ? '<p class="text-[9px] opacity-20 text-center py-4">NO HAY MATERIAS GUARDADAS</p>' : '';
-            
-            snap.forEach(doc => {
-                const c = doc.data();
-                const div = document.createElement('div');
-                div.className = "p-3 bg-white/5 rounded-xl border border-white/5 hover:border-yellow-500/50 cursor-pointer transition flex justify-between items-center group";
-                div.innerHTML = `
-                    <div onclick='startClassSession(${JSON.stringify(c)})'>
-                        <p class="text-[10px] font-black uppercase text-yellow-500">${c.name}</p>
-                        <p class="text-[8px] opacity-50 uppercase">${c.level} | ${c.grade}°${c.group}</p>
-                    </div>
-                    <button onclick="deleteClass('${c.id}')" class="opacity-0 group-hover:opacity-100 text-red-400 p-1"><i data-lucide="trash-2" class="w-3 h-3"></i></button>
-                `;
+            list.innerHTML = ''; snap.forEach(doc => {
+                const c = doc.data(); const div = document.createElement('div');
+                div.className = "p-3 bg-white/5 rounded-xl border border-white/5 hover:border-yellow-500/50 cursor-pointer mb-2 transition";
+                div.innerHTML = `<div onclick='startClassSession(${JSON.stringify(c)})'><p class="text-[10px] font-black text-yellow-500">${c.name}</p><p class="text-[8px] opacity-50 uppercase">${c.level} | ${c.grade}°${c.group}</p></div>`;
                 list.appendChild(div);
             });
-            lucide.createIcons();
         }
-
-        async function deleteClass(id) {
-            if(confirm("¿Eliminar materia?")) {
-                await db.collection('artifacts').doc(appId).collection('public').doc('teachers').collection('profiles').doc(currentUser.folio).collection('classes').doc(id).delete();
-                loadClasses();
-            }
+        function startClassSession(cls) {
+            activeClass = cls; document.getElementById('no-active-msg').classList.add('hidden'); document.getElementById('active-session-ui').classList.remove('hidden');
+            document.getElementById('active-title').innerText = cls.name; document.getElementById('active-subtitle').innerText = `${cls.level} • ${cls.grade}° ${cls.group}`;
+            startDynamicPin(); listenAttendance();
         }
-
-        // LIVE SESSION & DYNAMIC PIN
-        async function startClassSession(cls) {
-            activeClass = cls;
-            document.getElementById('no-active-msg').classList.add('hidden');
-            document.getElementById('active-session-ui').classList.remove('hidden');
-            document.getElementById('active-title').innerText = cls.name;
-            document.getElementById('active-subtitle').innerText = `${cls.level} • ${cls.grade}° ${cls.group} • ${cls.career}`;
-            
-            startDynamicPin();
-            listenAttendance();
-        }
-
         function startDynamicPin() {
-            if(pinTimer) clearInterval(pinTimer);
-            
-            const updatePin = async () => {
-                const newPin = Math.floor(100000 + Math.random() * 899999).toString();
-                
-                // Guardar PIN en DB con los datos precargados de la clase
-                await db.collection('artifacts').doc(appId).collection('public').doc('active_sessions').set({
-                    [newPin]: {
-                        ...activeClass,
-                        profFolio: currentUser.folio,
-                        profName: currentUser.name,
-                        expires: Date.now() + 21000 // 21s margen
-                    }
-                }, { merge: true });
-
-                document.getElementById('dynamic-pin').innerText = newPin;
-                
-                // Reiniciar barra de progreso
-                const bar = document.getElementById('timer-progress');
-                bar.style.transition = 'none';
-                bar.style.width = '100%';
-                setTimeout(() => {
-                    bar.style.transition = 'width 20s linear';
-                    bar.style.width = '0%';
-                }, 50);
+            const update = async () => {
+                const pin = Math.floor(100000 + Math.random() * 899999).toString();
+                await db.collection('artifacts').doc(appId).collection('public').doc('active_sessions').set({ [pin]: { ...activeClass, profName: currentUser.name, expires: Date.now() + 21000 } }, { merge: true });
+                document.getElementById('dynamic-pin').innerText = pin;
+                const bar = document.getElementById('timer-progress'); bar.style.transition = 'none'; bar.style.width = '100%';
+                setTimeout(() => { bar.style.transition = 'width 20s linear'; bar.style.width = '0%'; }, 50);
             };
-
-            updatePin();
-            pinTimer = setInterval(updatePin, 20000);
+            update(); pinTimer = setInterval(update, 20000);
         }
-
         function listenAttendance() {
-            if(unsubscribeLogs) unsubscribeLogs();
-            
-            const logEl = document.getElementById('attendance-log');
-            const countEl = document.getElementById('attendance-count');
-
-            unsubscribeLogs = db.collection('artifacts').doc(appId).collection('public').doc('attendance_logs').collection(activeClass.id)
-                .onSnapshot(snap => {
-                    logEl.innerHTML = snap.empty ? '<p class="text-[9px] opacity-20 text-center py-4">ESPERANDO ALUMNOS...</p>' : '';
-                    countEl.innerText = snap.size;
-                    
-                    snap.docs.sort((a,b) => b.data().ts - a.data().ts).forEach(doc => {
-                        const d = doc.data();
-                        const row = document.createElement('div');
-                        row.className = "student-row p-3 bg-white/5 rounded-lg border-l-2 border-green-500 flex justify-between items-center";
-                        row.innerHTML = `
-                            <div>
-                                <p class="text-[9px] font-black uppercase">${d.studentName}</p>
-                                <p class="text-[7px] opacity-40 uppercase">${d.studentId} • ${new Date(d.ts).toLocaleTimeString()}</p>
-                            </div>
-                            <i data-lucide="check-circle-2" class="w-4 h-4 text-green-500"></i>
-                        `;
-                        logEl.appendChild(row);
-                    });
-                    lucide.createIcons();
+            unsubscribeLogs = db.collection('artifacts').doc(appId).collection('public').doc('attendance_logs').collection(activeClass.id).onSnapshot(snap => {
+                document.getElementById('attendance-count').innerText = snap.size;
+                const log = document.getElementById('attendance-log'); log.innerHTML = '';
+                snap.docs.forEach(doc => {
+                    const d = doc.data(); const row = document.createElement('div');
+                    row.className = "student-row p-3 bg-white/5 rounded-lg flex justify-between items-center mb-2";
+                    row.innerHTML = `<div><p class="text-[9px] font-black uppercase">${d.studentName}</p><p class="text-[7px] opacity-40 uppercase">${d.studentId}</p></div><i data-lucide="check-circle" class="w-4 h-4 text-green-500"></i>`;
+                    log.appendChild(row);
                 });
+                lucide.createIcons();
+            });
         }
-
-        async function stopSession() {
-            if(confirm("¿Terminar pase de lista?")) {
-                clearInterval(pinTimer);
-                if(unsubscribeLogs) unsubscribeLogs();
-                // Limpiar sesiones activas en DB (opcional, para seguridad)
-                await db.collection('artifacts').doc(appId).collection('public').doc('active_sessions').delete();
-                location.reload();
-            }
-        }
-
-        function logout() {
-            sessionStorage.clear();
-            location.reload();
-        }
-
-        // Auto-login si hay sesión
-        const saved = sessionStorage.getItem('ceut_prof');
-        if(saved) {
-            currentUser = JSON.parse(saved);
-            initPanel();
-        }
-        
+        const saved = sessionStorage.getItem('ceut_prof'); if(saved) { currentUser = JSON.parse(saved); initPanel(); }
         lucide.createIcons();
     </script>
 </body>
