@@ -34,11 +34,6 @@
             100% { opacity: 0.03; transform: scale(1); }
         }
 
-        @keyframes glowBar {
-            0% { left: -100%; }
-            100% { left: 100%; }
-        }
-
         .bg-institutional {
             background-color: var(--ceut-dark);
             background-image: 
@@ -161,8 +156,9 @@
                     <i data-lucide="arrow-left" class="w-4 h-4"></i> Volver
                 </button>
                 <h2 class="heavy-title text-4xl text-[#eab308] mb-6">REGISTRO</h2>
-                <input type="text" id="input-folio" class="input-ceut text-2xl font-black mb-4" placeholder="MATRÍCULA">
-                <button onclick="registrarAsistencia()" class="btn-gold-solid w-full py-4 rounded-xl">Registrar Entrada</button>
+                <p class="text-[10px] uppercase font-bold mb-4 opacity-70">Escanee su credencial o ingrese matrícula</p>
+                <input type="text" id="input-folio" class="input-ceut text-2xl font-black mb-4 text-center tracking-tighter" placeholder="MATRÍCULA">
+                <button onclick="registrarAsistencia()" class="btn-gold-solid w-full py-4 rounded-xl shadow-lg shadow-yellow-500/10">Registrar Entrada</button>
             </div>
         </section>
 
@@ -173,30 +169,40 @@
                     <i data-lucide="arrow-left" class="w-4 h-4"></i> Volver
                 </button>
                 <h2 class="heavy-title text-4xl mb-6">DOCENTES</h2>
-                <input type="text" id="m-user" class="input-ceut mb-4" placeholder="Usuario">
+                <input type="text" id="m-user" class="input-ceut mb-4" placeholder="Usuario Institucional">
                 <input type="password" id="m-pass" class="input-ceut mb-4" placeholder="Contraseña">
                 <button onclick="loginDocente()" class="btn-gold-solid w-full py-4 rounded-xl">Iniciar Sesión</button>
-                <p class="mt-4 text-[10px] text-center opacity-50">Acceso: maestro / tigre2024</p>
+                <p class="mt-4 text-[9px] text-center opacity-40">Portal exclusivo para personal académico CEUT</p>
             </div>
         </section>
 
-        <!-- PORTAL ADMIN -->
+        <!-- PORTAL ADMIN (DIRECCIÓN) -->
         <section id="view-admin" class="view-section max-w-md">
-            <div class="bg-[#000b21]/90 backdrop-blur-md p-8 rounded-3xl border-2 border-red-500/20 w-full text-center">
-                <i data-lucide="shield-alert" class="w-12 h-12 text-red-500 mx-auto mb-4"></i>
-                <h2 class="heavy-title text-3xl mb-6">DIRECCIÓN</h2>
-                <input type="text" id="a-user" class="input-ceut mb-4" placeholder="ID Admin">
-                <input type="password" id="a-pass" class="input-ceut mb-4" placeholder="Pin de Seguridad">
-                <button onclick="loginAdmin()" class="btn-gold-solid w-full py-4 rounded-xl bg-white">Verificar Acceso</button>
-                <button onclick="showView('home')" class="mt-6 text-xs opacity-50">Cancelar</button>
-                <p class="mt-4 text-[10px] text-center opacity-30">Acceso: admin / ceut_root</p>
+            <div class="bg-[#000b21]/95 backdrop-blur-md p-8 rounded-3xl border-2 border-yellow-500/30 w-full text-center relative overflow-hidden">
+                <div class="absolute top-0 left-0 w-full h-1 bg-yellow-500 animate-pulse"></div>
+                <i data-lucide="shield-check" class="w-12 h-12 text-yellow-500 mx-auto mb-4"></i>
+                <h2 class="heavy-title text-3xl mb-2">DIRECCIÓN</h2>
+                <p class="text-[9px] font-black uppercase text-yellow-500/70 tracking-[0.3em] mb-6">Acceso Restringido</p>
+                
+                <input type="email" id="a-user" class="input-ceut mb-4 text-sm" placeholder="correo@ceut.edu.mx">
+                <input type="password" id="a-pass" class="input-ceut mb-4" placeholder="••••••••">
+                
+                <button onclick="loginAdmin()" class="btn-gold-solid w-full py-4 rounded-xl text-black hover:bg-white">
+                    Verificar Identidad
+                </button>
+                
+                <button onclick="showView('home')" class="mt-6 text-[10px] font-bold uppercase opacity-40 hover:opacity-100 transition-opacity">
+                    Cancelar Acceso
+                </button>
             </div>
         </section>
 
     </main>
 
-    <div id="toast" class="fixed bottom-10 left-1/2 -translate-x-1/2 bg-white text-black px-8 py-4 rounded-xl font-black uppercase italic text-xs shadow-2xl opacity-0 transition-all duration-500 pointer-events-none z-[200]">
-        MENSAJE
+    <!-- NOTIFICACIONES (TOAST) -->
+    <div id="toast" class="fixed bottom-10 left-1/2 -translate-x-1/2 bg-white text-black px-8 py-4 rounded-xl font-black uppercase italic text-[11px] shadow-2xl opacity-0 translate-y-10 transition-all duration-500 pointer-events-none z-[200] flex items-center gap-3">
+        <i data-lucide="info" class="w-4 h-4"></i>
+        <span id="toast-text">MENSAJE</span>
     </div>
 
     <script>
@@ -208,32 +214,65 @@
             window.scrollTo(0,0);
         }
 
-        function notify(msg) {
+        function notify(msg, type = 'info') {
             const t = document.getElementById('toast');
-            t.innerText = msg;
-            t.style.opacity = "1";
-            setTimeout(() => t.style.opacity = "0", 3000);
+            const txt = document.getElementById('toast-text');
+            txt.innerText = msg;
+            
+            // Estilos por tipo
+            t.style.background = type === 'error' ? '#f87171' : (type === 'success' ? '#fbbf24' : '#ffffff');
+            t.style.color = type === 'error' || type === 'success' ? '#000' : '#000';
+
+            t.classList.remove('opacity-0', 'translate-y-10');
+            t.classList.add('opacity-100', 'translate-y-0');
+            
+            setTimeout(() => {
+                t.classList.add('opacity-0', 'translate-y-10');
+                t.classList.remove('opacity-100', 'translate-y-0');
+            }, 4000);
         }
 
-        // LÓGICA DE ACCESO
+        // LÓGICA DE REGISTRO DE ALUMNOS
         function registrarAsistencia() {
-            const folio = document.getElementById('input-folio').value;
-            if(folio) notify(`ASISTENCIA REGISTRADA: ${folio}`);
-            else notify("INGRESE MATRÍCULA");
+            const folio = document.getElementById('input-folio').value.trim();
+            if(folio.length >= 4) {
+                notify(`BIENVENIDO TIGRE [${folio}] - ACCESO REGISTRADO`, 'success');
+                document.getElementById('input-folio').value = "";
+                // Aquí podrías disparar el audio de "Bienvenido Tigre" si lo deseas
+            } else {
+                notify("MATRÍCULA NO VÁLIDA O INCOMPLETA", "error");
+            }
         }
 
+        // ACCESO DOCENTE
         function loginDocente() {
             const u = document.getElementById('m-user').value;
             const p = document.getElementById('m-pass').value;
-            if(u === 'maestro' && p === 'tigre2024') notify("ACCESO CONCEDIDO - CARGANDO GRUPOS...");
-            else notify("CREDENCIALES INVÁLIDAS");
+            // Clave genérica para demo docente
+            if(u === 'maestro' && p === 'tigre2024') {
+                notify("ACCESO DOCENTE AUTORIZADO", "success");
+            } else {
+                notify("ERROR: USUARIO O CLAVE INCORRECTA", "error");
+            }
         }
 
+        // ACCESO DIRECCIÓN (CON TUS CREDENCIALES)
         function loginAdmin() {
-            const u = document.getElementById('a-user').value;
+            const u = document.getElementById('a-user').value.toLowerCase().trim();
             const p = document.getElementById('a-pass').value;
-            if(u === 'admin' && p === 'ceut_root') notify("ACCESO TOTAL NIVEL DIRECCIÓN");
-            else notify("ACCESO DENEGADO");
+            
+            const adminEmail = "carlos.aguilar@ceut.edu.mx";
+            const adminPass = "Jcas1015#";
+
+            if(u === adminEmail && p === adminPass) {
+                notify("IDENTIDAD CONFIRMADA: BIENVENIDO MTRO. CARLOS AGUILAR", "success");
+                // Aquí redirigirías a la consola administrativa real
+                setTimeout(() => {
+                    console.log("Iniciando Consola de Control Administrativo...");
+                }, 1500);
+            } else {
+                notify("FALLO DE AUTENTICACIÓN: ACCESO DENEGADO", "error");
+            }
         }
     </script>
 </body>
