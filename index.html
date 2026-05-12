@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>CEUT | Portal Institucional</title>
+    <title>CEUT | Sistema Tigre</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Plus+Jakarta+Sans:wght@400;700;800&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
@@ -20,11 +20,12 @@
             color: white; 
             margin: 0;
             overflow-x: hidden;
+            width: 100%;
         }
         
-        /* ANIMACIONES BASE */
+        /* Animaciones */
         @keyframes revealUp {
-            from { opacity: 0; transform: translateY(30px); }
+            from { opacity: 0; transform: translateY(20px); }
             to { opacity: 1; transform: translateY(0); }
         }
 
@@ -39,7 +40,6 @@
             100% { left: 100%; }
         }
 
-        /* FONDO DINÁMICO */
         .bg-institutional {
             background-color: var(--ceut-dark);
             background-image: 
@@ -47,7 +47,7 @@
                 linear-gradient(-45deg, var(--ceut-blue) 25%, transparent 25%), 
                 linear-gradient(45deg, transparent 75%, var(--ceut-blue) 75%), 
                 linear-gradient(-45deg, transparent 75%, var(--ceut-blue) 75%);
-            background-size: 80px 80px;
+            background-size: clamp(40px, 10vw, 80px) clamp(40px, 10vw, 80px);
             position: fixed;
             inset: 0;
             z-index: -1;
@@ -56,11 +56,11 @@
 
         .stripe-gold {
             background: var(--ceut-gold);
-            height: 12px;
+            height: clamp(6px, 1.5vw, 12px);
             width: 100%;
             position: sticky;
             top: 0;
-            z-index: 50;
+            z-index: 100;
             overflow: hidden;
         }
 
@@ -77,33 +77,26 @@
         .heavy-title {
             font-family: 'Archivo Black', sans-serif;
             text-transform: uppercase;
-            line-height: 0.85;
-            letter-spacing: -3px;
+            line-height: 0.9;
+            letter-spacing: -0.05em;
         }
 
-        /* TARJETAS CON ANIMACIÓN */
+        /* Tarjetas adaptables */
         .card-institutional {
             background: var(--ceut-blue);
-            border-bottom: 16px solid var(--ceut-gold);
-            transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            opacity: 0;
-            animation: revealUp 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+            border-bottom: clamp(10px, 2vw, 16px) solid var(--ceut-gold);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            cursor: pointer;
+            width: 100%;
         }
 
-        .card-institutional:hover {
-            transform: translateY(-20px) scale(1.02);
-            background: #2d3a82;
-            box-shadow: 0 50px 100px rgba(0,0,0,0.8), 0 0 20px rgba(234, 179, 8, 0.2);
-            border-bottom-width: 25px;
-        }
-
-        .card-institutional:hover i {
-            transform: scale(1.2) rotate(5deg);
-            color: var(--ceut-gold);
-        }
-
-        .card-institutional i {
-            transition: all 0.4s ease;
+        @media (min-width: 1024px) {
+            .card-institutional:hover {
+                transform: translateY(-10px) scale(1.02);
+                background: #2d3a82;
+                box-shadow: 0 30px 60px rgba(0,0,0,0.5);
+                border-bottom-width: 24px;
+            }
         }
 
         .btn-gold-solid {
@@ -113,118 +106,274 @@
             text-transform: uppercase;
             letter-spacing: 1px;
             transition: all 0.3s;
-            position: relative;
-            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
-        .btn-gold-solid:hover {
-            background: white;
-            letter-spacing: 2px;
+        .view-section {
+            display: none;
+            width: 100%;
+            max-width: 100%;
+            animation: revealUp 0.5s ease-out forwards;
         }
 
-        .logo-massive {
-            width: 420px;
-            filter: drop-shadow(0 0 25px rgba(59, 75, 164, 0.6));
-            animation: revealUp 1s ease-out forwards;
+        .view-section.active {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
 
-        /* DELAYS DE ANIMACIÓN */
-        .delay-1 { animation-delay: 0.2s; }
-        .delay-2 { animation-delay: 0.4s; }
-        .delay-3 { animation-delay: 0.6s; }
-        .delay-4 { animation-delay: 0.8s; }
+        .input-ceut {
+            background: rgba(255,255,255,0.05);
+            border: 2px solid rgba(255,255,255,0.1);
+            color: white;
+            padding: 1rem;
+            width: 100%;
+            border-radius: 12px;
+            outline: none;
+            transition: all 0.3s;
+            font-size: 16px; /* Evita zoom automático en iOS */
+        }
 
-        @media (max-width: 768px) {
-            .logo-massive { width: 260px; }
-            .heavy-title { font-size: 4.2rem; }
+        .input-ceut:focus {
+            border-color: var(--ceut-gold);
+            background: rgba(255,255,255,0.1);
+            box-shadow: 0 0 15px rgba(234, 179, 8, 0.2);
+        }
+
+        .logo-transition {
+            transition: all 0.5s ease;
+            max-width: 90%;
+            height: auto;
+        }
+        
+        /* Ajustes de Nav en pantallas pequeñas */
+        .view-active nav {
+            padding-top: 1.5rem;
+            padding-bottom: 1.5rem;
+        }
+        
+        .view-active .logo-transition {
+            width: clamp(120px, 30vw, 180px);
+            margin-top: 0;
+        }
+
+        /* Prevención de desbordamiento horizontal */
+        main {
+            width: 100%;
+            overflow-x: hidden;
         }
     </style>
 </head>
-<body class="flex flex-col min-h-screen">
+<body class="flex flex-col min-h-screen" id="app-body">
     <div class="bg-institutional"></div>
     <div class="stripe-gold"></div>
 
-    <!-- HEADER INSTITUCIONAL -->
-    <nav class="w-full py-16 flex flex-col items-center border-b border-white/10 bg-[#000b21] shadow-2xl">
+    <!-- HEADER -->
+    <nav class="w-full py-10 md:py-16 flex flex-col items-center border-b border-white/10 bg-[#000b21] shadow-2xl transition-all duration-500 z-50 px-4">
         <img src="https://lh3.googleusercontent.com/d/17NobXQ3JbRnLGejZe4Mn2x-Jl45F4rPm" 
-             class="logo-massive" 
-             alt="TIGRES CEUT LOGO">
-        <h2 class="text-sm font-black tracking-[1.1em] text-[#eab308] uppercase italic text-center px-6 leading-loose mt-10 animate-[revealUp_1s_ease-out_0.3s_forwards] opacity-0">
+             class="logo-transition w-[240px] sm:w-[320px] md:w-[420px] cursor-pointer" 
+             alt="TIGRES CEUT LOGO" 
+             onclick="showView('home')">
+        <h2 id="nav-subtitle" class="text-[10px] sm:text-xs font-black tracking-[0.5em] sm:tracking-[1.1em] text-[#eab308] uppercase italic text-center mt-6 sm:mt-10 transition-all duration-500">
             Centro Universitario Tehuacán
         </h2>
     </nav>
 
-    <main class="flex-grow flex flex-col items-center justify-center px-6 py-20">
-        <div class="text-center mb-24 animate-[revealUp_1s_ease-out_0.5s_forwards] opacity-0">
-            <h1 class="heavy-title text-8xl md:text-[12rem] mb-6">SISTEMA <br><span class="text-[#eab308]">TIGRE</span></h1>
-            <div class="h-4 w-56 bg-[#3b4ba4] mx-auto mb-10 transition-all duration-1000 hover:w-80"></div>
-            <!-- SECCIÓN DE FRASE DE MEJORA CONSTANTE -->
-            <div class="space-y-2">
-                <p class="text-lg font-black tracking-[0.6em] text-[#eab308] uppercase italic">
-                    Excelencia y Mejora Continua
-                </p>
-                <p class="text-[10px] font-bold tracking-[0.4em] text-blue-300 uppercase opacity-60 italic">
-                    Formando líderes con visión humana
-                </p>
+    <!-- CONTENIDO PRINCIPAL -->
+    <main class="flex-grow flex flex-col items-center px-4 sm:px-6 py-8 md:py-16">
+        
+        <!-- VISTA: INICIO -->
+        <section id="view-home" class="view-section active w-full max-w-7xl">
+            <div class="text-center mb-12 md:mb-20">
+                <h1 class="heavy-title text-5xl sm:text-7xl md:text-[8rem] lg:text-[10rem] mb-4">SISTEMA <br><span class="text-[#eab308]">TIGRE</span></h1>
+                <div class="h-2 md:h-3 w-32 md:w-48 bg-[#3b4ba4] mx-auto mb-6 md:mb-8"></div>
+                <p class="text-sm sm:text-lg font-black tracking-[0.3em] sm:tracking-[0.5em] text-[#eab308] uppercase italic">Excelencia y Mejora Continua</p>
             </div>
-        </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-12 w-full max-w-7xl">
-            <!-- PORTAL ALUMNOS -->
-            <a href="alumno.html" class="card-institutional p-14 flex flex-col items-center group delay-2">
-                <div class="bg-black/30 p-8 rounded-full mb-8 border-2 border-white/10 group-hover:border-white/40 transition-all duration-500">
-                    <i data-lucide="user-check" class="w-16 h-16 text-white"></i>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8 w-full">
+                <!-- Portal Alumnos -->
+                <div onclick="showView('alumno')" class="card-institutional p-8 lg:p-10 flex flex-col items-center text-center rounded-xl">
+                    <div class="bg-black/30 p-5 lg:p-6 rounded-full mb-6 border-2 border-white/10">
+                        <i data-lucide="user-check" class="w-10 h-10 lg:w-12 lg:h-12"></i>
+                    </div>
+                    <h3 class="text-2xl lg:text-3xl font-black uppercase italic mb-2">Alumnos</h3>
+                    <p class="text-[10px] font-bold text-blue-100 uppercase tracking-widest mb-8 opacity-70">Registro de asistencia e historial</p>
+                    <div class="btn-gold-solid w-full py-4 text-xs sm:text-sm rounded-lg">Entrar</div>
                 </div>
-                <h3 class="text-4xl font-black uppercase italic mb-4">Alumnos</h3>
-                <p class="text-[11px] font-bold text-blue-100 uppercase tracking-[0.2em] mb-12 opacity-80 text-center leading-relaxed">Registro de asistencia <br>vía código institucional</p>
-                <div class="btn-gold-solid w-full py-5 text-center text-sm italic">Acceso Estudiantil</div>
-            </a>
 
-            <!-- PORTAL DOCENTES (Corregido a maestro.html) -->
-            <a href="maestro.html" class="card-institutional p-14 flex flex-col items-center group bg-[#1a237e] delay-3">
-                <div class="bg-black/30 p-8 rounded-full mb-8 border-2 border-[#eab308]/30 group-hover:border-[#eab308] transition-all duration-500">
-                    <i data-lucide="presentation" class="w-16 h-16 text-[#eab308]"></i>
+                <!-- Portal Docentes -->
+                <div onclick="showView('maestro')" class="card-institutional p-8 lg:p-10 flex flex-col items-center text-center bg-[#1a237e] rounded-xl">
+                    <div class="bg-black/30 p-5 lg:p-6 rounded-full mb-6 border-2 border-white/10">
+                        <i data-lucide="presentation" class="w-10 h-10 lg:w-12 lg:h-12 text-[#eab308]"></i>
+                    </div>
+                    <h3 class="text-2xl lg:text-3xl font-black uppercase italic mb-2">Docentes</h3>
+                    <p class="text-[10px] font-bold text-blue-100 uppercase tracking-widest mb-8 opacity-70">Gestión de clases y grupos</p>
+                    <div class="btn-gold-solid w-full py-4 text-xs sm:text-sm rounded-lg">Panel Maestro</div>
                 </div>
-                <h3 class="text-4xl font-black uppercase italic mb-4">Docentes</h3>
-                <p class="text-[11px] font-bold text-blue-100 uppercase tracking-[0.2em] mb-12 opacity-80 text-center leading-relaxed">Gestión académica <br>y pases de lista</p>
-                <div class="btn-gold-solid w-full py-5 text-center text-sm italic">Panel Maestro</div>
-            </a>
 
-            <!-- PORTAL ADMINISTRATIVO -->
-            <a href="admin.html" class="card-institutional p-14 flex flex-col items-center group bg-[#0d1b3e] delay-4">
-                <div class="bg-black/30 p-8 rounded-full mb-8 border-2 border-white/10 group-hover:border-white/40 transition-all duration-500">
-                    <i data-lucide="shield-check" class="w-16 h-16 text-white"></i>
+                <!-- Portal Dirección -->
+                <div onclick="showView('admin')" class="card-institutional p-8 lg:p-10 flex flex-col items-center text-center bg-[#0d1b3e] rounded-xl">
+                    <div class="bg-black/30 p-5 lg:p-6 rounded-full mb-6 border-2 border-white/10">
+                        <i data-lucide="shield-check" class="w-10 h-10 lg:w-12 lg:h-12 text-white"></i>
+                    </div>
+                    <h3 class="text-2xl lg:text-3xl font-black uppercase italic mb-2">Dirección</h3>
+                    <p class="text-[10px] font-bold text-blue-100 uppercase tracking-widest mb-8 opacity-70">Control administrativo total</p>
+                    <div class="btn-gold-solid w-full py-4 text-xs sm:text-sm bg-transparent border border-white text-white rounded-lg">Acceso Admin</div>
                 </div>
-                <h3 class="text-4xl font-black uppercase italic mb-4">Dirección</h3>
-                <p class="text-[11px] font-bold text-blue-100 uppercase tracking-[0.2em] mb-12 opacity-80 text-center leading-relaxed">Supervisión por <br>Departamento</p>
-                <div class="btn-gold-solid w-full py-5 text-center text-sm italic border border-white/20 bg-transparent text-white hover:bg-white hover:text-black">Administración</div>
-            </a>
-        </div>
+            </div>
+        </section>
+
+        <!-- VISTA: ALUMNO -->
+        <section id="view-alumno" class="view-section w-full max-w-lg">
+            <div class="bg-[#3b4ba4]/30 backdrop-blur-xl p-6 sm:p-10 rounded-3xl border border-white/10 shadow-2xl relative overflow-hidden w-full">
+                <button onclick="showView('home')" class="mb-6 text-[#eab308] font-bold flex items-center gap-2 hover:translate-x-[-5px] transition-transform">
+                    <i data-lucide="arrow-left" class="w-4 h-4"></i> Volver
+                </button>
+                <h2 class="heavy-title text-4xl sm:text-5xl text-[#eab308] mb-1">PORTAL</h2>
+                <h3 class="text-xl sm:text-2xl font-black uppercase italic mb-8">Estudiante</h3>
+                
+                <div class="space-y-6">
+                    <div class="w-full">
+                        <label class="block text-[10px] font-bold uppercase tracking-[0.2em] mb-2 opacity-60">Matrícula Institucional</label>
+                        <input type="text" class="input-ceut text-xl sm:text-2xl font-black tracking-widest" placeholder="T-000000">
+                    </div>
+                    <button onclick="handleAction('Registro exitoso')" class="btn-gold-solid w-full py-4 sm:py-5 text-base sm:text-lg rounded-xl">
+                        Registrar Asistencia
+                    </button>
+                </div>
+                <div class="mt-8 p-4 sm:p-6 bg-black/40 rounded-xl border border-white/5">
+                    <h4 class="text-[10px] sm:text-xs font-black uppercase text-[#eab308] mb-1 italic">Aviso Importante</h4>
+                    <p class="text-[10px] sm:text-xs opacity-60 leading-relaxed uppercase font-bold">Registro válido dentro de los primeros 15 min.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- VISTA: MAESTRO -->
+        <section id="view-maestro" class="view-section w-full max-w-lg">
+            <div class="bg-[#1a237e]/40 backdrop-blur-xl p-6 sm:p-10 rounded-3xl border border-[#eab308]/20 shadow-2xl w-full">
+                <button onclick="showView('home')" class="mb-6 text-[#eab308] font-bold flex items-center gap-2 hover:translate-x-[-5px] transition-transform">
+                    <i data-lucide="arrow-left" class="w-4 h-4"></i> Volver
+                </button>
+                <h2 class="heavy-title text-4xl sm:text-5xl text-white mb-1">PANEL</h2>
+                <h3 class="text-xl sm:text-2xl font-black uppercase italic mb-8 text-[#eab308]">Docentes</h3>
+                
+                <div class="space-y-4">
+                    <input type="text" class="input-ceut" placeholder="Usuario / Email">
+                    <input type="password" class="input-ceut" placeholder="Contraseña">
+                    <button onclick="handleAction('Iniciando sesión docente...')" class="btn-gold-solid w-full py-4 sm:py-5 text-base sm:text-lg rounded-xl mt-4">
+                        Acceder
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- VISTA: ADMIN -->
+        <section id="view-admin" class="view-section w-full max-w-lg">
+            <div class="bg-[#000b21]/90 backdrop-blur-xl p-6 sm:p-10 rounded-3xl border-2 border-red-500/20 shadow-2xl text-center w-full">
+                <div class="mb-6 inline-block bg-red-600/20 p-4 sm:p-6 rounded-full border border-red-500/30">
+                    <i data-lucide="shield-alert" class="w-10 h-10 sm:w-12 sm:h-12 text-red-500"></i>
+                </div>
+                <h2 class="heavy-title text-3xl sm:text-4xl mb-2">ÁREA RESTRINGIDA</h2>
+                <p class="text-[10px] font-bold uppercase tracking-widest opacity-50 mb-8 italic">Solo personal autorizado</p>
+                
+                <div class="space-y-4 text-left">
+                    <input type="text" class="input-ceut" placeholder="ID Administrador">
+                    <input type="password" class="input-ceut" placeholder="Clave de Seguridad">
+                    <button onclick="handleAction('Validando acceso...')" class="w-full py-4 sm:py-5 bg-white text-black font-black uppercase italic text-xs sm:text-sm hover:bg-red-600 hover:text-white transition-all rounded-xl mt-4">
+                        Verificar Identidad
+                    </button>
+                </div>
+                <button onclick="showView('home')" class="mt-6 text-white/40 text-[10px] font-bold uppercase hover:text-white">Cancelar</button>
+            </div>
+        </section>
+
     </main>
 
-    <!-- FOOTER INSTITUCIONAL SÓLIDO -->
-    <footer class="w-full bg-[#3b4ba4] py-14 px-16 flex flex-col md:flex-row justify-between items-center border-t-[12px] border-[#eab308] mt-20">
-        <div class="text-white font-black text-sm uppercase tracking-widest mb-8 md:mb-0 italic text-center md:text-left leading-loose">
-            © <span id="footer-year">2026</span> <span class="text-white">Departamento Psicopedagógico</span><br>
-            <span class="text-[#eab308] text-base">Centro Universitario Tehuacán</span>
+    <!-- TOAST NOTIFICATION -->
+    <div id="toast" class="fixed bottom-6 sm:bottom-10 left-4 right-4 sm:left-1/2 sm:right-auto sm:-translate-x-1/2 bg-white text-black px-6 sm:px-10 py-4 sm:py-5 rounded-xl sm:rounded-full font-black uppercase italic tracking-widest text-[10px] sm:text-xs shadow-2xl opacity-0 translate-y-10 transition-all duration-500 pointer-events-none z-[200] text-center">
+        Mensaje del Sistema
+    </div>
+
+    <!-- FOOTER -->
+    <footer class="w-full bg-[#3b4ba4] py-10 px-6 sm:px-10 md:px-16 flex flex-col md:flex-row justify-between items-center border-t-[8px] md:border-t-[12px] border-[#eab308] mt-10">
+        <div class="text-white font-black text-[10px] sm:text-xs uppercase tracking-widest mb-8 md:mb-0 italic text-center md:text-left leading-relaxed">
+            © <span id="footer-year">2026</span> <span class="text-white">Dpto. Psicopedagógico</span><br>
+            <span class="text-[#eab308] text-sm sm:text-base">Centro Universitario Tehuacán</span>
         </div>
         
-        <div class="flex flex-col md:flex-row gap-12 items-center">
-            <div class="flex items-center gap-3 group cursor-default">
-                <div class="w-4 h-4 bg-[#eab308] rotate-45 transition-transform group-hover:rotate-[225deg] duration-700"></div>
-                <span class="text-[12px] font-black uppercase text-white tracking-[0.3em]">Excelencia</span>
+        <div class="flex flex-row gap-6 sm:gap-10 items-center justify-center">
+            <div class="flex items-center gap-2">
+                <div class="w-3 h-3 bg-[#eab308] rotate-45"></div>
+                <span class="text-[9px] sm:text-[10px] font-black uppercase text-white tracking-widest">Excelencia</span>
             </div>
-            <div class="flex items-center gap-3 group cursor-default">
-                <div class="w-4 h-4 bg-white rotate-45 transition-transform group-hover:rotate-[225deg] duration-700"></div>
-                <span class="text-[12px] font-black uppercase text-white tracking-[0.3em]">Orgullo Tigre</span>
+            <div class="flex items-center gap-2">
+                <div class="w-3 h-3 bg-white rotate-45"></div>
+                <span class="text-[9px] sm:text-[10px] font-black uppercase text-white tracking-widest">Orgullo Tigre</span>
             </div>
         </div>
     </footer>
 
     <script>
-        const year = new Date().getFullYear();
-        document.getElementById('footer-year').innerText = year;
+        // Inicializar iconos de Lucide
         lucide.createIcons();
+
+        // Control de Vistas (SPA)
+        function showView(viewId) {
+            const body = document.getElementById('app-body');
+            const navSubtitle = document.getElementById('nav-subtitle');
+            
+            // Ocultar todas las secciones
+            document.querySelectorAll('.view-section').forEach(section => {
+                section.classList.remove('active');
+            });
+
+            // Mostrar la seleccionada
+            const targetView = document.getElementById(`view-${viewId}`);
+            if(targetView) targetView.classList.add('active');
+
+            // Efectos visuales en el Header
+            if (viewId === 'home') {
+                body.classList.remove('view-active');
+                if(navSubtitle) navSubtitle.style.opacity = "1";
+            } else {
+                body.classList.add('view-active');
+                if(navSubtitle) navSubtitle.style.opacity = "0";
+            }
+
+            // Scroll suave arriba
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // Sistema de Notificaciones
+        let toastTimeout;
+        function handleAction(message) {
+            const toast = document.getElementById('toast');
+            if(!toast) return;
+
+            clearTimeout(toastTimeout);
+            toast.innerText = message;
+            toast.style.opacity = "1";
+            toast.style.transform = window.innerWidth > 640 ? "translateY(0) translateX(-50%)" : "translateY(0)";
+            
+            toastTimeout = setTimeout(() => {
+                toast.style.opacity = "0";
+                toast.style.transform = window.innerWidth > 640 ? "translateY(10px) translateX(-50%)" : "translateY(10px)";
+            }, 3000);
+        }
+
+        // Actualizar año del footer
+        const yearSpan = document.getElementById('footer-year');
+        if(yearSpan) yearSpan.innerText = new Date().getFullYear();
+
+        // Manejo de redimensionamiento para el Toast
+        window.addEventListener('resize', () => {
+            const toast = document.getElementById('toast');
+            if(toast.style.opacity === "0") {
+                toast.style.transform = window.innerWidth > 640 ? "translateY(10px) translateX(-50%)" : "translateY(10px)";
+            }
+        });
     </script>
 </body>
 </html>
