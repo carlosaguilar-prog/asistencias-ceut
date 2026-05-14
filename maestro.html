@@ -91,7 +91,7 @@
                 <img src="https://lh3.googleusercontent.com/u/0/d/17NobXQ3JbRnLGejZe4Mn2x-Jl45F4rPm" class="h-12 mx-auto mb-8">
                 
                 <div id="auth-toggle-header" class="text-center mb-10">
-                    <h2 class="text-3xl font-black italic uppercase italic tracking-tighter">Acceso <span class="text-yellow-500">Docente</span></h2>
+                    <h2 class="text-3xl font-black italic uppercase tracking-tighter">Acceso <span class="text-yellow-500">Docente</span></h2>
                     <p class="text-[10px] opacity-40 uppercase font-bold tracking-widest mt-2">Sistema Único de Registro</p>
                 </div>
 
@@ -153,6 +153,10 @@
                         <label class="text-[9px] opacity-40 uppercase font-black ml-2 mb-2 block">Nombre de la Materia</label>
                         <input id="clase-name" type="text" class="input-ceut uppercase font-bold" placeholder="EJ: ESTRUCTURA DE DATOS">
                     </div>
+                    <div class="md:col-span-2">
+                        <label class="text-[9px] opacity-40 uppercase font-black ml-2 mb-2 block">Carrera (Si aplica)</label>
+                        <input id="clase-career" type="text" class="input-ceut uppercase font-bold" placeholder="EJ: LIC. EN SISTEMAS COMPUTACIONALES">
+                    </div>
                     <div>
                         <label class="text-[9px] opacity-40 uppercase font-black ml-2 mb-2 block">Grado y Grupo</label>
                         <input id="clase-group" type="text" class="input-ceut uppercase font-bold" placeholder="4TO - GRUPO B">
@@ -165,7 +169,7 @@
                             <option value="MAESTRIA">MAESTRÍA</option>
                         </select>
                     </div>
-                    <div>
+                    <div class="md:col-span-2">
                         <label class="text-[9px] opacity-40 uppercase font-black ml-2 mb-2 block">Modalidad</label>
                         <select id="clase-mod" class="input-ceut uppercase font-bold">
                             <option value="ESCOLARIZADA">ESCOLARIZADA</option>
@@ -186,6 +190,7 @@
                 <div class="mb-12">
                     <h2 id="active-materia-name" class="text-5xl font-black italic uppercase mb-2 leading-none">MATERIA</h2>
                     <p id="active-materia-info" class="text-[10px] opacity-40 uppercase tracking-[0.5em] font-bold">LICENCIATURA | ESCOLARIZADA</p>
+                    <p id="active-career-name" class="text-[10px] text-yellow-500 uppercase font-black mt-2 tracking-widest"></p>
                 </div>
                 
                 <div class="glass-card p-20 rounded-[5rem] border-2 border-yellow-500/20 mb-12 relative overflow-hidden">
@@ -214,7 +219,6 @@
         import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, collection, onSnapshot, addDoc, updateDoc, doc, deleteDoc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // CONFIGURACIÓN FIREBASE
         const firebaseConfig = {
             apiKey: "AIzaSyCefP6qEqaCMpo8ZpUiLpN4e_-E4ZNTp94",
             authDomain: "asistencias-ceut.firebaseapp.com",
@@ -227,14 +231,13 @@
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'ceut-prod';
+        const appId = "ceut-prod";
 
         let currentUser = null;
         let userData = null;
         let activeInterval = null;
         let classesUnsubscribe = null;
 
-        // --- GESTIÓN DE SESIÓN ---
         onAuthStateChanged(auth, async (user) => {
             document.getElementById('loading-screen').classList.add('hidden');
             if (user) {
@@ -249,7 +252,6 @@
             }
         });
 
-        // --- AUTH ---
         window.toggleAuth = (isReg) => {
             document.getElementById('login-form').classList.toggle('hidden', isReg);
             document.getElementById('register-form').classList.toggle('hidden', !isReg);
@@ -287,7 +289,6 @@
 
         window.handleLogout = () => signOut(auth);
 
-        // --- DASHBOARD ---
         function showDashboard() {
             document.getElementById('auth-screen').classList.add('hidden');
             document.getElementById('main-dashboard').classList.remove('hidden');
@@ -301,11 +302,8 @@
             document.getElementById('auth-screen').classList.remove('hidden');
         }
 
-        // --- GESTIÓN CLASES ---
         function startListeningClasses() {
             const classesRef = collection(db, 'artifacts', appId, 'public', 'data', 'classes');
-            // Nota: En producción filtraríamos por teacherUid. 
-            // Para simplicidad en este prototipo, mostramos todas pero permitimos edición solo al dueño si se agrega el campo.
             classesUnsubscribe = onSnapshot(classesRef, (snap) => {
                 const container = document.getElementById('classes-grid');
                 container.innerHTML = "";
@@ -327,16 +325,17 @@
                                 </button>
                             </div>
                         </div>
-                        <h3 class="text-xl font-black italic uppercase leading-tight mb-2">${c.name}</h3>
+                        <h3 class="text-xl font-black italic uppercase leading-tight mb-1">${c.name}</h3>
+                        ${c.career ? `<p class="text-[9px] font-black text-yellow-500/60 uppercase tracking-tighter mb-4">${c.career}</p>` : ''}
                         <p class="text-[9px] font-bold opacity-30 uppercase tracking-[0.2em] mb-8">${c.grade} • ${c.mod}</p>
                         
                         <div class="grid grid-cols-2 gap-3">
                             <button onclick="startAttendance('${docSnap.id}')" class="btn-gold py-4 rounded-2xl text-[9px] font-black uppercase italic col-span-2">Generar Código</button>
                             <button onclick="generatePDF('${docSnap.id}')" class="bg-white/5 border border-white/10 py-3 rounded-xl text-[8px] font-black uppercase flex items-center justify-center hover:bg-white/10">
-                                <i data-lucide="file-text" class="w-3 h-3 mr-2"></i> PDF
+                                <i data-lucide="file-text" class="w-3 h-3 mr-2"></i> Reporte
                             </button>
                             <button onclick="window.print()" class="bg-white/5 border border-white/10 py-3 rounded-xl text-[8px] font-black uppercase flex items-center justify-center hover:bg-white/10">
-                                <i data-lucide="printer" class="w-3 h-3 mr-2"></i> Imprmir
+                                <i data-lucide="printer" class="w-3 h-3 mr-2"></i> Imprimir
                             </button>
                         </div>
                     `;
@@ -348,15 +347,17 @@
 
         window.saveClass = async () => {
             const name = document.getElementById('clase-name').value;
+            const career = document.getElementById('clase-career').value;
             const group = document.getElementById('clase-group').value;
             const level = document.getElementById('clase-level').value;
             const mod = document.getElementById('clase-mod').value;
             const editId = document.getElementById('edit-id').value;
 
-            if(!name || !group) return alert("Faltan datos");
+            if(!name || !group) return alert("Faltan datos obligatorios");
 
             const data = {
                 name: name.toUpperCase(),
+                career: career ? career.toUpperCase() : "",
                 grade: group.toUpperCase(),
                 level: level,
                 mod: mod,
@@ -375,7 +376,7 @@
                 }
                 closeModal('modal-clase');
                 document.querySelectorAll('.input-ceut').forEach(i => i.value = "");
-            } catch(e) { alert("Error de permisos."); }
+            } catch(e) { alert("Error al guardar cambios."); }
         };
 
         window.editClass = async (id) => {
@@ -383,6 +384,7 @@
             if(snap.exists()) {
                 const c = snap.data();
                 document.getElementById('clase-name').value = c.name;
+                document.getElementById('clase-career').value = c.career || "";
                 document.getElementById('clase-group').value = c.grade;
                 document.getElementById('clase-level').value = c.level;
                 document.getElementById('clase-mod').value = c.mod;
@@ -398,7 +400,6 @@
             }
         };
 
-        // --- PASE DE LISTA DINÁMICO ---
         window.startAttendance = (id) => {
             navigator.geolocation.getCurrentPosition(async (pos) => {
                 const geo = { lat: pos.coords.latitude, lng: pos.coords.longitude };
@@ -407,6 +408,7 @@
 
                 document.getElementById('active-materia-name').innerText = c.name;
                 document.getElementById('active-materia-info').innerText = `${c.level} | ${c.mod}`;
+                document.getElementById('active-career-name').innerText = c.career || "";
                 document.getElementById('attendance-screen').classList.remove('hidden');
 
                 const refreshCode = async () => {
@@ -427,7 +429,7 @@
 
                 refreshCode();
                 activeInterval = setInterval(refreshCode, 20000);
-            }, () => alert("GPS Obligatorio para el pase de lista."));
+            }, () => alert("GPS Obligatorio para el pase de lista institucional."));
         };
 
         window.stopAttendance = () => {
@@ -435,14 +437,12 @@
             document.getElementById('attendance-screen').classList.add('hidden');
         };
 
-        // --- GENERACIÓN PDF ELEGANTE ---
         window.generatePDF = async (id) => {
             const snap = await getDoc(doc(db, 'artifacts', appId, 'public', 'data', 'classes', id));
             const c = snap.data();
             const { jsPDF } = window.jspdf;
             const docPdf = new jsPDF();
 
-            // Cabecera Institucional
             docPdf.setFillColor(2, 6, 23);
             docPdf.rect(0, 0, 210, 45, 'F');
             docPdf.setTextColor(255, 255, 255);
@@ -450,37 +450,39 @@
             docPdf.setFont("helvetica", "bold");
             docPdf.text("CEUT UNIVERSIDAD", 20, 25);
             docPdf.setFontSize(9);
-            docPdf.text("CENTRO UNIVERSITARIO DE TEHUACÁN - REPORTE DOCENTE", 20, 35);
+            docPdf.text("CENTRO UNIVERSITARIO DE TEHUACÁN - REPORTE ACADÉMICO", 20, 35);
 
-            // Información General
             docPdf.setTextColor(20, 20, 20);
             docPdf.setFontSize(14);
-            docPdf.text(`RESUMEN ACADÉMICO: ${c.name}`, 20, 60);
+            docPdf.text(`MATERIA: ${c.name}`, 20, 60);
+
+            const reportData = [
+                ['DOCENTE', userData.name],
+                ['FOLIO', userData.folio],
+                ['ASIGNATURA', c.name],
+                ['CARRERA', c.career || 'NO ESPECIFICADO'],
+                ['NIVEL', c.level],
+                ['GRADO Y GRUPO', c.grade],
+                ['MODALIDAD', c.mod],
+                ['SESIONES REGISTRADAS', c.attendanceCount || 0],
+                ['FECHA DE REPORTE', new Date().toLocaleString()]
+            ];
 
             docPdf.autoTable({
                 startY: 70,
-                head: [['ATRIBUTO', 'DETALLE ESPECÍFICO']],
-                body: [
-                    ['DOCENTE', userData.name],
-                    ['FOLIO INTERNO', userData.folio],
-                    ['ASIGNATURA', c.name],
-                    ['NIVEL ACADÉMICO', c.level],
-                    ['GRADO Y GRUPO', c.grade],
-                    ['MODALIDAD', c.mod],
-                    ['TOTAL ASISTENCIAS REG.', c.attendanceCount || 0],
-                    ['FECHA EMISIÓN', new Date().toLocaleString()]
-                ],
+                head: [['CAMPO', 'VALOR INSTITUCIONAL']],
+                body: reportData,
                 theme: 'striped',
                 headStyles: { fillColor: [30, 58, 138], textColor: 255, fontStyle: 'bold' },
-                styles: { fontSize: 10, cellPadding: 5, halign: 'justify' },
+                styles: { fontSize: 10, cellPadding: 5 },
                 columnStyles: { 0: { fontStyle: 'bold', width: 60 } }
             });
 
             docPdf.setFontSize(8);
             docPdf.setTextColor(150);
-            docPdf.text("Este documento es una constancia digital emitida por el Portal Docente CEUT.", 20, docPdf.lastAutoTable.finalY + 20);
+            docPdf.text("Certificado Digital de Asistencia - Portal Docente CEUT.", 20, docPdf.lastAutoTable.finalY + 20);
 
-            docPdf.save(`REPORTE_CEUT_${c.name}.pdf`);
+            docPdf.save(`REPORTE_${c.name.replace(/ /g, '_')}.pdf`);
         };
 
         window.openModal = (id) => {
