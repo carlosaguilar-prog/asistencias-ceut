@@ -1,178 +1,495 @@
-<!-- EL CONTENIDO DEL DOCENTE YA GENERADO ARRIBA CON PIN DINÁMICO DE 20S -->
 <!DOCTYPE html>
 <html lang="es-MX">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>CEUT | Portal del Docente V2</title>
+    <title>CEUT | Portal Docente Institucional</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+
     <style>
-        :root { --ceut-blue-dark: #000b21; --ceut-blue-light: #1e1b4b; --ceut-gold: #eab308; --ceut-gold-light: #fef08a; }
-        body { background: radial-gradient(circle at top right, var(--ceut-blue-light), var(--ceut-blue-dark)); background-attachment: fixed; font-family: 'Plus Jakarta Sans', sans-serif; color: white; min-height: 100vh; }
-        .glass-card { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 1.5rem; }
-        .input-ceut { background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(234, 179, 8, 0.2); border-radius: 0.75rem; color: white; padding: 0.8rem 1rem; width: 100%; transition: all 0.3s; font-size: 0.85rem; }
-        .input-ceut:focus { border-color: var(--ceut-gold); outline: none; background: rgba(234, 179, 8, 0.1); }
-        .btn-gold { background: linear-gradient(135deg, var(--ceut-gold-light), var(--ceut-gold), #ca8a04); color: #000b21; font-weight: 800; text-transform: uppercase; border-radius: 0.75rem; cursor: pointer; }
-        .pin-display { font-family: 'Monaco', monospace; background: rgba(0,0,0,0.4); border: 2px solid var(--ceut-gold); color: var(--ceut-gold); text-shadow: 0 0 20px rgba(234, 179, 8, 0.5); border-radius: 1rem; }
-        .timer-bar { height: 4px; background: var(--ceut-gold); transition: width 1s linear; }
-        .hidden { display: none !important; }
-        .student-row { animation: slideIn 0.3s ease-out forwards; border-left: 3px solid var(--ceut-gold); }
-        @keyframes slideIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        :root {
+            --ceut-navy: #020617;
+            --ceut-blue: #1e3a8a;
+            --ceut-gold: #f5b800;
+        }
+
+        body { 
+            background: radial-gradient(circle at top right, #1e3a8a, #0f172a, #020617);
+            background-attachment: fixed;
+            font-family: 'Plus Jakarta Sans', sans-serif; 
+            color: white; min-height: 100vh;
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .btn-gold {
+            background: var(--ceut-gold);
+            color: var(--ceut-navy);
+            font-weight: 800;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .btn-gold:hover { transform: translateY(-2px); box-shadow: 0 10px 20px -5px rgba(245, 184, 0, 0.4); }
+
+        .input-ceut {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 1rem;
+            padding: 0.75rem 1rem;
+            color: white;
+            font-size: 0.875rem;
+            width: 100%;
+        }
+
+        .input-ceut:focus { outline: none; border-color: var(--ceut-gold); }
+
+        .timer-bar {
+            height: 4px;
+            background: var(--ceut-gold);
+            width: 100%;
+            transition: width 1s linear;
+        }
+
+        @keyframes pulse-gold {
+            0%, 100% { opacity: 1; text-shadow: 0 0 20px rgba(245, 184, 0, 0.5); }
+            50% { opacity: 0.7; text-shadow: 0 0 40px rgba(245, 184, 0, 0.8); }
+        }
+
+        .code-display {
+            font-size: 5rem;
+            font-weight: 900;
+            letter-spacing: 0.15em;
+            color: var(--ceut-gold);
+            animation: pulse-gold 2s infinite;
+        }
+
+        select.input-ceut option { background: #0f172a; color: white; }
     </style>
 </head>
 <body class="p-4 md:p-8">
-    <div class="max-w-6xl mx-auto">
-        <header class="flex justify-between items-center mb-10">
-            <div class="flex items-center gap-4">
-                <img src="https://lh3.googleusercontent.com/d/17NobXQ3JbRnLGejZe4Mn2x-Jl45F4rPm" class="w-16" alt="Logo">
-                <div>
-                    <h1 class="text-xl font-black uppercase italic">Control <span class="text-yellow-500">Docente</span></h1>
-                    <p id="user-display" class="text-[10px] opacity-50 uppercase tracking-widest text-blue-400">Autenticación Requerida</p>
-                </div>
-            </div>
-            <a href="index.html" id="logout-btn" class="hidden text-[10px] font-bold uppercase opacity-40 hover:opacity-100 flex items-center gap-2">
-                <i data-lucide="log-out" class="w-3 h-3"></i> Salir
-            </a>
-        </header>
 
-        <div id="auth-section" class="max-w-md mx-auto space-y-6">
-            <div id="login-box" class="glass-card p-8">
-                <h2 class="text-lg font-black uppercase italic mb-6">Iniciar Sesión</h2>
-                <div class="space-y-4">
-                    <input type="text" id="login-folio" placeholder="FOLIO (E.G. PROF-1234)" class="input-ceut uppercase">
-                    <input type="password" id="login-pass" placeholder="CONTRASEÑA" class="input-ceut">
-                    <button onclick="login()" class="btn-gold w-full py-4">Ingresar al Panel</button>
-                    <p class="text-center text-[10px] opacity-50 mt-4">¿No tienes cuenta? <button onclick="toggleAuth(true)" class="text-yellow-500 font-bold">Regístrate aquí</button></p>
-                </div>
+    <div id="app-container" class="max-w-6xl mx-auto">
+        <!-- Pantalla de Carga -->
+        <div id="loading-screen" class="fixed inset-0 flex items-center justify-center z-[100] bg-slate-950">
+            <div class="text-center">
+                <div class="w-16 h-16 border-4 border-yellow-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+                <p class="text-[10px] font-black uppercase tracking-[0.3em] opacity-40">Verificando Credenciales</p>
             </div>
-            <div id="register-box" class="glass-card p-8 hidden">
-                <h2 class="text-lg font-black uppercase italic mb-6 text-yellow-500">Registro Único</h2>
-                <div class="space-y-4">
-                    <input type="text" id="reg-name" placeholder="NOMBRE COMPLETO" class="input-ceut uppercase">
-                    <input type="email" id="reg-email" placeholder="CORREO INSTITUCIONAL" class="input-ceut">
-                    <input type="password" id="reg-pass" placeholder="CREAR CONTRASEÑA" class="input-ceut">
-                    <button onclick="register()" class="btn-gold w-full py-4">Finalizar Registro</button>
-                    <button onclick="toggleAuth(false)" class="w-full text-[10px] uppercase opacity-50 mt-2">Volver al inicio</button>
+        </div>
+
+        <!-- Pantalla de Autenticación / Registro -->
+        <div id="auth-screen" class="hidden flex items-center justify-center min-h-[80vh]">
+            <div class="glass-card p-10 md:p-16 rounded-[4rem] w-full max-w-lg">
+                <img src="https://lh3.googleusercontent.com/u/0/d/17NobXQ3JbRnLGejZe4Mn2x-Jl45F4rPm" class="h-12 mx-auto mb-8">
+                
+                <div id="auth-toggle-header" class="text-center mb-10">
+                    <h2 class="text-3xl font-black italic uppercase italic tracking-tighter">Acceso <span class="text-yellow-500">Docente</span></h2>
+                    <p class="text-[10px] opacity-40 uppercase font-bold tracking-widest mt-2">Sistema Único de Registro</p>
+                </div>
+
+                <div id="login-form" class="space-y-6">
+                    <input id="login-email" type="email" placeholder="Correo Institucional" class="input-ceut">
+                    <input id="login-pass" type="password" placeholder="Contraseña" class="input-ceut">
+                    <button onclick="handleLogin()" class="btn-gold w-full py-5 rounded-2xl uppercase italic font-black">Entrar al Portal</button>
+                    <p class="text-center text-[10px] opacity-40 font-bold uppercase">
+                        ¿Primera vez? <button onclick="toggleAuth(true)" class="text-yellow-500 underline">Regístrate aquí</button>
+                    </p>
+                </div>
+
+                <div id="register-form" class="hidden space-y-4">
+                    <input id="reg-name" type="text" placeholder="Nombre Completo" class="input-ceut">
+                    <input id="reg-email" type="email" placeholder="Correo Institucional" class="input-ceut">
+                    <input id="reg-pass" type="password" placeholder="Crear Contraseña" class="input-ceut">
+                    <button onclick="handleRegister()" class="btn-gold w-full py-5 rounded-2xl uppercase italic font-black mt-4">Crear Cuenta y Generar Folio</button>
+                    <p class="text-center text-[10px] opacity-40 font-bold uppercase">
+                        ¿Ya tienes cuenta? <button onclick="toggleAuth(false)" class="text-yellow-500 underline">Inicia Sesión</button>
+                    </p>
                 </div>
             </div>
         </div>
 
-        <div id="main-panel" class="hidden grid grid-cols-1 lg:grid-cols-3 gap-8">
-            <div class="lg:col-span-1 space-y-6">
-                <div class="glass-card p-6 border-t-4 border-yellow-500">
-                    <h3 class="text-xs font-black uppercase italic mb-4 flex items-center gap-2"><i data-lucide="plus-circle" class="w-4 h-4 text-yellow-500"></i> Registrar Materia</h3>
-                    <div class="space-y-3">
-                        <input type="text" id="cls-name" placeholder="NOMBRE DE LA MATERIA" class="input-ceut uppercase">
-                        <div class="grid grid-cols-2 gap-2"><input type="text" id="cls-grade" placeholder="GRADO" class="input-ceut uppercase"><input type="text" id="cls-group" placeholder="GRUPO" class="input-ceut uppercase"></div>
-                        <select id="cls-level" class="input-ceut uppercase bg-slate-900">
-                            <option value="PREPARATORIA ESCOLARIZADA">Prepa Escolarizada</option>
-                            <option value="PREPARATORIA MIXTA">Prepa Mixta</option>
-                            <option value="LICENCIATURA">Licenciatura</option>
-                            <option value="MAESTRÍA">Maestría</option>
+        <!-- Pantalla Principal (Dashboard) -->
+        <div id="main-dashboard" class="hidden">
+            <header class="glass-card p-8 rounded-[3rem] flex flex-col md:flex-row justify-between items-center gap-6 mb-12">
+                <div class="flex items-center gap-6">
+                    <div class="w-16 h-16 bg-yellow-500/10 rounded-2xl flex items-center justify-center border border-yellow-500/20">
+                        <i data-lucide="user-check" class="text-yellow-500 w-8 h-8"></i>
+                    </div>
+                    <div>
+                        <h1 id="prof-name" class="text-2xl font-black italic uppercase tracking-tighter">DOCENTE CEUT</h1>
+                        <p class="text-[10px] font-bold opacity-60 uppercase tracking-[0.2em]">FOLIO: <span id="prof-folio" class="text-yellow-500">---</span></p>
+                    </div>
+                </div>
+                <div class="flex gap-4">
+                    <button onclick="openModal('modal-clase')" class="btn-gold px-8 py-3.5 rounded-2xl text-[10px] uppercase italic font-black flex items-center">
+                        <i data-lucide="plus" class="w-4 h-4 mr-2"></i> Añadir Clase
+                    </button>
+                    <button onclick="handleLogout()" class="bg-white/5 border border-white/10 px-6 py-3.5 rounded-2xl text-[10px] uppercase italic font-black hover:bg-white/10 transition-all">
+                        Cerrar Sesión
+                    </button>
+                </div>
+            </header>
+
+            <div id="classes-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Tarjetas de clase dinámicas -->
+            </div>
+        </div>
+
+        <!-- Modal: Registro de Clase -->
+        <div id="modal-clase" class="fixed inset-0 z-50 glass flex items-center justify-center p-6 hidden">
+            <div class="bg-slate-950 w-full max-w-2xl p-10 rounded-[4rem] border border-white/10 shadow-2xl max-h-[90vh] overflow-y-auto">
+                <h2 id="modal-title" class="text-2xl font-black italic uppercase mb-8 text-yellow-500">Nueva Asignatura</h2>
+                <input id="edit-id" type="hidden">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mb-8">
+                    <div class="md:col-span-2">
+                        <label class="text-[9px] opacity-40 uppercase font-black ml-2 mb-2 block">Nombre de la Materia</label>
+                        <input id="clase-name" type="text" class="input-ceut uppercase font-bold" placeholder="EJ: ESTRUCTURA DE DATOS">
+                    </div>
+                    <div>
+                        <label class="text-[9px] opacity-40 uppercase font-black ml-2 mb-2 block">Grado y Grupo</label>
+                        <input id="clase-group" type="text" class="input-ceut uppercase font-bold" placeholder="4TO - GRUPO B">
+                    </div>
+                    <div>
+                        <label class="text-[9px] opacity-40 uppercase font-black ml-2 mb-2 block">Nivel Académico</label>
+                        <select id="clase-level" class="input-ceut uppercase font-bold">
+                            <option value="PREPARATORIA">PREPARATORIA</option>
+                            <option value="LICENCIATURA">LICENCIATURA</option>
+                            <option value="MAESTRIA">MAESTRÍA</option>
                         </select>
-                        <input type="text" id="cls-career" placeholder="CARRERA" class="input-ceut uppercase">
-                        <button onclick="saveClass()" class="btn-gold w-full py-3 text-xs">Guardar Materia</button>
+                    </div>
+                    <div>
+                        <label class="text-[9px] opacity-40 uppercase font-black ml-2 mb-2 block">Modalidad</label>
+                        <select id="clase-mod" class="input-ceut uppercase font-bold">
+                            <option value="ESCOLARIZADA">ESCOLARIZADA</option>
+                            <option value="MIXTA">MIXTA</option>
+                        </select>
                     </div>
                 </div>
-                <div class="glass-card p-6">
-                    <h3 class="text-xs font-black uppercase italic mb-4">Materias Guardadas</h3>
-                    <div id="saved-classes-list" class="space-y-2 max-h-60 overflow-y-auto pr-2"></div>
-                </div>
-            </div>
-            <div class="lg:col-span-2 space-y-6">
-                <div id="active-session-card" class="glass-card p-8 border-2 border-dashed border-white/10 text-center">
-                    <div id="no-active-msg">
-                        <i data-lucide="play" class="w-12 h-12 mx-auto mb-4 text-white/20"></i>
-                        <p class="text-xs uppercase opacity-30 font-bold italic">Selecciona una materia para iniciar</p>
-                    </div>
-                    <div id="active-session-ui" class="hidden">
-                        <div class="flex justify-between items-start mb-6 text-left">
-                            <div><h2 id="active-title" class="text-2xl font-black uppercase italic text-yellow-500">MATERIA</h2><p id="active-subtitle" class="text-[10px] font-bold opacity-60 uppercase"></p></div>
-                            <button onclick="location.reload()" class="bg-red-500/20 text-red-500 p-2 rounded-lg"><i data-lucide="square" class="w-5 h-5"></i></button>
-                        </div>
-                        <div class="max-w-xs mx-auto mb-8">
-                            <div id="dynamic-pin" class="pin-display text-6xl py-6 font-black tracking-widest">000000</div>
-                            <div class="w-full bg-white/5 mt-2 rounded-full overflow-hidden"><div id="timer-progress" class="timer-bar w-full"></div></div>
-                        </div>
-                        <div class="bg-white/5 rounded-2xl p-6 text-left">
-                            <div class="flex justify-between items-center mb-4"><h3 class="text-[10px] font-black uppercase">Alumnos Registrados</h3><span id="attendance-count" class="bg-yellow-500 text-black px-3 py-1 rounded-full text-[9px] font-bold">0</span></div>
-                            <div id="attendance-log" class="space-y-2 max-h-80 overflow-y-auto pr-2"></div>
-                        </div>
-                    </div>
+                <div class="flex gap-4">
+                    <button onclick="saveClass()" class="btn-gold flex-1 py-5 rounded-2xl uppercase text-[11px] font-black italic">Guardar Cambios</button>
+                    <button onclick="closeModal('modal-clase')" class="bg-white/5 border border-white/10 px-8 py-5 rounded-2xl uppercase text-[11px] font-black italic">Cancelar</button>
                 </div>
             </div>
         </div>
+
+        <!-- Pantalla de Pase de Lista (Código Vivo) -->
+        <div id="attendance-screen" class="fixed inset-0 z-[60] bg-slate-950/98 flex items-center justify-center p-6 hidden">
+            <div class="text-center w-full max-w-2xl">
+                <div class="mb-12">
+                    <h2 id="active-materia-name" class="text-5xl font-black italic uppercase mb-2 leading-none">MATERIA</h2>
+                    <p id="active-materia-info" class="text-[10px] opacity-40 uppercase tracking-[0.5em] font-bold">LICENCIATURA | ESCOLARIZADA</p>
+                </div>
+                
+                <div class="glass-card p-20 rounded-[5rem] border-2 border-yellow-500/20 mb-12 relative overflow-hidden">
+                    <p class="text-[10px] font-black uppercase text-yellow-500/60 tracking-widest mb-8">Código Dinámico (20s)</p>
+                    <div id="display-code" class="code-display">000000</div>
+                    <div class="absolute bottom-0 left-0 w-full bg-white/5 h-2">
+                        <div id="timer-bar" class="timer-bar"></div>
+                    </div>
+                </div>
+
+                <div class="flex flex-col items-center gap-6">
+                    <div class="flex items-center gap-3 px-8 py-4 bg-green-500/10 border border-green-500/20 rounded-full text-green-400 text-[10px] font-black uppercase italic animate-pulse">
+                        <i data-lucide="shield-check" class="w-4 h-4"></i> Geolocalización Activa (Radio 80m)
+                    </div>
+                    <button onclick="stopAttendance()" class="bg-red-500/10 border border-red-500/30 text-red-500 px-12 py-5 rounded-3xl uppercase text-[11px] font-black italic hover:bg-red-500 hover:text-white transition-all">
+                        Terminar Clase
+                    </button>
+                </div>
+            </div>
+        </div>
+
     </div>
-    <script>
-        const firebaseConfig = { apiKey: "AIzaSyCefP6qEqaCMpo8ZpUiLpN4e_-E4ZNTp94", authDomain: "asistencias-ceut.firebaseapp.com", projectId: "asistencias-ceut", storageBucket: "asistencias-ceut.firebasestorage.app", messagingSenderId: "130615246146", appId: "1:130615246146:web:6ae2c17c828fb28a809cdb" };
-        firebase.initializeApp(firebaseConfig);
-        const db = firebase.firestore();
-        const appId = 'ceut-dynamic-v2';
-        let currentUser = null, activeClass = null, pinTimer = null, unsubscribeLogs = null;
-        function toggleAuth(showReg) { document.getElementById('login-box').classList.toggle('hidden', showReg); document.getElementById('register-box').classList.toggle('hidden', !showReg); }
-        async function register() {
-            const name = document.getElementById('reg-name').value.trim().toUpperCase(), email = document.getElementById('reg-email').value.trim(), pass = document.getElementById('reg-pass').value;
-            if(!name || !email || pass.length < 4) return alert("Datos inválidos.");
-            const folio = `PROF-${Math.floor(1000 + Math.random() * 8999)}`;
-            await db.collection('artifacts').doc(appId).collection('public').doc('teachers').collection('profiles').doc(folio).set({ name, email, pass, folio, ts: Date.now() });
-            alert(`Folio asignado: ${folio}`); location.reload();
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, onSnapshot, addDoc, updateDoc, doc, deleteDoc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // CONFIGURACIÓN FIREBASE
+        const firebaseConfig = {
+            apiKey: "AIzaSyCefP6qEqaCMpo8ZpUiLpN4e_-E4ZNTp94",
+            authDomain: "asistencias-ceut.firebaseapp.com",
+            projectId: "asistencias-ceut",
+            storageBucket: "asistencias-ceut.firebasestorage.app",
+            messagingSenderId: "130615246146",
+            appId: "1:130615246146:web:6ae2c17c828fb28a809cdb"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'ceut-prod';
+
+        let currentUser = null;
+        let userData = null;
+        let activeInterval = null;
+        let classesUnsubscribe = null;
+
+        // --- GESTIÓN DE SESIÓN ---
+        onAuthStateChanged(auth, async (user) => {
+            document.getElementById('loading-screen').classList.add('hidden');
+            if (user) {
+                currentUser = user;
+                const userSnap = await getDoc(doc(db, 'artifacts', appId, 'users', user.uid, 'profile', 'data'));
+                if (userSnap.exists()) {
+                    userData = userSnap.data();
+                    showDashboard();
+                }
+            } else {
+                showAuth();
+            }
+        });
+
+        // --- AUTH ---
+        window.toggleAuth = (isReg) => {
+            document.getElementById('login-form').classList.toggle('hidden', isReg);
+            document.getElementById('register-form').classList.toggle('hidden', !isReg);
+            document.getElementById('auth-toggle-header').innerHTML = isReg ? 
+                `<h2 class="text-3xl font-black italic uppercase tracking-tighter">Registro <span class="text-yellow-500">Nuevo</span></h2>` : 
+                `<h2 class="text-3xl font-black italic uppercase tracking-tighter">Acceso <span class="text-yellow-500">Docente</span></h2>`;
+        };
+
+        window.handleRegister = async () => {
+            const name = document.getElementById('reg-name').value;
+            const email = document.getElementById('reg-email').value;
+            const pass = document.getElementById('reg-pass').value;
+
+            if (!name || !email || pass.length < 6) return alert("Completa los datos. Pass min 6 caracteres.");
+
+            try {
+                const cred = await createUserWithEmailAndPassword(auth, email, pass);
+                const folio = "CEUT-DOC-" + Math.floor(1000 + Math.random() * 9000);
+                
+                await setDoc(doc(db, 'artifacts', appId, 'users', cred.user.uid, 'profile', 'data'), {
+                    name: name.toUpperCase(),
+                    folio: folio,
+                    role: 'DOCENTE',
+                    createdAt: Date.now()
+                });
+            } catch (err) { alert("Error: " + err.message); }
+        };
+
+        window.handleLogin = async () => {
+            const email = document.getElementById('login-email').value;
+            const pass = document.getElementById('login-pass').value;
+            try { await signInWithEmailAndPassword(auth, email, pass); } 
+            catch (err) { alert("Credenciales incorrectas"); }
+        };
+
+        window.handleLogout = () => signOut(auth);
+
+        // --- DASHBOARD ---
+        function showDashboard() {
+            document.getElementById('auth-screen').classList.add('hidden');
+            document.getElementById('main-dashboard').classList.remove('hidden');
+            document.getElementById('prof-name').innerText = userData.name;
+            document.getElementById('prof-folio').innerText = userData.folio;
+            startListeningClasses();
         }
-        async function login() {
-            const folio = document.getElementById('login-folio').value.trim().toUpperCase(), pass = document.getElementById('login-pass').value;
-            const doc = await db.collection('artifacts').doc(appId).collection('public').doc('teachers').collection('profiles').doc(folio).get();
-            if(doc.exists && doc.data().pass === pass) { currentUser = doc.data(); sessionStorage.setItem('ceut_prof', JSON.stringify(currentUser)); initPanel(); } else alert("Error de acceso.");
+
+        function showAuth() {
+            document.getElementById('main-dashboard').classList.add('hidden');
+            document.getElementById('auth-screen').classList.remove('hidden');
         }
-        function initPanel() {
-            if(!currentUser) return; document.getElementById('auth-section').classList.add('hidden'); document.getElementById('main-panel').classList.remove('hidden'); document.getElementById('logout-btn').classList.remove('hidden');
-            document.getElementById('user-display').innerText = `${currentUser.name} (${currentUser.folio})`; loadClasses(); lucide.createIcons();
-        }
-        async function saveClass() {
-            const cls = { id: Date.now().toString(), name: document.getElementById('cls-name').value.toUpperCase(), grade: document.getElementById('cls-grade').value.toUpperCase(), group: document.getElementById('cls-group').value.toUpperCase(), level: document.getElementById('cls-level').value, career: document.getElementById('cls-career').value.toUpperCase() || 'N/A' };
-            await db.collection('artifacts').doc(appId).collection('public').doc('teachers').collection('profiles').doc(currentUser.folio).collection('classes').doc(cls.id).set(cls); loadClasses();
-        }
-        async function loadClasses() {
-            const list = document.getElementById('saved-classes-list');
-            const snap = await db.collection('artifacts').doc(appId).collection('public').doc('teachers').collection('profiles').doc(currentUser.folio).collection('classes').get();
-            list.innerHTML = ''; snap.forEach(doc => {
-                const c = doc.data(); const div = document.createElement('div');
-                div.className = "p-3 bg-white/5 rounded-xl border border-white/5 hover:border-yellow-500/50 cursor-pointer mb-2 transition";
-                div.innerHTML = `<div onclick='startClassSession(${JSON.stringify(c)})'><p class="text-[10px] font-black text-yellow-500">${c.name}</p><p class="text-[8px] opacity-50 uppercase">${c.level} | ${c.grade}°${c.group}</p></div>`;
-                list.appendChild(div);
-            });
-        }
-        function startClassSession(cls) {
-            activeClass = cls; document.getElementById('no-active-msg').classList.add('hidden'); document.getElementById('active-session-ui').classList.remove('hidden');
-            document.getElementById('active-title').innerText = cls.name; document.getElementById('active-subtitle').innerText = `${cls.level} • ${cls.grade}° ${cls.group}`;
-            startDynamicPin(); listenAttendance();
-        }
-        function startDynamicPin() {
-            const update = async () => {
-                const pin = Math.floor(100000 + Math.random() * 899999).toString();
-                await db.collection('artifacts').doc(appId).collection('public').doc('active_sessions').set({ [pin]: { ...activeClass, profName: currentUser.name, expires: Date.now() + 21000 } }, { merge: true });
-                document.getElementById('dynamic-pin').innerText = pin;
-                const bar = document.getElementById('timer-progress'); bar.style.transition = 'none'; bar.style.width = '100%';
-                setTimeout(() => { bar.style.transition = 'width 20s linear'; bar.style.width = '0%'; }, 50);
-            };
-            update(); pinTimer = setInterval(update, 20000);
-        }
-        function listenAttendance() {
-            unsubscribeLogs = db.collection('artifacts').doc(appId).collection('public').doc('attendance_logs').collection(activeClass.id).onSnapshot(snap => {
-                document.getElementById('attendance-count').innerText = snap.size;
-                const log = document.getElementById('attendance-log'); log.innerHTML = '';
-                snap.docs.forEach(doc => {
-                    const d = doc.data(); const row = document.createElement('div');
-                    row.className = "student-row p-3 bg-white/5 rounded-lg flex justify-between items-center mb-2";
-                    row.innerHTML = `<div><p class="text-[9px] font-black uppercase">${d.studentName}</p><p class="text-[7px] opacity-40 uppercase">${d.studentId}</p></div><i data-lucide="check-circle" class="w-4 h-4 text-green-500"></i>`;
-                    log.appendChild(row);
+
+        // --- GESTIÓN CLASES ---
+        function startListeningClasses() {
+            const classesRef = collection(db, 'artifacts', appId, 'public', 'data', 'classes');
+            // Nota: En producción filtraríamos por teacherUid. 
+            // Para simplicidad en este prototipo, mostramos todas pero permitimos edición solo al dueño si se agrega el campo.
+            classesUnsubscribe = onSnapshot(classesRef, (snap) => {
+                const container = document.getElementById('classes-grid');
+                container.innerHTML = "";
+                snap.docs.forEach(docSnap => {
+                    const c = docSnap.data();
+                    const card = document.createElement('div');
+                    card.className = "glass-card p-8 rounded-[3.5rem] relative group border-white/5 hover:border-yellow-500/30 transition-all duration-500";
+                    card.innerHTML = `
+                        <div class="flex justify-between items-start mb-6">
+                            <div class="px-4 py-2 bg-yellow-500/10 rounded-full text-[8px] font-black text-yellow-500 uppercase tracking-widest border border-yellow-500/10">
+                                ${c.level}
+                            </div>
+                            <div class="flex gap-2">
+                                <button onclick="editClass('${docSnap.id}')" class="p-2 bg-white/5 rounded-xl hover:bg-white/10 transition-colors">
+                                    <i data-lucide="edit-3" class="w-4 h-4 opacity-40"></i>
+                                </button>
+                                <button onclick="deleteClass('${docSnap.id}')" class="p-2 bg-white/5 rounded-xl hover:bg-red-500/20 text-red-500 transition-colors">
+                                    <i data-lucide="trash-2" class="w-4 h-4"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <h3 class="text-xl font-black italic uppercase leading-tight mb-2">${c.name}</h3>
+                        <p class="text-[9px] font-bold opacity-30 uppercase tracking-[0.2em] mb-8">${c.grade} • ${c.mod}</p>
+                        
+                        <div class="grid grid-cols-2 gap-3">
+                            <button onclick="startAttendance('${docSnap.id}')" class="btn-gold py-4 rounded-2xl text-[9px] font-black uppercase italic col-span-2">Generar Código</button>
+                            <button onclick="generatePDF('${docSnap.id}')" class="bg-white/5 border border-white/10 py-3 rounded-xl text-[8px] font-black uppercase flex items-center justify-center hover:bg-white/10">
+                                <i data-lucide="file-text" class="w-3 h-3 mr-2"></i> PDF
+                            </button>
+                            <button onclick="window.print()" class="bg-white/5 border border-white/10 py-3 rounded-xl text-[8px] font-black uppercase flex items-center justify-center hover:bg-white/10">
+                                <i data-lucide="printer" class="w-3 h-3 mr-2"></i> Imprmir
+                            </button>
+                        </div>
+                    `;
+                    container.appendChild(card);
                 });
                 lucide.createIcons();
             });
         }
-        const saved = sessionStorage.getItem('ceut_prof'); if(saved) { currentUser = JSON.parse(saved); initPanel(); }
+
+        window.saveClass = async () => {
+            const name = document.getElementById('clase-name').value;
+            const group = document.getElementById('clase-group').value;
+            const level = document.getElementById('clase-level').value;
+            const mod = document.getElementById('clase-mod').value;
+            const editId = document.getElementById('edit-id').value;
+
+            if(!name || !group) return alert("Faltan datos");
+
+            const data = {
+                name: name.toUpperCase(),
+                grade: group.toUpperCase(),
+                level: level,
+                mod: mod,
+                teacherUid: currentUser.uid,
+                teacherName: userData.name,
+                updatedAt: Date.now()
+            };
+
+            try {
+                if(editId) {
+                    await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'classes', editId), data);
+                } else {
+                    data.createdAt = Date.now();
+                    data.attendanceCount = 0;
+                    await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'classes'), data);
+                }
+                closeModal('modal-clase');
+                document.querySelectorAll('.input-ceut').forEach(i => i.value = "");
+            } catch(e) { alert("Error de permisos."); }
+        };
+
+        window.editClass = async (id) => {
+            const snap = await getDoc(doc(db, 'artifacts', appId, 'public', 'data', 'classes', id));
+            if(snap.exists()) {
+                const c = snap.data();
+                document.getElementById('clase-name').value = c.name;
+                document.getElementById('clase-group').value = c.grade;
+                document.getElementById('clase-level').value = c.level;
+                document.getElementById('clase-mod').value = c.mod;
+                document.getElementById('edit-id').value = id;
+                document.getElementById('modal-title').innerText = "Editar Asignatura";
+                openModal('modal-clase');
+            }
+        };
+
+        window.deleteClass = async (id) => {
+            if(confirm("¿Eliminar clase permanentemente?")) {
+                await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'classes', id));
+            }
+        };
+
+        // --- PASE DE LISTA DINÁMICO ---
+        window.startAttendance = (id) => {
+            navigator.geolocation.getCurrentPosition(async (pos) => {
+                const geo = { lat: pos.coords.latitude, lng: pos.coords.longitude };
+                const classSnap = await getDoc(doc(db, 'artifacts', appId, 'public', 'data', 'classes', id));
+                const c = classSnap.data();
+
+                document.getElementById('active-materia-name').innerText = c.name;
+                document.getElementById('active-materia-info').innerText = `${c.level} | ${c.mod}`;
+                document.getElementById('attendance-screen').classList.remove('hidden');
+
+                const refreshCode = async () => {
+                    const code = Math.floor(100000 + Math.random() * 900000).toString();
+                    document.getElementById('display-code').innerText = code;
+                    
+                    const bar = document.getElementById('timer-bar');
+                    bar.style.transition = 'none'; bar.style.width = '100%';
+                    setTimeout(() => { bar.style.transition = 'width 20s linear'; bar.style.width = '0%'; }, 50);
+
+                    await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'classes', id), {
+                        activeCode: code,
+                        geo: geo,
+                        expiry: Date.now() + 20000,
+                        lastSession: Date.now()
+                    });
+                };
+
+                refreshCode();
+                activeInterval = setInterval(refreshCode, 20000);
+            }, () => alert("GPS Obligatorio para el pase de lista."));
+        };
+
+        window.stopAttendance = () => {
+            clearInterval(activeInterval);
+            document.getElementById('attendance-screen').classList.add('hidden');
+        };
+
+        // --- GENERACIÓN PDF ELEGANTE ---
+        window.generatePDF = async (id) => {
+            const snap = await getDoc(doc(db, 'artifacts', appId, 'public', 'data', 'classes', id));
+            const c = snap.data();
+            const { jsPDF } = window.jspdf;
+            const docPdf = new jsPDF();
+
+            // Cabecera Institucional
+            docPdf.setFillColor(2, 6, 23);
+            docPdf.rect(0, 0, 210, 45, 'F');
+            docPdf.setTextColor(255, 255, 255);
+            docPdf.setFontSize(24);
+            docPdf.setFont("helvetica", "bold");
+            docPdf.text("CEUT UNIVERSIDAD", 20, 25);
+            docPdf.setFontSize(9);
+            docPdf.text("CENTRO UNIVERSITARIO DE TEHUACÁN - REPORTE DOCENTE", 20, 35);
+
+            // Información General
+            docPdf.setTextColor(20, 20, 20);
+            docPdf.setFontSize(14);
+            docPdf.text(`RESUMEN ACADÉMICO: ${c.name}`, 20, 60);
+
+            docPdf.autoTable({
+                startY: 70,
+                head: [['ATRIBUTO', 'DETALLE ESPECÍFICO']],
+                body: [
+                    ['DOCENTE', userData.name],
+                    ['FOLIO INTERNO', userData.folio],
+                    ['ASIGNATURA', c.name],
+                    ['NIVEL ACADÉMICO', c.level],
+                    ['GRADO Y GRUPO', c.grade],
+                    ['MODALIDAD', c.mod],
+                    ['TOTAL ASISTENCIAS REG.', c.attendanceCount || 0],
+                    ['FECHA EMISIÓN', new Date().toLocaleString()]
+                ],
+                theme: 'striped',
+                headStyles: { fillColor: [30, 58, 138], textColor: 255, fontStyle: 'bold' },
+                styles: { fontSize: 10, cellPadding: 5, halign: 'justify' },
+                columnStyles: { 0: { fontStyle: 'bold', width: 60 } }
+            });
+
+            docPdf.setFontSize(8);
+            docPdf.setTextColor(150);
+            docPdf.text("Este documento es una constancia digital emitida por el Portal Docente CEUT.", 20, docPdf.lastAutoTable.finalY + 20);
+
+            docPdf.save(`REPORTE_CEUT_${c.name}.pdf`);
+        };
+
+        window.openModal = (id) => {
+            document.getElementById('edit-id').value = "";
+            document.getElementById('modal-title').innerText = "Nueva Asignatura";
+            document.getElementById(id).classList.remove('hidden');
+        };
+        window.closeModal = (id) => document.getElementById(id).classList.add('hidden');
+
         lucide.createIcons();
     </script>
 </body>
