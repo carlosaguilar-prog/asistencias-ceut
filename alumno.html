@@ -9,216 +9,281 @@
     <link rel="icon" type="image/png" href="https://lh3.googleusercontent.com/u/0/d/17NobXQ3JbRnLGejZe4Mn2x-Jl45F4rPm">
 
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
     
     <style>
-        :root { --ceut-blue: #3b4ba4; --ceut-gold: #f5b800; }
+        :root {
+            --ceut-navy: #020617;
+            --ceut-blue: #1e3a8a;
+            --ceut-gold: #f5b800;
+        }
+
         body { 
+            background: radial-gradient(circle at top right, #1e3a8a, #0f172a, #020617);
+            background-attachment: fixed;
             font-family: 'Plus Jakarta Sans', sans-serif; 
-            background-color: #000b21; 
             color: white; 
             min-height: 100vh;
             margin: 0;
-            display: flex;
-            flex-direction: column;
         }
-        .glass { 
-            background: rgba(255, 255, 255, 0.03); 
-            backdrop-filter: blur(12px); 
-            border: 1px solid rgba(255, 255, 255, 0.08); 
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
-        .input-field {
+
+        .btn-gold {
+            background: var(--ceut-gold);
+            color: var(--ceut-navy);
+            font-weight: 800;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .btn-gold:hover { 
+            transform: translateY(-2px); 
+            box-shadow: 0 10px 20px -5px rgba(245, 184, 0, 0.4); 
+        }
+
+        .input-ceut {
             background: rgba(255, 255, 255, 0.05);
             border: 1px solid rgba(255, 255, 255, 0.1);
             border-radius: 1rem;
             padding: 1rem;
-            color: white; width: 100%; outline: none;
+            color: white;
+            font-size: 0.875rem;
+            width: 100%;
             transition: all 0.3s;
         }
-        .input-field:focus { border-color: var(--ceut-gold); background: rgba(255, 255, 255, 0.1); }
-        
-        /* Animación suave para evitar el parpadeo */
-        .page-transition { transition: opacity 0.5s ease; }
-        .hidden-v { opacity: 0; pointer-events: none; visibility: hidden; position: absolute; }
-        .visible-v { opacity: 1; pointer-events: auto; visibility: visible; position: relative; }
+
+        .input-ceut:focus { 
+            outline: none; 
+            border-color: var(--ceut-gold); 
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        #main-content, #register-screen { display: none; }
+        #auth-screen { display: flex; }
     </style>
 </head>
-<body>
+<body class="flex flex-col min-h-screen">
 
-    <!-- Pantalla de Carga Inicial -->
-    <div id="loader" class="fixed inset-0 z-[100] flex items-center justify-center bg-[#000b21]">
-        <div class="text-center">
-            <div class="w-10 h-10 border-4 border-yellow-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-            <p class="text-[10px] font-bold uppercase tracking-[0.3em] opacity-40">Estableciendo Enlace...</p>
-        </div>
-    </div>
-
-    <!-- Interfaz de Acceso (Login) -->
-    <div id="auth-screen" class="hidden-v flex-1 flex items-center justify-center p-6 page-transition">
-        <div class="text-center p-10 glass rounded-[3rem] max-w-sm w-full border-t-4 border-t-yellow-500 shadow-2xl">
-            <img src="https://lh3.googleusercontent.com/u/0/d/17NobXQ3JbRnLGejZe4Mn2x-Jl45F4rPm" class="h-24 mx-auto mb-8 drop-shadow-2xl" alt="CEUT Logo">
-            <h2 class="text-2xl font-black italic uppercase tracking-tighter mb-2">Portal <span class="text-yellow-500">Alumno</span></h2>
-            <p class="text-[10px] opacity-40 uppercase font-bold mb-10 tracking-[0.2em]">Acceso con Cuenta Institucional</p>
+    <!-- Pantalla de Acceso (Login) -->
+    <div id="auth-screen" class="flex-1 flex items-center justify-center p-6">
+        <div class="glass-card p-10 md:p-16 rounded-[4rem] w-full max-w-lg shadow-2xl border-t-4 border-t-yellow-500">
+            <img src="https://lh3.googleusercontent.com/u/0/d/17NobXQ3JbRnLGejZe4Mn2x-Jl45F4rPm" class="h-12 mx-auto mb-8 drop-shadow-lg" alt="CEUT Logo">
             
-            <div class="space-y-4">
-                <div class="text-left">
-                    <label class="text-[9px] uppercase font-black opacity-30 ml-4 mb-1 block">Usuario / Correo</label>
-                    <input id="login-email" type="email" class="input-field" placeholder="ejemplo@ceut.edu.mx">
+            <div class="text-center mb-10">
+                <h2 class="text-3xl font-black italic uppercase tracking-tighter">Portal <span class="text-yellow-500">Alumno</span></h2>
+                <p class="text-[10px] opacity-40 uppercase font-bold tracking-widest mt-2">Acceso Institucional Único</p>
+            </div>
+            
+            <div class="space-y-6">
+                <div>
+                    <label class="text-[9px] uppercase font-black opacity-30 ml-4 mb-1 block">Correo Institucional</label>
+                    <input id="login-email" type="email" class="input-ceut" placeholder="ejemplo@ceut.edu.mx">
                 </div>
-                <div class="text-left">
+                <div>
                     <label class="text-[9px] uppercase font-black opacity-30 ml-4 mb-1 block">Contraseña</label>
-                    <input id="login-pass" type="password" class="input-field" placeholder="••••••••">
+                    <input id="login-pass" type="password" class="input-ceut" placeholder="••••••••">
                 </div>
-                <button onclick="handleLogin()" id="btn-login" class="w-full bg-yellow-500 text-blue-950 font-black py-4 rounded-2xl uppercase text-xs hover:brightness-110 active:scale-95 transition-all mt-4 shadow-lg shadow-yellow-500/10">
+                <button onclick="window.handleLogin()" id="btn-login" class="btn-gold w-full py-5 rounded-2xl uppercase italic font-black text-xs shadow-lg shadow-yellow-500/10">
                     Entrar al Sistema
                 </button>
             </div>
             
-            <div id="login-error" class="mt-6 p-3 bg-red-500/10 border border-red-500/20 rounded-xl text-red-400 text-[10px] font-bold uppercase hidden"></div>
+            <div id="login-error" class="mt-6 p-4 bg-red-500/10 border border-red-500/20 rounded-2xl text-red-400 text-[10px] font-bold uppercase text-center hidden"></div>
 
-            <button onclick="window.location.href='index.html'" class="mt-10 text-[9px] opacity-40 uppercase font-bold hover:text-white transition-colors flex items-center justify-center gap-2 mx-auto">
-                <i data-lucide="arrow-left" class="w-3 h-3"></i> Volver al Inicio
+            <div class="mt-10 pt-8 border-t border-white/5 space-y-4 text-center">
+                <p class="text-[10px] opacity-40 font-bold uppercase">
+                    ¿No tienes cuenta? 
+                    <button onclick="window.showRegister()" class="text-yellow-500 underline ml-1">Regístrate por única ocasión</button>
+                </p>
+                <button onclick="window.location.href='index.html'" class="text-[9px] opacity-40 uppercase font-bold hover:text-white transition-colors flex items-center justify-center gap-2 mx-auto">
+                    <i data-lucide="arrow-left" class="w-3 h-3"></i> Volver al Inicio
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pantalla de Registro -->
+    <div id="register-screen" class="flex-1 flex items-center justify-center p-6">
+        <div class="glass-card p-10 md:p-16 rounded-[4rem] w-full max-w-lg shadow-2xl border-t-4 border-t-yellow-500">
+            <div class="text-center mb-10">
+                <h2 class="text-3xl font-black italic uppercase tracking-tighter">Nuevo <span class="text-yellow-500">Registro</span></h2>
+                <p class="text-[10px] opacity-40 uppercase font-bold tracking-widest mt-2">Crea tu Identidad Digital</p>
+            </div>
+            
+            <div class="space-y-4">
+                <input id="reg-name" type="text" class="input-ceut" placeholder="Nombre Completo">
+                <input id="reg-email" type="email" class="input-ceut" placeholder="Correo Institucional">
+                <input id="reg-pass" type="password" class="input-ceut" placeholder="Crear Contraseña (mín. 6 caracteres)">
+                <button onclick="window.handleRegister()" id="btn-register" class="btn-gold w-full py-5 rounded-2xl uppercase italic font-black text-xs mt-4">
+                    Completar Registro
+                </button>
+            </div>
+            
+            <button onclick="window.showLogin()" class="mt-8 text-[9px] opacity-40 uppercase font-bold hover:text-white flex items-center justify-center gap-2 mx-auto">
+                <i data-lucide="arrow-left" class="w-3 h-3"></i> Ya tengo cuenta / Cancelar
             </button>
         </div>
     </div>
 
-    <!-- Contenido Principal (Dashboard) -->
-    <div id="main-content" class="hidden-v flex-1 p-6 lg:p-12 max-w-6xl mx-auto w-full page-transition">
-        <header class="flex justify-between items-center mb-12">
+    <!-- Contenido Principal (Dashboard Alumno) -->
+    <div id="main-content" class="flex-1 p-6 lg:p-12 max-w-6xl mx-auto w-full">
+        <header class="glass-card p-8 rounded-[3rem] flex justify-between items-center mb-12 border-white/5">
             <div class="flex items-center gap-6">
-                <img src="https://lh3.googleusercontent.com/u/0/d/17NobXQ3JbRnLGejZe4Mn2x-Jl45F4rPm" class="h-14 drop-shadow-md" alt="CEUT">
-                <div class="h-10 w-px bg-white/10 hidden sm:block"></div>
+                <div class="w-16 h-16 bg-yellow-500/10 rounded-2xl flex items-center justify-center border border-yellow-500/20">
+                    <i data-lucide="graduation-cap" class="text-yellow-500 w-8 h-8"></i>
+                </div>
                 <div>
-                    <h1 id="user-display-name" class="font-black italic uppercase text-2xl leading-none tracking-tighter">...</h1>
-                    <p class="text-[10px] opacity-40 uppercase font-bold tracking-[0.3em] mt-1 text-yellow-500">Alumno Verificado</p>
+                    <h1 id="user-display-name" class="text-2xl font-black italic uppercase tracking-tighter leading-none">Cargando...</h1>
+                    <p class="text-[10px] opacity-40 uppercase font-bold tracking-[0.3em] mt-1 text-yellow-500">Estudiante Verificado</p>
                 </div>
             </div>
-            <button onclick="logout()" class="glass p-4 rounded-[1.5rem] text-red-400 hover:bg-red-500/10 transition-all active:scale-90">
+            <button onclick="window.logout()" class="bg-white/5 border border-white/10 p-4 rounded-[1.5rem] text-red-400 hover:bg-red-500/20 transition-all active:scale-90">
                 <i data-lucide="power" class="w-6 h-6"></i>
             </button>
         </header>
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <!-- Card 1 -->
-            <div class="glass p-10 rounded-[3rem] relative overflow-hidden group border-b-4 border-b-transparent hover:border-b-yellow-500 transition-all">
+            <!-- Credencial Card -->
+            <div class="glass-card p-10 rounded-[3.5rem] relative overflow-hidden group border-white/5 hover:border-yellow-500/30 transition-all duration-500">
                 <div class="flex justify-between items-start mb-16">
                     <div class="p-4 bg-yellow-500/10 rounded-2xl text-yellow-500">
                         <i data-lucide="id-card" class="w-8 h-8"></i>
                     </div>
-                    <span class="text-[9px] font-black uppercase opacity-40 tracking-widest">Activo 2026</span>
+                    <span class="text-[9px] font-black uppercase opacity-40 tracking-widest bg-white/5 px-4 py-2 rounded-full border border-white/5">Ciclo 2026-1</span>
                 </div>
-                <h3 class="text-4xl font-black italic uppercase mb-3">Mi Credencial</h3>
-                <p class="text-xs opacity-40 uppercase font-bold leading-relaxed">Presenta este código en los puntos de acceso para registrar tu entrada.</p>
+                <h3 class="text-4xl font-black italic uppercase mb-3 leading-none">Mi Credencial</h3>
+                <p class="text-xs opacity-40 uppercase font-bold leading-relaxed max-w-[250px]">Identificación digital para accesos y biblioteca.</p>
+                
                 <div class="absolute -right-8 -bottom-8 opacity-[0.03] group-hover:opacity-[0.06] transition-opacity">
-                    <i data-lucide="id-card" class="w-48 h-48"></i>
+                    <i data-lucide="id-card" class="w-56 h-56"></i>
                 </div>
             </div>
 
-            <!-- Card 2 -->
-            <div class="glass p-10 rounded-[3rem] relative overflow-hidden group border-b-4 border-b-transparent hover:border-b-yellow-500 transition-all">
+            <!-- Asistencias Card -->
+            <div class="glass-card p-10 rounded-[3.5rem] relative overflow-hidden group border-white/5 hover:border-yellow-500/30 transition-all duration-500">
                 <div class="flex justify-between items-start mb-16">
                     <div class="p-4 bg-yellow-500/10 rounded-2xl text-yellow-500">
-                        <i data-lucide="clock" class="w-8 h-8"></i>
+                        <i data-lucide="calendar-check-2" class="w-8 h-8"></i>
                     </div>
                 </div>
-                <h3 class="text-4xl font-black italic uppercase mb-3">Asistencias</h3>
-                <p class="text-xs opacity-40 uppercase font-bold mb-8">Revisa el historial de tus clases y registros de puntualidad.</p>
-                <button class="bg-white text-blue-950 px-8 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest hover:scale-105 transition-transform">Ver Historial</button>
+                <h3 class="text-4xl font-black italic uppercase mb-3 leading-none">Asistencias</h3>
+                <p class="text-xs opacity-40 uppercase font-bold mb-8 leading-relaxed">Registro histórico de puntualidad y permanencia.</p>
+                <button class="btn-gold px-8 py-4 rounded-2xl text-[10px] font-black uppercase italic tracking-widest shadow-lg shadow-yellow-500/5">Consultar Kárdex</button>
             </div>
         </div>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // Obtener configuración de forma segura
-        const getConfig = () => {
-            try { return JSON.parse(__firebase_config); }
-            catch(e) { return null; }
+        // CONFIGURACIÓN CENTRALIZADA
+        const firebaseConfig = {
+            apiKey: "AIzaSyCefP6qEqaCMpo8ZpUiLpN4e_-E4ZNTp94",
+            authDomain: "asistencias-ceut.firebaseapp.com",
+            projectId: "asistencias-ceut",
+            storageBucket: "asistencias-ceut.firebasestorage.app",
+            messagingSenderId: "130615246146",
+            appId: "1:130615246146:web:6ae2c17c828fb28a809cdb"
         };
 
-        const config = getConfig();
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'ceut-system';
+        let auth, db, appId;
         
-        let auth, db;
-
-        if (config) {
-            const app = initializeApp(config);
+        try {
+            const app = initializeApp(firebaseConfig);
             auth = getAuth(app);
             db = getFirestore(app);
+            appId = typeof __app_id !== 'undefined' ? __app_id : 'ceut-system';
+
+            onAuthStateChanged(auth, async (user) => {
+                const authScreen = document.getElementById('auth-screen');
+                const regScreen = document.getElementById('register-screen');
+                const mainContent = document.getElementById('main-content');
+                
+                if (user) {
+                    authScreen.style.display = 'none';
+                    regScreen.style.display = 'none';
+                    mainContent.style.display = 'block';
+                    
+                    const snap = await getDoc(doc(db, 'artifacts', appId, 'users', user.uid, 'profile', 'data'));
+                    document.getElementById('user-display-name').innerText = snap.exists() ? snap.data().name : user.email.split('@')[0].toUpperCase();
+                } else {
+                    mainContent.style.display = 'none';
+                    regScreen.style.display = 'none';
+                    authScreen.style.display = 'flex';
+                }
+                lucide.createIcons();
+            });
+
+        } catch (error) {
+            console.error("Firebase Error:", error);
+            document.getElementById('auth-screen').style.display = 'flex';
         }
 
-        // Lógica de UI
-        const showAuth = () => {
-            document.getElementById('loader').style.display = 'none';
-            document.getElementById('main-content').classList.replace('visible-v', 'hidden-v');
-            document.getElementById('auth-screen').classList.replace('hidden-v', 'visible-v');
-            document.getElementById('auth-screen').classList.remove('hidden');
+        window.showRegister = () => {
+            document.getElementById('auth-screen').style.display = 'none';
+            document.getElementById('register-screen').style.display = 'flex';
+            lucide.createIcons();
         };
 
-        const showMain = () => {
-            document.getElementById('loader').style.display = 'none';
-            document.getElementById('auth-screen').classList.replace('visible-v', 'hidden-v');
-            document.getElementById('main-content').classList.replace('hidden-v', 'visible-v');
-            document.getElementById('main-content').classList.remove('hidden');
+        window.showLogin = () => {
+            document.getElementById('register-screen').style.display = 'none';
+            document.getElementById('auth-screen').style.display = 'flex';
+            lucide.createIcons();
         };
 
-        // Acciones globales
         window.handleLogin = async () => {
-            if (!auth) return alert("Error de conexión con el servidor.");
-            
             const email = document.getElementById('login-email').value;
             const pass = document.getElementById('login-pass').value;
             const btn = document.getElementById('btn-login');
             const err = document.getElementById('login-error');
-            
-            if(!email || !pass) return;
 
-            btn.disabled = true;
-            btn.innerText = "VERIFICANDO...";
+            if(!email || !pass) return;
+            
+            btn.disabled = true; btn.innerText = "VERIFICANDO...";
             err.classList.add('hidden');
 
             try {
                 await signInWithEmailAndPassword(auth, email, pass);
             } catch(e) {
-                err.innerText = "Usuario o contraseña incorrectos";
+                err.innerText = "ACCESO DENEGADO: VERIFICA TUS CREDENCIALES";
                 err.classList.remove('hidden');
-                btn.disabled = false;
-                btn.innerText = "ENTRAR AL PORTAL";
+                btn.disabled = false; btn.innerText = "ENTRAR AL SISTEMA";
             }
         };
 
-        window.logout = () => auth && signOut(auth);
+        window.handleRegister = async () => {
+            const name = document.getElementById('reg-name').value;
+            const email = document.getElementById('reg-email').value;
+            const pass = document.getElementById('reg-pass').value;
+            const btn = document.getElementById('btn-register');
 
-        // Listener de sesión
-        if (auth) {
-            onAuthStateChanged(auth, async (user) => {
-                if (user) {
-                    try {
-                        const snap = await getDoc(doc(db, 'artifacts', appId, 'users', user.uid, 'profile', 'data'));
-                        document.getElementById('user-display-name').innerText = snap.exists() ? snap.data().name : user.email.split('@')[0].toUpperCase();
-                    } catch(e) {
-                        document.getElementById('user-display-name').innerText = "ALUMNO CEUT";
-                    }
-                    showMain();
-                } else {
-                    showAuth();
-                }
-                lucide.createIcons();
-            });
-        }
+            if(!name || !email || !pass) return alert("Por favor completa todos los campos.");
+            if(pass.length < 6) return alert("La contraseña debe tener al menos 6 caracteres.");
 
-        // Seguridad: Si en 3 segundos no hay respuesta del sistema, forzar pantalla de login
-        setTimeout(() => {
-            if (document.getElementById('loader').style.display !== 'none') {
-                showAuth();
-                lucide.createIcons();
+            btn.disabled = true; btn.innerText = "PROCESANDO REGISTRO...";
+
+            try {
+                const res = await createUserWithEmailAndPassword(auth, email, pass);
+                await setDoc(doc(db, 'artifacts', appId, 'users', res.user.uid, 'profile', 'data'), {
+                    name: name.toUpperCase(),
+                    email: email,
+                    role: 'alumno',
+                    createdAt: new Date().toISOString()
+                });
+            } catch(e) {
+                alert("ERROR EN REGISTRO: " + e.message);
+                btn.disabled = false; btn.innerText = "COMPLETAR REGISTRO";
             }
-        }, 3000);
+        };
 
+        window.logout = () => signOut(auth);
         lucide.createIcons();
     </script>
 </body>
