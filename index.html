@@ -2,75 +2,157 @@
 <html lang="es-MX">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CEUT | Sistema Central</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>CEUT | Portal de Enlace Institucional</title>
+    
+    <!-- Favicon para la pestaña del navegador -->
+    <link rel="icon" type="image/png" href="https://lh3.googleusercontent.com/u/0/d/17NobXQ3JbRnLGejZe4Mn2x-Jl45F4rPm">
+    <link rel="apple-touch-icon" href="https://lh3.googleusercontent.com/u/0/d/17NobXQ3JbRnLGejZe4Mn2x-Jl45F4rPm">
+
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
+
     <style>
         :root {
-            --ceut-blue-dark: #000b21;
-            --ceut-blue-light: #1e1b4b;
-            --ceut-gold: #eab308;
+            --ceut-blue: #1e3a8a;
+            --ceut-navy: #020617;
+            --ceut-gold: #f5b800;
         }
+
         body { 
-            background: radial-gradient(circle at center, var(--ceut-blue-light), var(--ceut-blue-dark));
+            background: radial-gradient(circle at top right, #1e3a8a, #0f172a, #020617);
+            background-attachment: fixed;
             font-family: 'Plus Jakarta Sans', sans-serif; 
             color: white; min-height: 100vh;
-            display: flex; align-items: center; justify-content: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow-x: hidden;
         }
-        .menu-card {
+
+        .glass-card {
             background: rgba(255, 255, 255, 0.03);
-            backdrop-filter: blur(15px);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
             border: 1px solid rgba(255, 255, 255, 0.1);
-            transition: all 0.3s ease;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
         }
-        .menu-card:hover {
+
+        .glass-card:hover {
+            background: rgba(255, 255, 255, 0.08);
             transform: translateY(-10px);
             border-color: var(--ceut-gold);
-            background: rgba(234, 179, 8, 0.05);
+            box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.5);
         }
+
+        .icon-box {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 1.5rem;
+            width: 64px;
+            height: 64px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1.5rem;
+            transition: all 0.3s;
+        }
+
+        .glass-card:hover .icon-box {
+            background: var(--ceut-gold);
+            color: var(--ceut-navy);
+            transform: scale(1.1) rotate(5deg);
+        }
+
+        .btn-link {
+            background: var(--ceut-gold);
+            color: var(--ceut-navy);
+            font-weight: 800;
+            padding: 0.75rem 1.5rem;
+            border-radius: 1rem;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-top: 1.5rem;
+            display: inline-block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .animate-fade { animation: fadeIn 0.8s ease-out forwards; }
     </style>
 </head>
 <body class="p-6">
-    <div class="max-w-5xl w-full">
-        <div class="text-center mb-12">
-            <img src="https://lh3.googleusercontent.com/d/17NobXQ3JbRnLGejZe4Mn2x-Jl45F4rPm" class="w-24 mx-auto mb-6" alt="Logo">
-            <h1 class="text-4xl font-black uppercase italic italic tracking-tighter">Sistema Integral <span class="text-yellow-500">CEUT</span></h1>
-            <p class="opacity-50 text-sm mt-2 uppercase tracking-[0.3em]">Seleccione su portal de acceso</p>
+
+    <div class="max-w-5xl w-full text-center">
+        <!-- Logo Central -->
+        <div class="mb-12 animate-fade" style="animation-delay: 0.1s;">
+            <img src="https://lh3.googleusercontent.com/u/0/d/17NobXQ3JbRnLGejZe4Mn2x-Jl45F4rPm" class="h-28 mx-auto drop-shadow-2xl mb-6" alt="CEUT Logo">
+            <h1 class="text-3xl font-black italic uppercase tracking-tighter">Sistema <span class="text-yellow-500">Integral CEUT</span></h1>
+            <p class="text-[10px] opacity-40 uppercase tracking-[0.5em] font-bold mt-2">Seleccione el portal de acceso</p>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <!-- Admin -->
-            <a href="admin.html" class="menu-card p-8 rounded-3xl text-center group">
-                <div class="w-16 h-16 bg-red-500/20 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition">
-                    <i data-lucide="shield-check" class="w-8 h-8 text-red-500"></i>
+        <!-- Grid de Portales -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 animate-fade" style="animation-delay: 0.3s;">
+            
+            <!-- Alumnos -->
+            <div onclick="window.location.href='index.html'" class="glass-card p-10 rounded-[3rem] text-left relative overflow-hidden group">
+                <div class="icon-box">
+                    <i data-lucide="graduation-cap" class="w-8 h-8"></i>
                 </div>
-                <h2 class="text-xl font-bold uppercase italic italic mb-2">Administrativo</h2>
-                <p class="text-[10px] opacity-40 uppercase">Control de usuarios y reportes generales</p>
-            </a>
+                <h3 class="text-xl font-black italic uppercase mb-2">Portal de <span class="text-yellow-500">Alumnos</span></h3>
+                <p class="text-[10px] opacity-40 uppercase font-bold leading-relaxed">Registro de asistencia, consulta de historial y credencial digital.</p>
+                <div class="btn-link">Acceder ahora</div>
+                <div class="absolute -right-4 -bottom-4 opacity-5 group-hover:opacity-10 transition-opacity">
+                    <i data-lucide="graduation-cap" class="w-32 h-32"></i>
+                </div>
+            </div>
 
-            <!-- Docente -->
-            <a href="docente.html" class="menu-card p-8 rounded-3xl text-center group">
-                <div class="w-16 h-16 bg-yellow-500/20 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition">
-                    <i data-lucide="graduation-cap" class="w-8 h-8 text-yellow-500"></i>
+            <!-- Docentes -->
+            <div onclick="window.location.href='docente.html'" class="glass-card p-10 rounded-[3rem] text-left relative overflow-hidden group">
+                <div class="icon-box">
+                    <i data-lucide="presentation" class="w-8 h-8"></i>
                 </div>
-                <h2 class="text-xl font-bold uppercase italic italic mb-2 text-yellow-500">Docente</h2>
-                <p class="text-[10px] opacity-40 uppercase">Gestión de clases y pase de lista</p>
-            </a>
+                <h3 class="text-xl font-black italic uppercase mb-2">Panel de <span class="text-yellow-500">Docentes</span></h3>
+                <p class="text-[10px] opacity-40 uppercase font-bold leading-relaxed">Gestión de clases, generación de códigos QR y control de grupo.</p>
+                <div class="btn-link">Gestionar Clases</div>
+                <div class="absolute -right-4 -bottom-4 opacity-5 group-hover:opacity-10 transition-opacity">
+                    <i data-lucide="presentation" class="w-32 h-32"></i>
+                </div>
+            </div>
 
-            <!-- Alumno -->
-            <a href="alumno.html" class="menu-card p-8 rounded-3xl text-center group">
-                <div class="w-16 h-16 bg-blue-500/20 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition">
-                    <i data-lucide="user" class="w-8 h-8 text-blue-500"></i>
+            <!-- Administrativo -->
+            <div onclick="window.location.href='admin.html'" class="glass-card p-10 rounded-[3rem] text-left relative overflow-hidden group">
+                <div class="icon-box">
+                    <i data-lucide="shield-check" class="w-8 h-8"></i>
                 </div>
-                <h2 class="text-xl font-bold uppercase italic italic mb-2 text-blue-400">Alumno</h2>
-                <p class="text-[10px] opacity-40 uppercase">Registro de asistencia y datos</p>
-            </a>
+                <h3 class="text-xl font-black italic uppercase mb-2">Control <span class="text-yellow-500">Administrativo</span></h3>
+                <p class="text-[10px] opacity-40 uppercase font-bold leading-relaxed">Auditoría global, estadísticas, edición de registros y reportes PDF.</p>
+                <div class="btn-link">Área Académica</div>
+                <div class="absolute -right-4 -bottom-4 opacity-5 group-hover:opacity-10 transition-opacity">
+                    <i data-lucide="shield-check" class="w-32 h-32"></i>
+                </div>
+            </div>
+
         </div>
-        
-        <p class="text-center mt-16 text-[9px] opacity-30 uppercase tracking-widest font-bold">Centro Universitario de Tehuacán © 2024</p>
+
+        <footer class="mt-16 text-[9px] opacity-20 uppercase font-black tracking-[0.3em]">
+            &copy; <span id="current-year">2026</span> CEUT Universidad • Plataforma de Gestión Universitaria
+        </footer>
     </div>
-    <script>lucide.createIcons();</script>
+
+    <script>
+        // Inicializar iconos de Lucide
+        lucide.createIcons();
+
+        // Actualizar el año automáticamente
+        const yearSpan = document.getElementById('current-year');
+        const currentYear = new Date().getFullYear();
+        yearSpan.textContent = currentYear;
+    </script>
 </body>
 </html>
