@@ -3,42 +3,79 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CEUT | Administración</title>
+    <title>CEUT | Admin</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #020617; color: white; }
+        body { background: #020617; color: white; font-family: 'Plus Jakarta Sans', sans-serif; min-height: 100vh; display: flex; }
         .glass { background: rgba(255, 255, 255, 0.02); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.05); }
+        .sidebar-item:hover { background: rgba(245, 184, 0, 0.05); color: #f5b800; border-right: 3px solid #f5b800; }
     </style>
 </head>
-<body class="flex min-h-screen">
-    <aside class="w-64 glass border-r border-white/5 p-6 flex flex-col">
-        <img src="Gemini_Generated_Image_ob1grpob1grpob1g-removebg-preview.png" class="h-10 w-auto mb-10" alt="Logo">
-        <nav class="space-y-2 flex-1">
-            <div class="p-4 bg-yellow-500/10 text-yellow-500 rounded-2xl font-bold text-[10px] uppercase flex items-center gap-3">
-                <i data-lucide="layout-dashboard" class="w-4 h-4"></i> Dashboard
-            </div>
+<body>
+    <!-- Sidebar Navegación -->
+    <aside class="w-72 glass border-r border-white/5 p-8 flex flex-col">
+        <div class="flex items-center gap-3 mb-16">
+            <img src="Gemini_Generated_Image_ob1grpob1grpob1g-removebg-preview.png" class="h-10" alt="Logo">
+            <div class="font-black italic uppercase text-[10px] leading-tight">Admin<br><span class="text-yellow-500">Central</span></div>
+        </div>
+        
+        <nav class="space-y-3 flex-1">
+            <div class="sidebar-item p-4 bg-yellow-500/10 text-yellow-500 rounded-2xl font-bold text-[11px] uppercase flex items-center gap-3 border-r-3 border-yellow-500"><i data-lucide="layout-dashboard" class="w-4 h-4"></i> Dashboard</div>
+            <div class="sidebar-item p-4 opacity-40 transition-all font-bold text-[11px] uppercase flex items-center gap-3 cursor-pointer"><i data-lucide="users" class="w-4 h-4"></i> Control Alumnos</div>
+            <div class="sidebar-item p-4 opacity-40 transition-all font-bold text-[11px] uppercase flex items-center gap-3 cursor-pointer"><i data-lucide="graduation-cap" class="w-4 h-4"></i> Control Maestros</div>
+            <div class="sidebar-item p-4 opacity-40 transition-all font-bold text-[11px] uppercase flex items-center gap-3 cursor-pointer"><i data-lucide="file-spreadsheet" class="w-4 h-4"></i> Reportes Excel</div>
         </nav>
-        <button onclick="window.location.href='index.html'" class="p-4 text-red-400 font-bold text-[10px] uppercase flex items-center gap-3">
-            <i data-lucide="log-out" class="w-4 h-4"></i> Salir
-        </button>
+        
+        <div class="mt-auto pt-6 border-t border-white/5">
+            <div class="flex items-center gap-3 p-4 opacity-30">
+                <div class="w-8 h-8 bg-white/10 rounded-full"></div>
+                <div class="text-[9px] font-bold uppercase">Super Admin</div>
+            </div>
+        </div>
     </aside>
 
-    <main class="flex-1 p-10">
-        <h1 class="text-3xl font-black italic uppercase mb-10">Control <span class="text-yellow-500">Admin</span></h1>
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div class="glass p-8 rounded-[2.5rem] border-l-4 border-l-yellow-500">
-                <p class="text-[9px] font-black opacity-30 uppercase mb-2">Alumnos</p>
-                <h4 class="text-4xl font-black italic">1,420</h4>
+    <!-- Contenido Principal -->
+    <main class="flex-1 p-16">
+        <header class="flex justify-between items-center mb-16">
+            <h1 class="text-5xl font-black italic uppercase text-white tracking-tighter">Control <span class="text-yellow-500">Global</span></h1>
+            <div class="flex items-center gap-4 glass px-6 py-3 rounded-2xl border border-white/10">
+                <span class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
+                <span class="text-[10px] font-bold uppercase tracking-widest opacity-60">Sistemas en Línea</span>
             </div>
-            <div class="glass p-8 rounded-[2.5rem]">
-                <p class="text-[9px] font-black opacity-30 uppercase mb-2">Clases</p>
-                <h4 class="text-4xl font-black italic text-yellow-500">24</h4>
+        </header>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-10">
+            <div class="glass p-12 rounded-[3.5rem] border-l-4 border-l-yellow-500 group transition-all">
+                <p class="text-[11px] font-black opacity-30 uppercase tracking-[0.2em]">Alumnos Registrados</p>
+                <div class="text-6xl font-black italic mt-4 text-white group-hover:scale-105 transition-transform">1,248</div>
             </div>
-            <div class="glass p-8 rounded-[2.5rem]">
-                <p class="text-[9px] font-black opacity-30 uppercase mb-2">Asistencia</p>
-                <h4 class="text-4xl font-black italic">98%</h4>
+            <div class="glass p-12 rounded-[3.5rem] border-l-4 border-l-yellow-500 group transition-all">
+                <p class="text-[11px] font-black opacity-30 uppercase tracking-[0.2em]">Maestros Activos</p>
+                <div class="text-6xl font-black italic mt-4 text-yellow-500 group-hover:scale-105 transition-transform">54</div>
+            </div>
+            <div class="glass p-12 rounded-[3.5rem] border-l-4 border-l-yellow-500 group transition-all">
+                <p class="text-[11px] font-black opacity-30 uppercase tracking-[0.2em]">Asistencia de Hoy</p>
+                <div class="text-6xl font-black italic mt-4 text-white group-hover:scale-105 transition-transform">91%</div>
+            </div>
+        </div>
+
+        <!-- Gráfico / Tabla Mockup -->
+        <div class="mt-10 glass p-10 rounded-[3rem] border border-white/5">
+            <div class="flex justify-between items-center mb-8">
+                <h3 class="text-[11px] font-black uppercase tracking-widest opacity-40">Actividad Reciente del Servidor</h3>
+                <div class="flex gap-2">
+                    <span class="px-3 py-1 bg-white/5 rounded-full text-[8px] font-bold uppercase tracking-widest">Hoy</span>
+                    <span class="px-3 py-1 bg-white/5 rounded-full text-[8px] font-bold uppercase tracking-widest">7 días</span>
+                </div>
+            </div>
+            <div class="h-48 w-full flex items-end gap-2 overflow-hidden px-4">
+                <div class="flex-1 bg-yellow-500/10 border-t border-yellow-500/20 h-32 rounded-t-lg"></div>
+                <div class="flex-1 bg-yellow-500/10 border-t border-yellow-500/20 h-40 rounded-t-lg"></div>
+                <div class="flex-1 bg-yellow-500 h-24 rounded-t-lg shadow-[0_0_20px_rgba(245,184,0,0.2)]"></div>
+                <div class="flex-1 bg-yellow-500/10 border-t border-yellow-500/20 h-36 rounded-t-lg"></div>
+                <div class="flex-1 bg-yellow-500/10 border-t border-yellow-500/20 h-28 rounded-t-lg"></div>
+                <div class="flex-1 bg-yellow-500/10 border-t border-yellow-500/20 h-44 rounded-t-lg"></div>
             </div>
         </div>
     </main>
