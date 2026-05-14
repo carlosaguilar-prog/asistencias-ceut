@@ -3,237 +3,58 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CEUT | Panel de Maestros</title>
+    <title>CEUT | Maestros</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
     <style>
-        /* CSS INTERNO DE ALTO RENDIMIENTO */
-        :root {
-            --navy: #020617;
-            --blue-deep: #1e3a8a;
-            --gold: #f5b800;
-            --white: #ffffff;
-            --glass: rgba(255, 255, 255, 0.05);
-            --glass-border: rgba(255, 255, 255, 0.1);
-        }
-
-        body {
-            margin: 0;
-            padding: 0;
-            background: var(--navy);
-            background: radial-gradient(circle at top right, var(--blue-deep), var(--navy));
-            color: var(--white);
-            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-
-        .navbar {
-            width: 100%;
-            max-width: 1200px;
-            padding: 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            box-sizing: border-box;
-        }
-
-        .brand {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-
-        .brand img {
-            height: 60px;
-            filter: drop-shadow(0 0 10px rgba(245, 184, 0, 0.4));
-        }
-
-        .brand-text h1 {
-            margin: 0;
-            font-size: 22px;
-            text-transform: uppercase;
-            font-style: italic;
-            font-weight: 900;
-        }
-
-        .brand-text h1 span {
-            color: var(--gold);
-        }
-
-        .brand-text p {
-            margin: 0;
-            font-size: 8px;
-            letter-spacing: 3px;
-            text-transform: uppercase;
-            opacity: 0.6;
-        }
-
-        .container {
-            width: 90%;
-            max-width: 1000px;
-            background: var(--glass);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border: 1px solid var(--glass-border);
-            border-top: 4px solid var(--gold);
-            border-radius: 40px;
-            margin: 20px 0;
-            padding: 40px;
-            box-sizing: border-box;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-        }
-
-        .header-section {
-            margin-bottom: 40px;
-        }
-
-        .header-section h2 {
-            font-size: 32px;
-            margin: 0;
-            text-transform: uppercase;
-            font-style: italic;
-            font-weight: 800;
-        }
-
-        .header-section p {
-            font-size: 12px;
-            opacity: 0.5;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            margin-top: 5px;
-        }
-
-        .grid-classes {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-            gap: 20px;
-        }
-
-        .card {
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid var(--glass-border);
-            border-left: 6px solid var(--gold);
-            border-radius: 25px;
-            padding: 30px;
-            text-align: left;
-            text-decoration: none;
-            color: white;
-            transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .card:hover {
-            background: rgba(255, 255, 255, 0.08);
-            transform: translateY(-5px);
-            border-color: rgba(255,255,255,0.3);
-        }
-
-        .card h3 {
-            margin: 0 0 15px 0;
-            color: var(--gold);
-            font-size: 20px;
-            text-transform: uppercase;
-            font-style: italic;
-        }
-
-        .info-tag {
-            display: inline-flex;
-            align-items: center;
-            background: rgba(255, 255, 255, 0.05);
-            padding: 5px 12px;
-            border-radius: 50px;
-            font-size: 10px;
-            font-weight: bold;
-            text-transform: uppercase;
-            margin-right: 8px;
-        }
-
-        .status-badge {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            font-size: 18px;
-            opacity: 0.3;
-        }
-
-        footer {
-            margin-top: auto;
-            padding: 30px;
-            font-size: 9px;
-            text-transform: uppercase;
-            letter-spacing: 4px;
-            opacity: 0.3;
-        }
-
-        .btn-exit {
-            background: transparent;
-            border: 1px solid rgba(255,255,255,0.2);
-            color: white;
-            padding: 10px 20px;
-            border-radius: 15px;
-            font-size: 10px;
-            font-weight: 800;
-            text-transform: uppercase;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-
-        .btn-exit:hover {
-            background: #ef4444;
-            border-color: #ef4444;
-        }
+        body { background: radial-gradient(circle at top right, #1e3a8a, #020617); color: white; font-family: 'Plus Jakarta Sans', sans-serif; min-height: 100vh; }
+        .glass { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.1); }
     </style>
 </head>
-<body>
+<body class="p-8">
+    <div class="max-w-5xl mx-auto">
+        <header class="flex justify-between items-center mb-10">
+            <div class="flex items-center gap-5">
+                <img src="Gemini_Generated_Image_ob1grpob1grpob1g-removebg-preview.png" class="h-16" alt="Logo">
+                <div>
+                    <h1 class="text-2xl font-black italic uppercase leading-none">Panel <span class="text-yellow-500">Docente</span></h1>
+                    <p class="text-[9px] font-bold opacity-30 uppercase tracking-[0.3em]">Catedrático Autorizado</p>
+                </div>
+            </div>
+        </header>
 
-    <nav class="navbar">
-        <div class="brand">
-            <img src="Gemini_Generated_Image_ob1grpob1grpob1g-removebg-preview.png" alt="Logo CEUT" onerror="this.style.display='none'">
-            <div class="brand-text">
-                <h1>SISTEMA <span>MAESTRO</span></h1>
-                <p>CEUT Tehuacán</p>
+        <div class="glass p-12 rounded-[4rem] border-t-4 border-t-yellow-500 shadow-2xl">
+            <div class="flex justify-between items-end mb-10">
+                <div>
+                    <h2 class="text-3xl font-black italic uppercase text-white">Mis Clases <span class="text-yellow-500 text-sm opacity-50 ml-2">Sábado</span></h2>
+                </div>
+                <div class="text-right opacity-40 text-[10px] font-bold uppercase tracking-widest">Ciclo Escolar 2024-B</div>
+            </div>
+
+            <div class="grid gap-6">
+                <div class="glass p-10 rounded-[2.5rem] border-l-8 border-l-yellow-500 flex flex-col md:flex-row justify-between items-center hover:bg-white/5 transition-all group">
+                    <div class="mb-4 md:mb-0">
+                        <h3 class="text-2xl font-black italic uppercase text-yellow-500">Derecho Civil I</h3>
+                        <div class="flex gap-4 mt-2">
+                            <span class="text-[10px] opacity-60 font-bold uppercase flex items-center gap-2"><i data-lucide="clock" class="w-3 h-3"></i> 08:00 - 10:30</span>
+                            <span class="text-[10px] opacity-60 font-bold uppercase flex items-center gap-2"><i data-lucide="map-pin" class="w-3 h-3"></i> Salón A-102</span>
+                        </div>
+                    </div>
+                    <button class="bg-yellow-500 text-slate-900 px-8 py-3 rounded-2xl font-black text-xs uppercase tracking-tighter hover:scale-105 transition-transform shadow-lg shadow-yellow-500/20">Iniciar Pase de Lista</button>
+                </div>
+
+                <div class="glass p-10 rounded-[2.5rem] border-l-8 border-l-slate-700 flex flex-col md:flex-row justify-between items-center opacity-60">
+                    <div class="mb-4 md:mb-0 text-white">
+                        <h3 class="text-2xl font-black italic uppercase opacity-50">Criminalística</h3>
+                        <div class="flex gap-4 mt-2">
+                            <span class="text-[10px] opacity-60 font-bold uppercase flex items-center gap-2">10:30 - 13:00</span>
+                        </div>
+                    </div>
+                    <span class="text-[10px] font-black uppercase tracking-widest bg-white/5 px-6 py-3 rounded-xl border border-white/10">Próxima Clase</span>
+                </div>
             </div>
         </div>
-        <button class="btn-exit" onclick="alert('Cerrando sesión...')">Salir</button>
-    </nav>
-
-    <main class="container">
-        <div class="header-section">
-            <h2>Gestión de <span>Clases</span></h2>
-            <p>Seleccione su asignatura para el pase de lista</p>
-        </div>
-
-        <div class="grid-classes">
-            <!-- Clase 1 -->
-            <a href="#" class="card" onclick="alert('Abriendo pase de lista para Derecho Civil I')">
-                <div class="status-badge">📋</div>
-                <h3>Derecho Civil I</h3>
-                <div class="info-tag">Sábado</div>
-                <div class="info-tag" style="opacity: 0.6;">08:00 - 10:30</div>
-            </a>
-
-            <!-- Clase 2 -->
-            <a href="#" class="card" onclick="alert('Abriendo pase de lista para Criminalística')">
-                <div class="status-badge">📋</div>
-                <h3>Criminalística</h3>
-                <div class="info-tag">Sábado</div>
-                <div class="info-tag" style="opacity: 0.6;">10:30 - 13:00</div>
-            </a>
-        </div>
-    </main>
-
-    <footer>
-        © 2024 CEUT Tehuacán • Excelencia Educativa
-    </footer>
-
-    <script>
-        // Script de activación forzada
-        console.log("Panel de Maestros cargado correctamente.");
-        window.onload = function() {
-            document.body.style.opacity = '1';
-        };
-    </script>
+    </div>
+    <script>lucide.createIcons();</script>
 </body>
 </html>
