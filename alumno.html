@@ -130,7 +130,7 @@
             <div class="mt-10 pt-8 border-t border-white/5 space-y-4 text-center">
                 <p class="text-[10px] opacity-40 font-bold uppercase">
                     ¿No tienes cuenta? 
-                    <button onclick="window.showRegister()" class="text-yellow-500 underline ml-1">Regístrate por única ocasión</button>
+                    <button onclick="window.showRegister()" class="text-yellow-500 underline ml-1 font-black">Regístrate por única ocasión</button>
                 </p>
             </div>
         </div>
@@ -145,11 +145,20 @@
             </div>
             
             <div class="space-y-4">
-                <input id="reg-name" type="text" class="input-ceut" placeholder="Nombre Completo">
-                <input id="reg-email" type="email" class="input-ceut" placeholder="Correo Institucional">
-                <input id="reg-pass" type="password" class="input-ceut" placeholder="Crear Contraseña (mín. 6 caracteres)">
+                <div>
+                    <label class="text-[9px] uppercase font-black opacity-30 ml-4 mb-1 block">Nombre Completo</label>
+                    <input id="reg-name" type="text" class="input-ceut uppercase" placeholder="JUAN PÉREZ LÓPEZ">
+                </div>
+                <div>
+                    <label class="text-[9px] uppercase font-black opacity-30 ml-4 mb-1 block">Correo Institucional</label>
+                    <input id="reg-email" type="email" class="input-ceut" placeholder="alumno@ceut.edu.mx">
+                </div>
+                <div>
+                    <label class="text-[9px] uppercase font-black opacity-30 ml-4 mb-1 block">Crear Contraseña</label>
+                    <input id="reg-pass" type="password" class="input-ceut" placeholder="Mínimo 6 caracteres">
+                </div>
                 <button onclick="window.handleRegister()" id="btn-register" class="btn-gold w-full py-5 rounded-2xl uppercase italic font-black text-xs mt-4">
-                    Confirmar Registro
+                    Completar Registro Único
                 </button>
             </div>
             
@@ -232,29 +241,47 @@
         };
 
         function switchView(viewName) {
+            // Ocultar todas las secciones
             Object.values(sections).forEach(s => s.classList.remove('view-active'));
+            // Mostrar la sección solicitada
             sections[viewName].classList.add('view-active');
+            // Ocultar overlay de carga
             overlay.style.opacity = '0';
-            setTimeout(() => overlay.style.display = 'none', 500);
+            setTimeout(() => { overlay.style.display = 'none'; }, 500);
             lucide.createIcons();
         }
 
+        // Observador de estado de autenticación
         onAuthStateChanged(auth, async (user) => {
             if (user) {
                 try {
                     const snap = await getDoc(doc(db, 'artifacts', appId, 'users', user.uid, 'profile', 'data'));
                     if(snap.exists()) {
                         document.getElementById('user-display-name').innerText = snap.data().name;
+                    } else {
+                        document.getElementById('user-display-name').innerText = user.email.split('@')[0].toUpperCase();
                     }
                     switchView('main');
-                } catch(e) { switchView('main'); }
+                } catch(e) { 
+                    switchView('main'); 
+                }
             } else {
                 switchView('auth');
             }
         });
 
-        window.showRegister = () => switchView('reg');
-        window.showLogin = () => switchView('auth');
+        // Funciones globales para botones
+        window.showRegister = () => {
+            Object.values(sections).forEach(s => s.classList.remove('view-active'));
+            sections.reg.classList.add('view-active');
+            lucide.createIcons();
+        };
+
+        window.showLogin = () => {
+            Object.values(sections).forEach(s => s.classList.remove('view-active'));
+            sections.auth.classList.add('view-active');
+            lucide.createIcons();
+        };
 
         window.handleLogin = async () => {
             const email = document.getElementById('login-email').value;
@@ -263,6 +290,7 @@
             const err = document.getElementById('login-error');
 
             if(!email || !pass) return;
+            
             btn.disabled = true; btn.innerText = "ACCEDIENDO...";
             err.classList.add('hidden');
 
@@ -281,19 +309,31 @@
             const pass = document.getElementById('reg-pass').value;
             const btn = document.getElementById('btn-register');
 
-            if(!name || !email || !pass) return alert("Completa todos los campos");
-            btn.disabled = true;
+            if(!name || !email || !pass) {
+                alert("Por favor, completa todos los campos requeridos.");
+                return;
+            }
+            
+            if(pass.length < 6) {
+                alert("La contraseña debe tener al menos 6 caracteres.");
+                return;
+            }
+
+            btn.disabled = true; btn.innerText = "REGISTRANDO...";
 
             try {
                 const res = await createUserWithEmailAndPassword(auth, email, pass);
+                // Guardar perfil del alumno
                 await setDoc(doc(db, 'artifacts', appId, 'users', res.user.uid, 'profile', 'data'), {
                     name: name.toUpperCase(),
                     email: email,
-                    role: 'alumno'
+                    role: 'ALUMNO',
+                    createdAt: Date.now()
                 });
+                // El observador onAuthStateChanged detectará el login y hará el switchView automáticamente
             } catch(e) {
-                alert("Error: " + e.message);
-                btn.disabled = false;
+                alert("Error al registrar: " + e.message);
+                btn.disabled = false; btn.innerText = "COMPLETAR REGISTRO ÚNICO";
             }
         };
 
