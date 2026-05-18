@@ -23,8 +23,6 @@
         .animate-fade-in-up { animation: fadeInUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards; opacity: 0; }
         .animate-slide-left { animation: slideInLeft 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
         .animate-zoom-in { animation: zoomIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
-        .delay-100 { animation-delay: 100ms; }
-        .delay-200 { animation-delay: 200ms; }
         .hidden-view { display: none !important; }
         @media print {
             body { background: white !important; color: black !important; display: block; overflow: auto; }
@@ -94,387 +92,181 @@
                 <div class="font-black italic uppercase text-[10px] leading-tight hidden md:block">Admin<br><span class="text-yellow-500">Central</span></div>
             </div>
             <nav class="space-y-2 flex-1 px-4">
-                <div onclick="navigate('dashboard')" id="nav-dashboard" class="sidebar-item active p-4 opacity-60 font-bold text-[11px] uppercase flex items-center justify-center md:justify-start gap-3 cursor-pointer rounded-2xl">
-                    <i data-lucide="layout-dashboard" class="w-5 h-5 shrink-0"></i> <span class="hidden md:inline">Dashboard</span>
-                </div>
-                <div onclick="navigate('alumnos')" id="nav-alumnos" class="sidebar-item p-4 opacity-60 font-bold text-[11px] uppercase flex items-center justify-center md:justify-start gap-3 cursor-pointer rounded-2xl">
-                    <i data-lucide="graduation-cap" class="w-5 h-5 shrink-0"></i> <span class="hidden md:inline">Alumnos</span>
-                </div>
-                <div onclick="navigate('maestros')" id="nav-maestros" class="sidebar-item p-4 opacity-60 font-bold text-[11px] uppercase flex items-center justify-center md:justify-start gap-3 cursor-pointer rounded-2xl">
-                    <i data-lucide="users" class="w-5 h-5 shrink-0"></i> <span class="hidden md:inline">Maestros</span>
-                </div>
-                <div onclick="navigate('reportes')" id="nav-reportes" class="sidebar-item p-4 opacity-60 font-bold text-[11px] uppercase flex items-center justify-center md:justify-start gap-3 cursor-pointer rounded-2xl">
-                    <i data-lucide="file-spreadsheet" class="w-5 h-5 shrink-0"></i> <span class="hidden md:inline">Reportes</span>
-                </div>
-                <div onclick="navigate('cms')" id="nav-cms" class="sidebar-item p-4 opacity-60 font-bold text-[11px] uppercase flex items-center justify-center md:justify-start gap-3 cursor-pointer rounded-2xl">
-                    <i data-lucide="settings" class="w-5 h-5 shrink-0"></i> <span class="hidden md:inline">Ajustes Sistema</span>
-                </div>
+                <div onclick="navigate('dashboard')" id="nav-dashboard" class="sidebar-item active p-4 opacity-60 font-bold text-[11px] uppercase flex items-center justify-center md:justify-start gap-3 cursor-pointer rounded-2xl"><i data-lucide="layout-dashboard" class="w-5 h-5 shrink-0"></i> <span class="hidden md:inline">Dashboard</span></div>
+                <div onclick="navigate('alumnos')" id="nav-alumnos" class="sidebar-item p-4 opacity-60 font-bold text-[11px] uppercase flex items-center justify-center md:justify-start gap-3 cursor-pointer rounded-2xl"><i data-lucide="graduation-cap" class="w-5 h-5 shrink-0"></i> <span class="hidden md:inline">Alumnos</span></div>
+                <div onclick="navigate('maestros')" id="nav-maestros" class="sidebar-item p-4 opacity-60 font-bold text-[11px] uppercase flex items-center justify-center md:justify-start gap-3 cursor-pointer rounded-2xl"><i data-lucide="users" class="w-5 h-5 shrink-0"></i> <span class="hidden md:inline">Maestros</span></div>
+                <div onclick="navigate('reportes')" id="nav-reportes" class="sidebar-item p-4 opacity-60 font-bold text-[11px] uppercase flex items-center justify-center md:justify-start gap-3 cursor-pointer rounded-2xl"><i data-lucide="file-spreadsheet" class="w-5 h-5 shrink-0"></i> <span class="hidden md:inline">Reportes</span></div>
+                <div onclick="navigate('cms')" id="nav-cms" class="sidebar-item p-4 opacity-60 font-bold text-[11px] uppercase flex items-center justify-center md:justify-start gap-3 cursor-pointer rounded-2xl"><i data-lucide="settings" class="w-5 h-5 shrink-0"></i> <span class="hidden md:inline">Ajustes Sistema</span></div>
             </nav>
             <div class="mt-auto p-6 border-t border-white/5 text-center md:text-left">
                 <div class="flex items-center justify-center md:justify-start gap-3 mb-4 opacity-80">
                     <div class="w-8 h-8 bg-yellow-500/20 rounded-full flex items-center justify-center text-yellow-500 shrink-0"><i data-lucide="shield" class="w-4 h-4"></i></div>
                     <div class="text-[9px] font-bold uppercase hidden md:block text-left text-yellow-500">Dirección<br>Académica</div>
                 </div>
-                <button onclick="logoutAdmin()" class="flex items-center justify-center md:justify-start gap-3 w-full opacity-50 hover:opacity-100 hover:text-red-400 transition-colors">
-                    <div class="w-8 h-8 bg-white/10 rounded-full flex items-center justify-center text-xs shrink-0"><i data-lucide="power" class="w-4 h-4"></i></div>
-                    <div class="text-[9px] font-bold uppercase hidden md:block text-left">Cerrar<br>Sesión</div>
-                </button>
+                <button onclick="logoutAdmin()" class="flex items-center justify-center md:justify-start gap-3 w-full opacity-50 hover:opacity-100 hover:text-red-400 transition-colors"><div class="w-8 h-8 bg-white/10 rounded-full flex items-center justify-center text-xs shrink-0"><i data-lucide="power" class="w-4 h-4"></i></div><div class="text-[9px] font-bold uppercase hidden md:block text-left">Cerrar<br>Sesión</div></button>
             </div>
         </aside>
 
         <main id="main-content" class="flex-1 p-6 md:p-12 h-screen overflow-y-auto w-full relative hidden-view">
             <header class="flex flex-col md:flex-row justify-between items-start md:items-center mb-12 gap-4 animate-fade-in-up">
-                <div>
-                    <h1 class="text-3xl md:text-5xl font-black italic uppercase text-white tracking-tighter" id="page-title">Control <span class="text-yellow-500">Global</span></h1>
-                    <p class="text-[10px] font-bold opacity-40 uppercase tracking-widest mt-2" id="page-subtitle">Visión general del sistema</p>
-                </div>
-                <div class="flex items-center gap-4 glass px-6 py-3 rounded-2xl border border-white/10 shadow-[0_0_20px_rgba(245,184,0,0.1)]">
-                    <span class="w-2 h-2 rounded-full animate-pulse shadow-[0_0_10px_currentColor]" id="status-indicator"></span>
-                    <span class="text-[10px] font-bold uppercase tracking-widest opacity-80" id="status-text">Sistemas en Línea</span>
-                </div>
+                <div><h1 class="text-3xl md:text-5xl font-black italic uppercase text-white tracking-tighter" id="page-title">Control <span class="text-yellow-500">Global</span></h1><p class="text-[10px] font-bold opacity-40 uppercase tracking-widest mt-2" id="page-subtitle">Visión general del sistema</p></div>
+                <div class="flex items-center gap-4 glass px-6 py-3 rounded-2xl border border-white/10 shadow-[0_0_20px_rgba(245,184,0,0.1)]"><span class="w-2 h-2 rounded-full animate-pulse shadow-[0_0_10px_currentColor]" id="status-indicator"></span><span class="text-[10px] font-bold uppercase tracking-widest opacity-80" id="status-text">Sistemas en Línea</span></div>
             </header>
 
-            <!-- VISTA: DASHBOARD -->
             <div id="view-dashboard" class="space-y-8 hidden-view">
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <div class="glass p-10 rounded-[2.5rem] border-l-4 border-l-yellow-500 group hover:-translate-y-2 hover:shadow-2xl transition-all animate-fade-in-up">
-                        <p class="text-[10px] font-black opacity-40 uppercase tracking-[0.2em]">Alumnos Registrados</p>
-                        <div class="text-5xl font-black italic mt-3 text-white group-hover:text-yellow-500 transition-colors" id="dash-alumnos">0</div>
-                    </div>
-                    <div class="glass p-10 rounded-[2.5rem] border-l-4 border-l-yellow-500 group hover:-translate-y-2 hover:shadow-2xl transition-all animate-fade-in-up delay-100">
-                        <p class="text-[10px] font-black opacity-40 uppercase tracking-[0.2em]">Maestros Activos</p>
-                        <div class="text-5xl font-black italic mt-3 text-yellow-500 group-hover:drop-shadow-[0_0_15px_rgba(245,184,0,0.5)] transition-all" id="dash-maestros">0</div>
-                    </div>
-                    <div class="glass p-10 rounded-[2.5rem] border-l-4 border-l-yellow-500 group hover:-translate-y-2 hover:shadow-2xl transition-all animate-fade-in-up delay-200">
-                        <p class="text-[10px] font-black opacity-40 uppercase tracking-[0.2em]">Asistencias Hoy</p>
-                        <div class="text-5xl font-black italic mt-3 text-white group-hover:text-yellow-500 transition-colors" id="dash-asistencias">0</div>
-                    </div>
+                    <div class="glass p-10 rounded-[2.5rem] border-l-4 border-l-yellow-500 group transition-all animate-fade-in-up"><p class="text-[10px] font-black opacity-40 uppercase tracking-[0.2em]">Alumnos Registrados</p><div class="text-5xl font-black italic mt-3 text-white group-hover:text-yellow-500 transition-colors" id="dash-alumnos">0</div></div>
+                    <div class="glass p-10 rounded-[2.5rem] border-l-4 border-l-yellow-500 group transition-all animate-fade-in-up delay-100"><p class="text-[10px] font-black opacity-40 uppercase tracking-[0.2em]">Maestros Activos</p><div class="text-5xl font-black italic mt-3 text-yellow-500 group-hover:drop-shadow-[0_0_15px_rgba(245,184,0,0.5)] transition-all" id="dash-maestros">0</div></div>
+                    <div class="glass p-10 rounded-[2.5rem] border-l-4 border-l-yellow-500 group transition-all animate-fade-in-up delay-200"><p class="text-[10px] font-black opacity-40 uppercase tracking-[0.2em]">Asistencias Hoy</p><div class="text-5xl font-black italic mt-3 text-white group-hover:text-yellow-500 transition-colors" id="dash-asistencias">0</div></div>
                 </div>
-
                 <div class="glass p-10 rounded-[3rem] border border-white/5 animate-fade-in-up delay-200">
-                    <div class="flex justify-between items-center mb-6">
-                        <h3 class="text-[11px] font-black uppercase tracking-widest opacity-60 text-yellow-500">Últimos Registros Globales</h3>
-                        <button onclick="navigate('reportes')" class="text-[10px] font-bold uppercase tracking-widest opacity-50 hover:opacity-100 transition-opacity">Ver todos</button>
-                    </div>
+                    <div class="flex justify-between items-center mb-6"><h3 class="text-[11px] font-black uppercase tracking-widest opacity-60 text-yellow-500">Últimos Registros Globales</h3><button onclick="navigate('reportes')" class="text-[10px] font-bold uppercase tracking-widest opacity-50 hover:opacity-100 transition-opacity">Ver todos</button></div>
                     <div class="overflow-x-auto">
-                        <table class="w-full text-left text-sm whitespace-nowrap">
-                            <thead class="bg-white/5 text-[9px] uppercase tracking-widest opacity-60">
-                                <tr>
-                                    <th class="px-4 py-3 rounded-l-xl">Alumno</th>
-                                    <th class="px-4 py-3">Materia</th>
-                                    <th class="px-4 py-3">Fecha/Hora</th>
-                                </tr>
-                            </thead>
-                            <tbody id="dash-recent-table" class="divide-y divide-white/5"></tbody>
-                        </table>
+                        <table class="w-full text-left text-sm whitespace-nowrap"><thead class="bg-white/5 text-[9px] uppercase tracking-widest opacity-60"><tr><th class="px-4 py-3 rounded-l-xl">Alumno</th><th class="px-4 py-3">Materia</th><th class="px-4 py-3">Fecha/Hora</th></tr></thead>
+                        <tbody id="dash-recent-table" class="divide-y divide-white/5"></tbody></table>
                     </div>
                 </div>
             </div>
 
-            <!-- VISTA: GESTIÓN DE ALUMNOS -->
             <div id="view-alumnos" class="hidden-view animate-fade-in-up">
                 <div class="glass p-8 md:p-10 rounded-[3rem] border border-white/5">
-                    <div class="flex justify-between items-center mb-8">
-                        <h2 class="text-xl font-black uppercase italic text-yellow-500">Base de Datos <span class="text-white">Alumnos</span></h2>
-                        <div class="relative">
-                            <i data-lucide="search" class="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 opacity-50"></i>
-                            <input type="text" id="search-alumno" onkeyup="filterTable('alumnos-table', this.value)" placeholder="Buscar alumno..." class="glass-input rounded-full pl-12 pr-6 py-3 text-xs font-bold w-full md:w-64">
-                        </div>
-                    </div>
+                    <div class="flex justify-between items-center mb-8"><h2 class="text-xl font-black uppercase italic text-yellow-500">Base de Datos <span class="text-white">Alumnos</span></h2><div class="relative"><i data-lucide="search" class="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 opacity-50"></i><input type="text" id="search-alumno" onkeyup="filterTable('alumnos-table', this.value)" placeholder="Buscar alumno..." class="glass-input rounded-full pl-12 pr-6 py-3 text-xs font-bold w-full md:w-64"></div></div>
                     <div class="overflow-x-auto">
-                        <table class="w-full text-left text-sm whitespace-nowrap" id="alumnos-table">
-                            <thead class="bg-white/5 text-[9px] uppercase tracking-widest opacity-60">
-                                <tr>
-                                    <th class="px-6 py-4 rounded-l-xl">ID / Folio</th>
-                                    <th class="px-6 py-4">Nombre Completo</th>
-                                    <th class="px-6 py-4">Nivel / Grado</th>
-                                    <th class="px-6 py-4 text-center rounded-r-xl">Acciones</th>
-                                </tr>
-                            </thead>
-                            <tbody id="alumnos-tbody" class="divide-y divide-white/5"></tbody>
-                        </table>
+                        <table class="w-full text-left text-sm whitespace-nowrap" id="alumnos-table"><thead class="bg-white/5 text-[9px] uppercase tracking-widest opacity-60"><tr><th class="px-6 py-4 rounded-l-xl">ID / Folio</th><th class="px-6 py-4">Nombre Completo</th><th class="px-6 py-4">Nivel / Grado</th><th class="px-6 py-4 text-center rounded-r-xl">Acciones</th></tr></thead>
+                        <tbody id="alumnos-tbody" class="divide-y divide-white/5"></tbody></table>
                     </div>
                 </div>
             </div>
 
-            <!-- VISTA: DETALLE ALUMNO -->
             <div id="view-alumno-detalle" class="hidden-view animate-zoom-in">
-                <div class="flex items-center justify-between mb-8">
-                    <button onclick="navigate('alumnos')" class="bg-white/10 hover:bg-white/20 text-white px-5 py-3 rounded-2xl font-black text-[10px] uppercase tracking-widest transition-colors flex items-center gap-2"><i data-lucide="arrow-left" class="w-4 h-4"></i> Volver a Lista</button>
-                    <div class="flex gap-2">
-                        <button onclick="deleteRecord('alumnos', currentDetailId)" class="bg-red-500/20 hover:bg-red-500 text-red-400 hover:text-white px-5 py-3 rounded-2xl font-black text-[10px] uppercase tracking-widest transition-colors flex items-center gap-2"><i data-lucide="trash-2" class="w-4 h-4"></i> Eliminar Perfil</button>
-                        <button onclick="printAlumnoHistory()" class="bg-green-500/20 hover:bg-green-500 text-green-400 hover:text-white px-5 py-3 rounded-2xl font-black text-[10px] uppercase tracking-widest transition-colors flex items-center gap-2"><i data-lucide="printer" class="w-4 h-4"></i> Imprimir / PDF</button>
-                    </div>
-                </div>
+                <div class="flex items-center justify-between mb-8"><button onclick="navigate('alumnos')" class="bg-white/10 hover:bg-white/20 text-white px-5 py-3 rounded-2xl font-black text-[10px] uppercase tracking-widest transition-colors flex items-center gap-2"><i data-lucide="arrow-left" class="w-4 h-4"></i> Volver a Lista</button><div class="flex gap-2"><button onclick="deleteRecord('alumnos', currentDetailId)" class="bg-red-500/20 hover:bg-red-500 text-red-400 hover:text-white px-5 py-3 rounded-2xl font-black text-[10px] uppercase tracking-widest transition-colors flex items-center gap-2"><i data-lucide="trash-2" class="w-4 h-4"></i> Eliminar Perfil</button><button onclick="printAlumnoHistory()" class="bg-green-500/20 hover:bg-green-500 text-green-400 hover:text-white px-5 py-3 rounded-2xl font-black text-[10px] uppercase tracking-widest transition-colors flex items-center gap-2"><i data-lucide="printer" class="w-4 h-4"></i> Imprimir / PDF</button></div></div>
                 <div class="grid md:grid-cols-3 gap-8">
-                    <div class="md:col-span-1 glass p-8 rounded-[3rem] border-t-4 border-t-yellow-500">
-                        <h3 class="text-lg font-black uppercase text-yellow-500 mb-6 flex items-center gap-2"><i data-lucide="user-cog" class="w-5 h-5"></i> Editar Datos</h3>
-                        <div class="space-y-4">
-                            <div><label class="text-[10px] opacity-50 uppercase font-black ml-2">Nombre</label><input type="text" id="det-alu-nombre" class="w-full glass-input rounded-xl px-4 py-3 font-bold mt-1 text-sm"></div>
-                            <div><label class="text-[10px] opacity-50 uppercase font-black ml-2">Nivel Educativo</label><input type="text" id="det-alu-nivel" class="w-full glass-input rounded-xl px-4 py-3 font-bold mt-1 text-sm"></div>
-                            <div class="grid grid-cols-2 gap-2">
-                                <div><label class="text-[10px] opacity-50 uppercase font-black ml-2">Grado</label><input type="text" id="det-alu-grado" class="w-full glass-input rounded-xl px-4 py-3 font-bold mt-1 text-sm"></div>
-                                <div><label class="text-[10px] opacity-50 uppercase font-black ml-2">Grupo</label><input type="text" id="det-alu-grupo" class="w-full glass-input rounded-xl px-4 py-3 font-bold mt-1 text-sm uppercase"></div>
-                            </div>
-                            <div><label class="text-[10px] opacity-50 uppercase font-black ml-2 text-red-400">Contraseña</label><input type="text" id="det-alu-pass" class="w-full glass-input border-red-500/30 rounded-xl px-4 py-3 font-bold mt-1 text-sm"></div>
-                            <button onclick="saveDetailAlumno()" class="w-full bg-yellow-500 text-slate-900 font-black uppercase tracking-widest px-4 py-3 rounded-xl hover:scale-105 transition-transform mt-4 text-xs">Actualizar</button>
-                        </div>
-                    </div>
-                    <div class="md:col-span-2 glass p-8 rounded-[3rem]">
-                        <div class="flex justify-between items-center mb-6">
-                            <div>
-                                <h3 class="text-xl font-black italic uppercase text-white">Historial de <span class="text-yellow-500">Asistencias</span></h3>
-                                <p class="text-[10px] opacity-40 font-bold uppercase tracking-widest mt-1">Registros del alumno</p>
-                            </div>
-                            <div class="flex gap-2">
-                                <button onclick="filterAlumnoHistory('hoy')" id="btn-alu-hoy" class="px-4 py-1 rounded-full font-black text-[9px] uppercase tracking-widest bg-yellow-500 text-slate-900">Hoy</button>
-                                <button onclick="filterAlumnoHistory('mes')" id="btn-alu-mes" class="px-4 py-1 rounded-full font-black text-[9px] uppercase tracking-widest bg-white/10 hover:bg-white/20">Mes</button>
-                                <button onclick="filterAlumnoHistory('cuatrimestre')" id="btn-alu-cuatrimestre" class="px-4 py-1 rounded-full font-black text-[9px] uppercase tracking-widest bg-white/10 hover:bg-white/20">Cuatrimestre</button>
-                            </div>
-                        </div>
-                        <div class="bg-black/20 rounded-2xl overflow-hidden border border-white/5 h-80 overflow-y-auto">
-                            <table class="w-full text-left text-sm whitespace-nowrap">
-                                <thead class="bg-white/5 text-[9px] uppercase tracking-widest opacity-60">
-                                    <tr>
-                                        <th class="px-4 py-3">Fecha/Hora</th>
-                                        <th class="px-4 py-3">Materia</th>
-                                        <th class="px-4 py-3">Maestro</th>
-                                        <th class="px-4 py-3 text-right">Acción</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="det-alu-history" class="divide-y divide-white/5"></tbody>
-                            </table>
-                        </div>
-                    </div>
+                    <div class="md:col-span-1 glass p-8 rounded-[3rem] border-t-4 border-t-yellow-500"><h3 class="text-lg font-black uppercase text-yellow-500 mb-6 flex items-center gap-2"><i data-lucide="user-cog" class="w-5 h-5"></i> Editar Datos</h3><div class="space-y-4"><div><label class="text-[10px] opacity-50 uppercase font-black ml-2">Nombre</label><input type="text" id="det-alu-nombre" class="w-full glass-input rounded-xl px-4 py-3 font-bold mt-1 text-sm"></div><div><label class="text-[10px] opacity-50 uppercase font-black ml-2">Nivel Educativo</label><input type="text" id="det-alu-nivel" class="w-full glass-input rounded-xl px-4 py-3 font-bold mt-1 text-sm"></div><div class="grid grid-cols-2 gap-2"><div><label class="text-[10px] opacity-50 uppercase font-black ml-2">Grado</label><input type="text" id="det-alu-grado" class="w-full glass-input rounded-xl px-4 py-3 font-bold mt-1 text-sm"></div><div><label class="text-[10px] opacity-50 uppercase font-black ml-2">Grupo</label><input type="text" id="det-alu-grupo" class="w-full glass-input rounded-xl px-4 py-3 font-bold mt-1 text-sm uppercase"></div></div><div><label class="text-[10px] opacity-50 uppercase font-black ml-2 text-red-400">Contraseña</label><input type="text" id="det-alu-pass" class="w-full glass-input border-red-500/30 rounded-xl px-4 py-3 font-bold mt-1 text-sm"></div><button onclick="saveDetailAlumno()" class="w-full bg-yellow-500 text-slate-900 font-black uppercase tracking-widest px-4 py-3 rounded-xl hover:scale-105 transition-transform mt-4 text-xs">Actualizar</button></div></div>
+                    <div class="md:col-span-2 glass p-8 rounded-[3rem]"><div class="flex justify-between items-center mb-6"><div><h3 class="text-xl font-black italic uppercase text-white">Historial de <span class="text-yellow-500">Asistencias</span></h3><p class="text-[10px] opacity-40 font-bold uppercase tracking-widest mt-1">Registros del alumno</p></div><div class="flex gap-2"><button onclick="filterAlumnoHistory('hoy')" id="btn-alu-hoy" class="px-4 py-1 rounded-full font-black text-[9px] uppercase tracking-widest bg-yellow-500 text-slate-900">Hoy</button><button onclick="filterAlumnoHistory('mes')" id="btn-alu-mes" class="px-4 py-1 rounded-full font-black text-[9px] uppercase tracking-widest bg-white/10 hover:bg-white/20">Mes</button><button onclick="filterAlumnoHistory('cuatrimestre')" id="btn-alu-cuatrimestre" class="px-4 py-1 rounded-full font-black text-[9px] uppercase tracking-widest bg-white/10 hover:bg-white/20">Cuatrimestre</button></div></div><div class="bg-black/20 rounded-2xl overflow-hidden border border-white/5 h-80 overflow-y-auto"><table class="w-full text-left text-sm whitespace-nowrap"><thead class="bg-white/5 text-[9px] uppercase tracking-widest opacity-60"><tr><th class="px-4 py-3">Fecha/Hora</th><th class="px-4 py-3">Materia</th><th class="px-4 py-3">Maestro</th><th class="px-4 py-3 text-right">Acción</th></tr></thead><tbody id="det-alu-history" class="divide-y divide-white/5"></tbody></table></div></div>
                 </div>
             </div>
 
-            <!-- VISTA: GESTIÓN DE MAESTROS -->
             <div id="view-maestros" class="hidden-view animate-fade-in-up">
                 <div class="glass p-8 md:p-10 rounded-[3rem] border border-white/5">
-                    <div class="flex justify-between items-center mb-8">
-                        <h2 class="text-xl font-black uppercase italic text-yellow-500">Base de Datos <span class="text-white">Docentes</span></h2>
-                        <div class="relative">
-                            <i data-lucide="search" class="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 opacity-50"></i>
-                            <input type="text" id="search-maestro" onkeyup="filterTable('maestros-table', this.value)" placeholder="Buscar maestro..." class="glass-input rounded-full pl-12 pr-6 py-3 text-xs font-bold w-full md:w-64">
-                        </div>
-                    </div>
-                    <div class="overflow-x-auto">
-                        <table class="w-full text-left text-sm whitespace-nowrap" id="maestros-table">
-                            <thead class="bg-white/5 text-[9px] uppercase tracking-widest opacity-60">
-                                <tr>
-                                    <th class="px-6 py-4 rounded-l-xl">ID / Folio</th>
-                                    <th class="px-6 py-4">Catedrático</th>
-                                    <th class="px-6 py-4 text-center">Clases Asignadas</th>
-                                    <th class="px-6 py-4 text-center rounded-r-xl">Acciones</th>
-                                </tr>
-                            </thead>
-                            <tbody id="maestros-tbody" class="divide-y divide-white/5"></tbody>
-                        </table>
-                    </div>
+                    <div class="flex justify-between items-center mb-8"><h2 class="text-xl font-black uppercase italic text-yellow-500">Base de Datos <span class="text-white">Docentes</span></h2><div class="relative"><i data-lucide="search" class="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 opacity-50"></i><input type="text" id="search-maestro" onkeyup="filterTable('maestros-table', this.value)" placeholder="Buscar maestro..." class="glass-input rounded-full pl-12 pr-6 py-3 text-xs font-bold w-full md:w-64"></div></div>
+                    <div class="overflow-x-auto"><table class="w-full text-left text-sm whitespace-nowrap" id="maestros-table"><thead class="bg-white/5 text-[9px] uppercase tracking-widest opacity-60"><tr><th class="px-6 py-4 rounded-l-xl">ID / Folio</th><th class="px-6 py-4">Catedrático</th><th class="px-6 py-4 text-center">Clases Asignadas</th><th class="px-6 py-4 text-center rounded-r-xl">Acciones</th></tr></thead><tbody id="maestros-tbody" class="divide-y divide-white/5"></tbody></table></div>
                 </div>
             </div>
 
-            <!-- VISTA: DETALLE DE MAESTRO -->
             <div id="view-maestro-detalle" class="hidden-view animate-zoom-in">
-                <div class="flex items-center justify-between mb-8">
-                    <button onclick="navigate('maestros')" class="bg-white/10 hover:bg-white/20 text-white px-5 py-3 rounded-2xl font-black text-[10px] uppercase tracking-widest transition-colors flex items-center gap-2"><i data-lucide="arrow-left" class="w-4 h-4"></i> Volver a Lista</button>
-                    <div class="flex gap-2">
-                        <button onclick="deleteRecord('maestros', currentDetailId)" class="bg-red-500/20 hover:bg-red-500 text-red-400 hover:text-white px-5 py-3 rounded-2xl font-black text-[10px] uppercase tracking-widest transition-colors flex items-center gap-2"><i data-lucide="trash-2" class="w-4 h-4"></i> Eliminar Docente</button>
-                        <button onclick="printMaestroHistory()" class="bg-green-500/20 hover:bg-green-500 text-green-400 hover:text-white px-5 py-3 rounded-2xl font-black text-[10px] uppercase tracking-widest transition-colors flex items-center gap-2"><i data-lucide="printer" class="w-4 h-4"></i> Imprimir / PDF</button>
-                    </div>
-                </div>
-                <div class="grid md:grid-cols-3 gap-8 mb-8">
-                    <div class="md:col-span-1 glass p-8 rounded-[3rem] border-t-4 border-t-yellow-500">
-                        <h3 class="text-lg font-black uppercase text-yellow-500 mb-6 flex items-center gap-2"><i data-lucide="user-cog" class="w-5 h-5"></i> Editar Docente</h3>
-                        <div class="space-y-4">
-                            <div><label class="text-[10px] opacity-50 uppercase font-black ml-2">Nombre / Título</label><input type="text" id="det-doc-nombre" class="w-full glass-input rounded-xl px-4 py-3 font-bold mt-1 text-sm"></div>
-                            <div><label class="text-[10px] opacity-50 uppercase font-black ml-2 text-red-400">Contraseña</label><input type="text" id="det-doc-pass" class="w-full glass-input border-red-500/30 rounded-xl px-4 py-3 font-bold mt-1 text-sm"></div>
-                            <button onclick="saveDetailMaestro()" class="w-full bg-yellow-500 text-slate-900 font-black uppercase tracking-widest px-4 py-3 rounded-xl hover:scale-105 transition-transform mt-4 text-xs">Actualizar Docente</button>
-                        </div>
-                    </div>
-                    <div class="md:col-span-2 glass p-8 rounded-[3rem]">
-                        <h3 class="text-xl font-black italic uppercase text-white mb-1">Clases / Materias <span class="text-yellow-500">Generadas</span></h3>
-                        <p class="text-[10px] opacity-40 font-bold uppercase tracking-widest mb-6">Administradas por este docente</p>
-                        <div class="bg-black/20 rounded-2xl overflow-hidden border border-white/5 h-48 overflow-y-auto">
-                            <table class="w-full text-left text-sm whitespace-nowrap">
-                                <thead class="bg-white/5 text-[9px] uppercase tracking-widest opacity-60">
-                                    <tr><th class="px-4 py-3">Folio Clase</th><th class="px-4 py-3">Materia</th><th class="px-4 py-3">Grado/Grupo</th></tr>
-                                </thead>
-                                <tbody id="det-doc-materias" class="divide-y divide-white/5"></tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-                <div class="glass p-8 rounded-[3rem]">
-                    <div class="flex justify-between items-center mb-6">
-                        <div>
-                            <h3 class="text-xl font-black italic uppercase text-white">Alumnos que <span class="text-yellow-500">Pasaron Lista</span></h3>
-                            <p class="text-[10px] opacity-40 font-bold uppercase tracking-widest mt-1">Registros asociados a las clases de este maestro</p>
-                        </div>
-                        <div class="flex gap-2">
-                            <button onclick="filterMaestroHistory('hoy')" id="btn-doc-hoy" class="px-4 py-1 rounded-full font-black text-[9px] uppercase tracking-widest bg-yellow-500 text-slate-900">Hoy</button>
-                            <button onclick="filterMaestroHistory('mes')" id="btn-doc-mes" class="px-4 py-1 rounded-full font-black text-[9px] uppercase tracking-widest bg-white/10 hover:bg-white/20">Mes</button>
-                            <button onclick="filterMaestroHistory('cuatrimestre')" id="btn-doc-cuatrimestre" class="px-4 py-1 rounded-full font-black text-[9px] uppercase tracking-widest bg-white/10 hover:bg-white/20">Cuatrimestre</button>
-                        </div>
-                    </div>
-                    <div class="bg-black/20 rounded-2xl overflow-hidden border border-white/5 h-64 overflow-y-auto">
-                        <table class="w-full text-left text-sm whitespace-nowrap">
-                            <thead class="bg-white/5 text-[9px] uppercase tracking-widest opacity-60">
-                                <tr>
-                                    <th class="px-4 py-3">Fecha/Hora</th>
-                                    <th class="px-4 py-3">Alumno</th>
-                                    <th class="px-4 py-3">Materia / Clase</th>
-                                    <th class="px-4 py-3 text-right">Acción</th>
-                                </tr>
-                            </thead>
-                            <tbody id="det-doc-history" class="divide-y divide-white/5"></tbody>
-                        </table>
-                    </div>
-                </div>
+                <div class="flex items-center justify-between mb-8"><button onclick="navigate('maestros')" class="bg-white/10 hover:bg-white/20 text-white px-5 py-3 rounded-2xl font-black text-[10px] uppercase tracking-widest transition-colors flex items-center gap-2"><i data-lucide="arrow-left" class="w-4 h-4"></i> Volver a Lista</button><div class="flex gap-2"><button onclick="deleteRecord('maestros', currentDetailId)" class="bg-red-500/20 hover:bg-red-500 text-red-400 hover:text-white px-5 py-3 rounded-2xl font-black text-[10px] uppercase tracking-widest transition-colors flex items-center gap-2"><i data-lucide="trash-2" class="w-4 h-4"></i> Eliminar Docente</button><button onclick="printMaestroHistory()" class="bg-green-500/20 hover:bg-green-500 text-green-400 hover:text-white px-5 py-3 rounded-2xl font-black text-[10px] uppercase tracking-widest transition-colors flex items-center gap-2"><i data-lucide="printer" class="w-4 h-4"></i> Imprimir / PDF</button></div></div>
+                <div class="grid md:grid-cols-3 gap-8 mb-8"><div class="md:col-span-1 glass p-8 rounded-[3rem] border-t-4 border-t-yellow-500"><h3 class="text-lg font-black uppercase text-yellow-500 mb-6 flex items-center gap-2"><i data-lucide="user-cog" class="w-5 h-5"></i> Editar Docente</h3><div class="space-y-4"><div><label class="text-[10px] opacity-50 uppercase font-black ml-2">Nombre / Título</label><input type="text" id="det-doc-nombre" class="w-full glass-input rounded-xl px-4 py-3 font-bold mt-1 text-sm"></div><div><label class="text-[10px] opacity-50 uppercase font-black ml-2 text-red-400">Contraseña</label><input type="text" id="det-doc-pass" class="w-full glass-input border-red-500/30 rounded-xl px-4 py-3 font-bold mt-1 text-sm"></div><button onclick="saveDetailMaestro()" class="w-full bg-yellow-500 text-slate-900 font-black uppercase tracking-widest px-4 py-3 rounded-xl hover:scale-105 transition-transform mt-4 text-xs">Actualizar Docente</button></div></div><div class="md:col-span-2 glass p-8 rounded-[3rem]"><h3 class="text-xl font-black italic uppercase text-white mb-1">Clases / Materias <span class="text-yellow-500">Generadas</span></h3><p class="text-[10px] opacity-40 font-bold uppercase tracking-widest mb-6">Administradas por este docente</p><div class="bg-black/20 rounded-2xl overflow-hidden border border-white/5 h-48 overflow-y-auto"><table class="w-full text-left text-sm whitespace-nowrap"><thead class="bg-white/5 text-[9px] uppercase tracking-widest opacity-60"><tr><th class="px-4 py-3">Folio Clase</th><th class="px-4 py-3">Materia</th><th class="px-4 py-3">Grado/Grupo</th></tr></thead><tbody id="det-doc-materias" class="divide-y divide-white/5"></tbody></table></div></div></div>
+                <div class="glass p-8 rounded-[3rem]"><div class="flex justify-between items-center mb-6"><div><h3 class="text-xl font-black italic uppercase text-white">Alumnos que <span class="text-yellow-500">Pasaron Lista</span></h3><p class="text-[10px] opacity-40 font-bold uppercase tracking-widest mt-1">Registros asociados a las clases de este maestro</p></div><div class="flex gap-2"><button onclick="filterMaestroHistory('hoy')" id="btn-doc-hoy" class="px-4 py-1 rounded-full font-black text-[9px] uppercase tracking-widest bg-yellow-500 text-slate-900">Hoy</button><button onclick="filterMaestroHistory('mes')" id="btn-doc-mes" class="px-4 py-1 rounded-full font-black text-[9px] uppercase tracking-widest bg-white/10 hover:bg-white/20">Mes</button><button onclick="filterMaestroHistory('cuatrimestre')" id="btn-doc-cuatrimestre" class="px-4 py-1 rounded-full font-black text-[9px] uppercase tracking-widest bg-white/10 hover:bg-white/20">Cuatrimestre</button></div></div><div class="bg-black/20 rounded-2xl overflow-hidden border border-white/5 h-64 overflow-y-auto"><table class="w-full text-left text-sm whitespace-nowrap"><thead class="bg-white/5 text-[9px] uppercase tracking-widest opacity-60"><tr><th class="px-4 py-3">Fecha/Hora</th><th class="px-4 py-3">Alumno</th><th class="px-4 py-3">Materia / Clase</th><th class="px-4 py-3 text-right">Acción</th></tr></thead><tbody id="det-doc-history" class="divide-y divide-white/5"></tbody></table></div></div>
             </div>
 
-            <!-- VISTA: REPORTES GLOBALES -->
             <div id="view-reportes" class="hidden-view animate-fade-in-up">
                 <div class="glass p-8 md:p-10 rounded-[3rem] border border-white/5">
                     <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
-                        <div class="flex flex-wrap gap-2">
-                            <button onclick="loadReportes('hoy')" id="btn-filter-hoy" class="bg-yellow-500 text-slate-900 px-6 py-2 rounded-full font-black text-[10px] uppercase tracking-widest transition-colors">Hoy</button>
-                            <button onclick="loadReportes('mes')" id="btn-filter-mes" class="bg-white/5 hover:bg-white/10 px-6 py-2 rounded-full font-black text-[10px] uppercase tracking-widest transition-colors">Mes</button>
-                            <button onclick="loadReportes('cuatrimestre')" id="btn-filter-cuatrimestre" class="bg-white/5 hover:bg-white/10 px-6 py-2 rounded-full font-black text-[10px] uppercase tracking-widest transition-colors">Cuatrimestre</button>
-                        </div>
-                        <button onclick="downloadGlobalCSV()" class="bg-green-500/20 hover:bg-green-500 text-green-400 hover:text-white px-6 py-3 rounded-xl font-black text-[10px] uppercase tracking-widest transition-colors flex items-center gap-2">
-                            <i data-lucide="download" class="w-4 h-4"></i> Exportar Lista Activa
-                        </button>
+                        <div class="flex flex-wrap gap-2"><button onclick="loadReportes('hoy')" id="btn-filter-hoy" class="bg-yellow-500 text-slate-900 px-6 py-2 rounded-full font-black text-[10px] uppercase tracking-widest transition-colors">Hoy</button><button onclick="loadReportes('mes')" id="btn-filter-mes" class="bg-white/5 hover:bg-white/10 px-6 py-2 rounded-full font-black text-[10px] uppercase tracking-widest transition-colors">Mes</button><button onclick="loadReportes('cuatrimestre')" id="btn-filter-cuatrimestre" class="bg-white/5 hover:bg-white/10 px-6 py-2 rounded-full font-black text-[10px] uppercase tracking-widest transition-colors">Cuatrimestre</button></div>
+                        <button onclick="downloadGlobalCSV()" class="bg-green-500/20 hover:bg-green-500 text-green-400 hover:text-white px-6 py-3 rounded-xl font-black text-[10px] uppercase tracking-widest transition-colors flex items-center gap-2"><i data-lucide="download" class="w-4 h-4"></i> Exportar Lista Activa</button>
                     </div>
-                    <div class="overflow-x-auto">
-                        <table class="w-full text-left text-sm whitespace-nowrap">
-                            <thead class="bg-white/5 text-[9px] uppercase tracking-widest opacity-60">
-                                <tr>
-                                    <th class="px-6 py-4 rounded-l-xl">Fecha / Hora</th>
-                                    <th class="px-6 py-4">Alumno (Grado/Grupo)</th>
-                                    <th class="px-6 py-4">Materia</th>
-                                    <th class="px-6 py-4">Maestro</th>
-                                    <th class="px-6 py-4 rounded-r-xl text-center">Acciones</th>
-                                </tr>
-                            </thead>
-                            <tbody id="reportes-tbody" class="divide-y divide-white/5"></tbody>
-                        </table>
-                    </div>
+                    <div class="overflow-x-auto"><table class="w-full text-left text-sm whitespace-nowrap"><thead class="bg-white/5 text-[9px] uppercase tracking-widest opacity-60"><tr><th class="px-6 py-4 rounded-l-xl">Fecha / Hora</th><th class="px-6 py-4">Alumno (Grado/Grupo)</th><th class="px-6 py-4">Materia</th><th class="px-6 py-4">Maestro</th><th class="px-6 py-4 rounded-r-xl text-center">Acciones</th></tr></thead><tbody id="reportes-tbody" class="divide-y divide-white/5"></tbody></table></div>
                 </div>
             </div>
 
-            <!-- VISTA: AJUSTES DEL SISTEMA (CMS) -->
             <div id="view-cms" class="hidden-view animate-fade-in-up">
                 <div class="grid md:grid-cols-2 gap-8">
-                    <div class="glass p-10 rounded-[3rem] border-t-4 border-t-yellow-500">
-                        <h3 class="text-xl font-black uppercase text-white mb-6">Variables del Sistema</h3>
-                        <div class="space-y-6">
-                            <div>
-                                <label class="text-[10px] font-black uppercase opacity-60 ml-2">Ciclo Escolar Vigente</label>
-                                <input type="text" id="cms-ciclo" class="w-full glass-input rounded-xl px-5 py-4 font-bold mt-1 text-yellow-500" value="2026-B">
-                            </div>
-                            <div>
-                                <label class="text-[10px] font-black uppercase opacity-60 ml-2">Estado de la Plataforma</label>
-                                <select id="cms-estado" class="w-full glass-input rounded-xl px-5 py-4 font-bold mt-1 appearance-none">
-                                    <option value="online" class="bg-slate-900">En Línea (Normal)</option>
-                                    <option value="maintenance" class="bg-slate-900">Modo Mantenimiento</option>
-                                </select>
-                            </div>
-                            <button onclick="saveCMS()" class="bg-yellow-500 text-slate-900 font-black uppercase tracking-widest px-8 py-4 rounded-xl hover:scale-105 transition-transform mt-4 w-full">Guardar Cambios</button>
-                        </div>
-                    </div>
-                    <div class="glass p-10 rounded-[3rem] border-t-4 border-t-red-500 bg-red-500/5">
-                        <h3 class="text-xl font-black uppercase text-red-400 mb-6">Zona de Riesgo</h3>
-                        <p class="text-xs opacity-60 mb-6">Acciones destructivas para la base de datos de prueba local. Una vez ejecutadas, no se pueden deshacer.</p>
-                        <div class="space-y-4">
-                            <button onclick="clearDatabase('asistencias')" class="w-full bg-red-500/20 hover:bg-red-500 text-red-400 hover:text-white px-6 py-4 rounded-xl font-black text-[10px] uppercase tracking-widest transition-colors flex items-center justify-between">
-                                <span>Borrar Historial de Asistencias</span> <i data-lucide="trash-2" class="w-4 h-4"></i>
-                            </button>
-                            <button onclick="clearDatabase('all')" class="w-full bg-red-500/20 hover:bg-red-500 text-red-400 hover:text-white px-6 py-4 rounded-xl font-black text-[10px] uppercase tracking-widest transition-colors flex items-center justify-between">
-                                <span>Formatear Sistema Completo (Reset)</span> <i data-lucide="alert-triangle" class="w-4 h-4"></i>
-                            </button>
-                        </div>
-                    </div>
+                    <div class="glass p-10 rounded-[3rem] border-t-4 border-t-yellow-500"><h3 class="text-xl font-black uppercase text-white mb-6">Variables del Sistema</h3><div class="space-y-6"><div><label class="text-[10px] font-black uppercase opacity-60 ml-2">Ciclo Escolar Vigente</label><input type="text" id="cms-ciclo" class="w-full glass-input rounded-xl px-5 py-4 font-bold mt-1 text-yellow-500" value="2026-B"></div><div><label class="text-[10px] font-black uppercase opacity-60 ml-2">Estado de la Plataforma</label><select id="cms-estado" class="w-full glass-input rounded-xl px-5 py-4 font-bold mt-1 appearance-none"><option value="online" class="bg-slate-900">En Línea (Normal)</option><option value="maintenance" class="bg-slate-900">Modo Mantenimiento</option></select></div><button onclick="saveCMS()" class="bg-yellow-500 text-slate-900 font-black uppercase tracking-widest px-8 py-4 rounded-xl hover:scale-105 transition-transform mt-4 w-full">Guardar Cambios</button></div></div>
+                    <div class="glass p-10 rounded-[3rem] border-t-4 border-t-red-500 bg-red-500/5"><h3 class="text-xl font-black uppercase text-red-400 mb-6">Zona de Riesgo</h3><p class="text-xs opacity-60 mb-6">Acciones destructivas para la base de datos de prueba local. Una vez ejecutadas, no se pueden deshacer.</p><div class="space-y-4"><button onclick="clearDatabase('asistencias')" class="w-full bg-red-500/20 hover:bg-red-500 text-red-400 hover:text-white px-6 py-4 rounded-xl font-black text-[10px] uppercase tracking-widest transition-colors flex items-center justify-between"><span>Borrar Historial de Asistencias</span> <i data-lucide="trash-2" class="w-4 h-4"></i></button><button onclick="clearDatabase('all')" class="w-full bg-red-500/20 hover:bg-red-500 text-red-400 hover:text-white px-6 py-4 rounded-xl font-black text-[10px] uppercase tracking-widest transition-colors flex items-center justify-between"><span>Formatear Sistema Completo (Reset)</span> <i data-lucide="alert-triangle" class="w-4 h-4"></i></button></div></div>
                 </div>
             </div>
         </main>
     </div>
 
-    <!-- LÓGICA UNIFICADA DE LA BASE DE DATOS -->
-    <script>
-        lucide.createIcons();
+    <!-- LÓGICA DE BASE DE DATOS EN LA NUBE (FIREBASE) -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+        import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
-        // LLAVES CENTRALES DE BASE DE DATOS LOCAL
-        const DB_KEYS = {
-            ALUMNOS: 'ceut_db_alumnos',
-            MAESTROS: 'ceut_db_maestros',
-            ASISTENCIAS: 'ceut_db_asistencias',
-            SESSIONS: 'ceut_db_active_sessions',
-            CONFIG: 'ceut_db_config'
+        const firebaseConfig = {
+            apiKey: "AIzaSyCefP6qEqaCMpo8ZpUiLpN4e_-E4ZNTp94",
+            authDomain: "asistencias-ceut.firebaseapp.com",
+            projectId: "asistencias-ceut",
+            storageBucket: "asistencias-ceut.firebasestorage.app",
+            messagingSenderId: "130615246146",
+            appId: "1:130615246146:web:6ae2c17c828fb28a809cdb"
+        };
+        const app = initializeApp(firebaseConfig);
+        const dbFS = getFirestore(app);
+
+        window.lucide.createIcons();
+
+        // Estado Global sincronizado
+        let db = { alumnos: [], maestros: [], asistencias: [], activeSessions: [], config: { ciclo: '2026-B', estado: 'online' } };
+        let currentView = 'auth';
+
+        // Escuchar cambios en la nube en Tiempo Real
+        onSnapshot(doc(dbFS, "ceut", "database"), (docSnap) => {
+            if (docSnap.exists()) {
+                db = docSnap.data();
+                // Asegurar arrays base
+                db.alumnos = db.alumnos || []; db.maestros = db.maestros || [];
+                db.asistencias = db.asistencias || []; db.activeSessions = db.activeSessions || [];
+                db.config = db.config || { ciclo: '2026-B', estado: 'online' };
+
+                if (window.isAdminAuthenticated && currentView !== 'auth') {
+                    window.applyConfig();
+                    window.navigate(currentView, false); // Actualizar interfaz
+                }
+            } else {
+                window.saveDB(db); // Inicializa BD si está vacía
+            }
+        });
+
+        // Guardar en Firestore
+        window.saveDB = function(database) {
+            db = database;
+            setDoc(doc(dbFS, "ceut", "database"), database).catch(e => {
+                alert("SISTEMA CEUT:\nPor favor configura las Reglas de Firestore a 'allow read, write: if true;' en tu consola de Firebase.");
+            });
         };
 
-        function getDB() {
-            return {
-                alumnos: JSON.parse(localStorage.getItem(DB_KEYS.ALUMNOS)) || [],
-                maestros: JSON.parse(localStorage.getItem(DB_KEYS.MAESTROS)) || [],
-                asistencias: JSON.parse(localStorage.getItem(DB_KEYS.ASISTENCIAS)) || [],
-                activeSessions: JSON.parse(localStorage.getItem(DB_KEYS.SESSIONS)) || [],
-                config: JSON.parse(localStorage.getItem(DB_KEYS.CONFIG)) || { ciclo: '2026-B', estado: 'online' }
-            };
-        }
-
-        function saveDB(database) {
-            localStorage.setItem(DB_KEYS.ALUMNOS, JSON.stringify(database.alumnos));
-            localStorage.setItem(DB_KEYS.MAESTROS, JSON.stringify(database.maestros));
-            localStorage.setItem(DB_KEYS.ASISTENCIAS, JSON.stringify(database.asistencias));
-            localStorage.setItem(DB_KEYS.SESSIONS, JSON.stringify(database.activeSessions));
-            localStorage.setItem(DB_KEYS.CONFIG, JSON.stringify(database.config));
-        }
-
-        let db = getDB();
-        function refreshDB() { db = getDB(); }
-
-        // --- CREDENCIALES DE ACCESO ---
+        // --- LÓGICA DE LA INTERFAZ ADMIN ---
         const ADMIN_USER = "carlos.aguilar@ceut.edu.mx";
         const ADMIN_PASS = "Jcas1015#";
-        let isAdminAuthenticated = sessionStorage.getItem('ceut_admin_auth') === 'true';
+        window.isAdminAuthenticated = sessionStorage.getItem('ceut_admin_auth') === 'true';
         let currentDetailId = null;
         let currentDetailName = null;
         let currentHistoryData = [];
         let currentGlobalReportFilter = 'hoy';
 
-        function loginAdmin() {
+        window.loginAdmin = function() {
             const user = document.getElementById('admin-user').value.trim();
             const pass = document.getElementById('admin-pass').value;
             if (user === ADMIN_USER && pass === ADMIN_PASS) {
                 sessionStorage.setItem('ceut_admin_auth', 'true');
-                isAdminAuthenticated = true;
-                showApp();
-                navigate('dashboard');
+                window.isAdminAuthenticated = true;
+                window.showApp();
+                window.navigate('dashboard');
             } else { alert("SISTEMA CEUT:\nCredenciales incorrectas. Acceso denegado."); }
-        }
+        };
 
-        function showApp() {
+        window.showApp = function() {
             document.getElementById('view-auth').classList.add('hidden-view');
             document.getElementById('sidebar').classList.remove('hidden-view');
             document.getElementById('main-content').classList.remove('hidden-view');
-        }
-        function hideApp() {
+        };
+        window.hideApp = function() {
             document.getElementById('sidebar').classList.add('hidden-view');
             document.getElementById('main-content').classList.add('hidden-view');
             document.getElementById('view-auth').classList.remove('hidden-view');
-        }
+        };
 
         window.onload = () => {
-            applyConfig();
-            if (isAdminAuthenticated) { showApp(); navigate('dashboard'); } else { hideApp(); }
-            const executeLoginOnEnter = (e) => { if (e.key === 'Enter') loginAdmin(); };
+            window.applyConfig();
+            if (window.isAdminAuthenticated) { window.showApp(); window.navigate('dashboard'); } else { window.hideApp(); }
+            const executeLoginOnEnter = (e) => { if (e.key === 'Enter') window.loginAdmin(); };
             document.getElementById('admin-user').addEventListener('keypress', executeLoginOnEnter);
             document.getElementById('admin-pass').addEventListener('keypress', executeLoginOnEnter);
         };
 
-        function navigate(view) {
+        window.navigate = function(view, updateState = true) {
+            if(updateState) currentView = view;
             const views = ['view-dashboard', 'view-alumnos', 'view-alumno-detalle', 'view-maestros', 'view-maestro-detalle', 'view-reportes', 'view-cms'];
             views.forEach(v => document.getElementById(v).classList.add('hidden-view'));
             document.querySelectorAll('.sidebar-item').forEach(el => el.classList.remove('active', 'bg-yellow-500/10', 'text-yellow-500'));
@@ -488,132 +280,87 @@
 
             const titleEl = document.getElementById('page-title');
             const subtitleEl = document.getElementById('page-subtitle');
-            refreshDB(); // Siempre refrescar la DB al cambiar de vista
 
             if(view === 'dashboard') {
-                titleEl.innerHTML = `Control <span class="text-yellow-500">Global</span>`;
-                subtitleEl.innerText = "Visión general del sistema";
-                renderDashboard();
+                titleEl.innerHTML = `Control <span class="text-yellow-500">Global</span>`; subtitleEl.innerText = "Visión general del sistema";
+                window.renderDashboard();
             } else if (view === 'alumnos') {
-                titleEl.innerHTML = `Gestión <span class="text-yellow-500">Alumnos</span>`;
-                subtitleEl.innerText = "Directorio y perfiles";
-                renderAlumnos();
+                titleEl.innerHTML = `Gestión <span class="text-yellow-500">Alumnos</span>`; subtitleEl.innerText = "Directorio y perfiles";
+                window.renderAlumnos();
             } else if (view === 'alumno-detalle') {
-                titleEl.innerHTML = `Perfil <span class="text-yellow-500">Estudiante</span>`;
-                subtitleEl.innerText = "Detalles y auditoría de asistencias";
+                titleEl.innerHTML = `Perfil <span class="text-yellow-500">Estudiante</span>`; subtitleEl.innerText = "Detalles y auditoría de asistencias";
             } else if (view === 'maestros') {
-                titleEl.innerHTML = `Gestión <span class="text-yellow-500">Docentes</span>`;
-                subtitleEl.innerText = "Plantilla y administración";
-                renderMaestros();
+                titleEl.innerHTML = `Gestión <span class="text-yellow-500">Docentes</span>`; subtitleEl.innerText = "Plantilla y administración";
+                window.renderMaestros();
             } else if (view === 'maestro-detalle') {
-                titleEl.innerHTML = `Perfil <span class="text-yellow-500">Catedrático</span>`;
-                subtitleEl.innerText = "Clases generadas e historial de asistencias";
+                titleEl.innerHTML = `Perfil <span class="text-yellow-500">Catedrático</span>`; subtitleEl.innerText = "Clases generadas e historial de asistencias";
             } else if (view === 'reportes') {
-                titleEl.innerHTML = `Reportes <span class="text-yellow-500">Centrales</span>`;
-                subtitleEl.innerText = "Auditoría global de asistencias";
-                loadReportes('hoy');
+                titleEl.innerHTML = `Reportes <span class="text-yellow-500">Centrales</span>`; subtitleEl.innerText = "Auditoría global de asistencias";
+                window.loadReportes(currentGlobalReportFilter);
             } else if (view === 'cms') {
-                titleEl.innerHTML = `Ajustes <span class="text-yellow-500">Sistema</span>`;
-                subtitleEl.innerText = "Configuración sin código";
-                document.getElementById('cms-ciclo').value = db.config.ciclo;
-                document.getElementById('cms-estado').value = db.config.estado;
+                titleEl.innerHTML = `Ajustes <span class="text-yellow-500">Sistema</span>`; subtitleEl.innerText = "Configuración sin código";
+                document.getElementById('cms-ciclo').value = db.config.ciclo; document.getElementById('cms-estado').value = db.config.estado;
             }
-        }
+        };
 
-        function applyConfig() {
-            const ind = document.getElementById('status-indicator');
-            const txt = document.getElementById('status-text');
+        window.applyConfig = function() {
+            const ind = document.getElementById('status-indicator'); const txt = document.getElementById('status-text');
             if(db.config.estado === 'maintenance') {
-                ind.className = "w-2 h-2 rounded-full animate-pulse shadow-[0_0_10px_#ef4444] bg-red-500";
-                txt.innerText = "Modo Mantenimiento (Cerrado)";
-                txt.classList.add('text-red-400');
+                ind.className = "w-2 h-2 rounded-full animate-pulse shadow-[0_0_10px_#ef4444] bg-red-500"; txt.innerText = "Modo Mantenimiento (Cerrado)"; txt.classList.add('text-red-400');
             } else {
-                ind.className = "w-2 h-2 rounded-full animate-pulse shadow-[0_0_10px_#22c55e] bg-green-500";
-                txt.innerText = `Sistemas en Línea • Ciclo ${db.config.ciclo}`;
-                txt.classList.remove('text-red-400');
+                ind.className = "w-2 h-2 rounded-full animate-pulse shadow-[0_0_10px_#22c55e] bg-green-500"; txt.innerText = `Sistemas en Línea • Ciclo ${db.config.ciclo}`; txt.classList.remove('text-red-400');
             }
-        }
+        };
 
-        function renderDashboard() {
-            document.getElementById('dash-alumnos').innerText = db.alumnos.length;
-            document.getElementById('dash-maestros').innerText = db.maestros.length;
+        window.renderDashboard = function() {
+            document.getElementById('dash-alumnos').innerText = db.alumnos.length; document.getElementById('dash-maestros').innerText = db.maestros.length;
             const hoy = new Date().toLocaleDateString('es-MX');
             document.getElementById('dash-asistencias').innerText = db.asistencias.filter(a => a.fecha === hoy).length;
             
-            const tbody = document.getElementById('dash-recent-table');
-            tbody.innerHTML = '';
+            const tbody = document.getElementById('dash-recent-table'); tbody.innerHTML = '';
             const recientes = [...db.asistencias].reverse().slice(0, 4);
-            if(recientes.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="3" class="text-center py-6 opacity-30 text-[10px]">Sin actividad reciente</td></tr>`; return;
-            }
-            recientes.forEach(r => {
-                tbody.innerHTML += `<tr class="hover:bg-white/5 transition-colors">
-                    <td class="px-4 py-3 font-bold text-yellow-500">${r.alumnoNombre}</td>
-                    <td class="px-4 py-3 opacity-80">${r.materiaNombre}</td>
-                    <td class="px-4 py-3 opacity-60 text-xs">${r.fecha} ${r.hora}</td>
-                </tr>`;
-            });
-        }
+            if(recientes.length === 0) { tbody.innerHTML = `<tr><td colspan="3" class="text-center py-6 opacity-30 text-[10px]">Sin actividad reciente</td></tr>`; return; }
+            recientes.forEach(r => { tbody.innerHTML += `<tr class="hover:bg-white/5 transition-colors"><td class="px-4 py-3 font-bold text-yellow-500">${r.alumnoNombre}</td><td class="px-4 py-3 opacity-80">${r.materiaNombre}</td><td class="px-4 py-3 opacity-60 text-xs">${r.fecha} ${r.hora}</td></tr>`; });
+        };
 
-        function renderAlumnos() {
-            const tbody = document.getElementById('alumnos-tbody');
-            tbody.innerHTML = '';
+        window.renderAlumnos = function() {
+            const tbody = document.getElementById('alumnos-tbody'); tbody.innerHTML = '';
             db.alumnos.forEach(a => {
-                tbody.innerHTML += `<tr class="hover:bg-white/5 transition-colors">
-                    <td class="px-6 py-4 font-black text-yellow-500">${a.folio}</td>
-                    <td class="px-6 py-4 font-bold text-white">${a.nombre}</td>
-                    <td class="px-6 py-4 text-xs opacity-60">${a.nivel} • ${a.grado} "${a.grupo}"</td>
-                    <td class="px-6 py-4 text-center"><button onclick="viewAlumno('${a.folio}')" class="px-4 py-2 bg-yellow-500 text-slate-900 font-black text-[10px] uppercase rounded-full hover:scale-105 transition-transform">Ver Perfil</button></td>
-                </tr>`;
+                tbody.innerHTML += `<tr class="hover:bg-white/5 transition-colors"><td class="px-6 py-4 font-black text-yellow-500">${a.folio}</td><td class="px-6 py-4 font-bold text-white">${a.nombre}</td><td class="px-6 py-4 text-xs opacity-60">${a.nivel} • ${a.grado} "${a.grupo}"</td><td class="px-6 py-4 text-center"><button onclick="viewAlumno('${a.folio}')" class="px-4 py-2 bg-yellow-500 text-slate-900 font-black text-[10px] uppercase rounded-full hover:scale-105 transition-transform">Ver Perfil</button></td></tr>`;
             });
-        }
+        };
 
-        function viewAlumno(folio) {
-            const a = db.alumnos.find(x => x.folio === folio);
-            if(!a) return;
+        window.viewAlumno = function(folio) {
+            const a = db.alumnos.find(x => x.folio === folio); if(!a) return;
             currentDetailId = a.folio; currentDetailName = a.nombre;
-            document.getElementById('det-alu-nombre').value = a.nombre;
-            document.getElementById('det-alu-nivel').value = a.nivel;
-            document.getElementById('det-alu-grado').value = a.grado;
-            document.getElementById('det-alu-grupo').value = a.grupo;
+            document.getElementById('det-alu-nombre').value = a.nombre; document.getElementById('det-alu-nivel').value = a.nivel;
+            document.getElementById('det-alu-grado').value = a.grado; document.getElementById('det-alu-grupo').value = a.grupo;
             document.getElementById('det-alu-pass').value = a.pass;
-            filterAlumnoHistory('cuatrimestre'); navigate('alumno-detalle');
-        }
+            window.filterAlumnoHistory('cuatrimestre'); window.navigate('alumno-detalle');
+        };
 
-        function saveDetailAlumno() {
-            refreshDB();
+        window.saveDetailAlumno = function() {
             const idx = db.alumnos.findIndex(a => a.folio === currentDetailId);
             if(idx > -1) {
-                db.alumnos[idx].nombre = document.getElementById('det-alu-nombre').value;
-                db.alumnos[idx].nivel = document.getElementById('det-alu-nivel').value;
-                db.alumnos[idx].grado = document.getElementById('det-alu-grado').value;
-                db.alumnos[idx].grupo = document.getElementById('det-alu-grupo').value;
+                db.alumnos[idx].nombre = document.getElementById('det-alu-nombre').value; db.alumnos[idx].nivel = document.getElementById('det-alu-nivel').value;
+                db.alumnos[idx].grado = document.getElementById('det-alu-grado').value; db.alumnos[idx].grupo = document.getElementById('det-alu-grupo').value;
                 db.alumnos[idx].pass = document.getElementById('det-alu-pass').value;
                 
                 const nuevoNombre = db.alumnos[idx].nombre;
-                if(nuevoNombre !== currentDetailName) {
-                    db.asistencias.forEach(asis => { if(asis.alumnoNombre === currentDetailName) asis.alumnoNombre = nuevoNombre; });
-                    currentDetailName = nuevoNombre;
-                }
-                saveDB(db); alert('SISTEMA CEUT:\nPerfil de Alumno actualizado correctamente.'); filterAlumnoHistory('cuatrimestre');
+                if(nuevoNombre !== currentDetailName) { db.asistencias.forEach(asis => { if(asis.alumnoNombre === currentDetailName) asis.alumnoNombre = nuevoNombre; }); currentDetailName = nuevoNombre; }
+                window.saveDB(db); alert('SISTEMA CEUT:\nPerfil de Alumno actualizado correctamente.'); window.filterAlumnoHistory('cuatrimestre');
             }
-        }
+        };
 
-        function filterAlumnoHistory(filter) {
+        window.filterAlumnoHistory = function(filter) {
             ['hoy', 'mes', 'cuatrimestre'].forEach(f => document.getElementById(`btn-alu-${f}`).className = "px-4 py-1 rounded-full font-black text-[9px] uppercase tracking-widest bg-white/10 hover:bg-white/20 text-white");
             document.getElementById(`btn-alu-${filter}`).className = "px-4 py-1 rounded-full font-black text-[9px] uppercase tracking-widest bg-yellow-500 text-slate-900";
-
-            const hoy = new Date(); const hoyStr = hoy.toLocaleDateString('es-MX');
-            const mesActual = hoy.getMonth(); const anioActual = hoy.getFullYear();
+            const hoy = new Date(); const hoyStr = hoy.toLocaleDateString('es-MX'); const mesActual = hoy.getMonth(); const anioActual = hoy.getFullYear();
 
             let records = db.asistencias.filter(a => a.alumnoId === currentDetailId);
             records = records.filter(a => {
                 if(filter === 'hoy') return a.fecha === hoyStr;
-                if(filter === 'mes') {
-                    const partes = a.fecha.split('/');
-                    if(partes.length === 3) return parseInt(partes[1])-1 === mesActual && parseInt(partes[2]) === anioActual;
-                    return false;
-                }
+                if(filter === 'mes') { const partes = a.fecha.split('/'); if(partes.length === 3) return parseInt(partes[1])-1 === mesActual && parseInt(partes[2]) === anioActual; return false; }
                 return true; 
             });
             currentHistoryData = records;
@@ -621,91 +368,58 @@
             const tbody = document.getElementById('det-alu-history'); tbody.innerHTML = '';
             if(records.length === 0) { tbody.innerHTML = `<tr><td colspan="4" class="text-center py-10 opacity-30 text-xs">No hay asistencias en este periodo.</td></tr>`; return; }
             [...records].reverse().forEach(a => {
-                tbody.innerHTML += `<tr class="hover:bg-white/5 transition-colors">
-                    <td class="px-4 py-3 font-bold text-yellow-500 text-xs">${a.fecha} <br><span class="opacity-50 text-white font-normal">${a.hora}</span></td>
-                    <td class="px-4 py-3 font-bold text-white">${a.materiaNombre}</td>
-                    <td class="px-4 py-3 opacity-80 text-xs">${a.maestroNombre}</td>
-                    <td class="px-4 py-3 text-right"><button onclick="deleteAssistanceRecord('${a.id}', 'alumno')" class="p-2 bg-red-500/20 hover:bg-red-500 text-red-400 hover:text-white rounded-full transition-colors"><i data-lucide="trash" class="w-4 h-4"></i></button></td>
-                </tr>`;
+                tbody.innerHTML += `<tr class="hover:bg-white/5 transition-colors"><td class="px-4 py-3 font-bold text-yellow-500 text-xs">${a.fecha} <br><span class="opacity-50 text-white font-normal">${a.hora}</span></td><td class="px-4 py-3 font-bold text-white">${a.materiaNombre}</td><td class="px-4 py-3 opacity-80 text-xs">${a.maestroNombre}</td><td class="px-4 py-3 text-right"><button onclick="deleteAssistanceRecord('${a.id}', 'alumno')" class="p-2 bg-red-500/20 hover:bg-red-500 text-red-400 hover:text-white rounded-full transition-colors"><i data-lucide="trash" class="w-4 h-4"></i></button></td></tr>`;
             });
-            lucide.createIcons();
-        }
+            window.lucide.createIcons();
+        };
 
-        function printAlumnoHistory() {
-            document.getElementById('print-doc-type').innerText = "Historial Académico de Asistencia";
-            document.getElementById('print-date').innerText = `Impreso el: ${new Date().toLocaleDateString('es-MX')}`;
+        window.printAlumnoHistory = function() {
+            document.getElementById('print-doc-type').innerText = "Historial Académico de Asistencia"; document.getElementById('print-date').innerText = `Impreso el: ${new Date().toLocaleDateString('es-MX')}`;
             const info = db.alumnos.find(a => a.folio === currentDetailId);
-            document.getElementById('print-user-name').innerText = `Alumno: ${info.nombre}`;
-            document.getElementById('print-user-details').innerText = `Folio: ${info.folio} | Grado/Grupo: ${info.grado} "${info.grupo}" | Nivel: ${info.nivel}`;
-            const table = document.getElementById('print-table-content');
-            table.innerHTML = `<tr><th>Fecha</th><th>Hora</th><th>Materia</th><th>Catedrático</th></tr>`;
+            document.getElementById('print-user-name').innerText = `Alumno: ${info.nombre}`; document.getElementById('print-user-details').innerText = `Folio: ${info.folio} | Grado/Grupo: ${info.grado} "${info.grupo}" | Nivel: ${info.nivel}`;
+            const table = document.getElementById('print-table-content'); table.innerHTML = `<tr><th>Fecha</th><th>Hora</th><th>Materia</th><th>Catedrático</th></tr>`;
             [...currentHistoryData].reverse().forEach(r => { table.innerHTML += `<tr><td>${r.fecha}</td><td>${r.hora}</td><td><strong>${r.materiaNombre}</strong></td><td>${r.maestroNombre}</td></tr>`; });
             window.print();
-        }
+        };
 
-        function renderMaestros() {
+        window.renderMaestros = function() {
             const tbody = document.getElementById('maestros-tbody'); tbody.innerHTML = '';
             db.maestros.forEach(m => {
                 const total = m.materias ? m.materias.length : 0;
-                tbody.innerHTML += `<tr class="hover:bg-white/5 transition-colors">
-                    <td class="px-6 py-4 font-black text-yellow-500">${m.folio}</td>
-                    <td class="px-6 py-4 font-bold text-white">${m.nombre}</td>
-                    <td class="px-6 py-4 text-center"><span class="bg-white/10 px-3 py-1 rounded-full text-xs font-bold">${total} Materias</span></td>
-                    <td class="px-6 py-4 text-center"><button onclick="viewMaestro('${m.folio}')" class="px-4 py-2 bg-yellow-500 text-slate-900 font-black text-[10px] uppercase rounded-full hover:scale-105 transition-transform">Ver Perfil</button></td>
-                </tr>`;
+                tbody.innerHTML += `<tr class="hover:bg-white/5 transition-colors"><td class="px-6 py-4 font-black text-yellow-500">${m.folio}</td><td class="px-6 py-4 font-bold text-white">${m.nombre}</td><td class="px-6 py-4 text-center"><span class="bg-white/10 px-3 py-1 rounded-full text-xs font-bold">${total} Materias</span></td><td class="px-6 py-4 text-center"><button onclick="viewMaestro('${m.folio}')" class="px-4 py-2 bg-yellow-500 text-slate-900 font-black text-[10px] uppercase rounded-full hover:scale-105 transition-transform">Ver Perfil</button></td></tr>`;
             });
-        }
+        };
 
-        function viewMaestro(folio) {
-            const m = db.maestros.find(x => x.folio === folio);
-            if(!m) return;
+        window.viewMaestro = function(folio) {
+            const m = db.maestros.find(x => x.folio === folio); if(!m) return;
             currentDetailId = m.folio; currentDetailName = m.nombre;
-            document.getElementById('det-doc-nombre').value = m.nombre;
-            document.getElementById('det-doc-pass').value = m.pass;
+            document.getElementById('det-doc-nombre').value = m.nombre; document.getElementById('det-doc-pass').value = m.pass;
 
             const matTable = document.getElementById('det-doc-materias'); matTable.innerHTML = '';
-            if(!m.materias || m.materias.length === 0) {
-                matTable.innerHTML = `<tr><td colspan="3" class="text-center py-4 opacity-30 text-xs">No ha generado clases</td></tr>`;
-            } else {
-                m.materias.forEach(mat => {
-                    matTable.innerHTML += `<tr class="hover:bg-white/5">
-                        <td class="px-4 py-3 font-bold text-yellow-500 text-xs">${mat.id}</td><td class="px-4 py-3 text-white">${mat.nombre}</td><td class="px-4 py-3 opacity-60 text-xs">${mat.grado} "${mat.grupo}"</td>
-                    </tr>`;
-                });
-            }
-            filterMaestroHistory('cuatrimestre'); navigate('maestro-detalle');
-        }
+            if(!m.materias || m.materias.length === 0) { matTable.innerHTML = `<tr><td colspan="3" class="text-center py-4 opacity-30 text-xs">No ha generado clases</td></tr>`; } 
+            else { m.materias.forEach(mat => { matTable.innerHTML += `<tr class="hover:bg-white/5"><td class="px-4 py-3 font-bold text-yellow-500 text-xs">${mat.id}</td><td class="px-4 py-3 text-white">${mat.nombre}</td><td class="px-4 py-3 opacity-60 text-xs">${mat.grado} "${mat.grupo}"</td></tr>`; }); }
+            window.filterMaestroHistory('cuatrimestre'); window.navigate('maestro-detalle');
+        };
 
-        function saveDetailMaestro() {
-            refreshDB();
+        window.saveDetailMaestro = function() {
             const idx = db.maestros.findIndex(m => m.folio === currentDetailId);
             if(idx > -1) {
-                db.maestros[idx].nombre = document.getElementById('det-doc-nombre').value;
-                db.maestros[idx].pass = document.getElementById('det-doc-pass').value;
+                db.maestros[idx].nombre = document.getElementById('det-doc-nombre').value; db.maestros[idx].pass = document.getElementById('det-doc-pass').value;
                 const nuevoNombre = db.maestros[idx].nombre;
-                if(nuevoNombre !== currentDetailName) {
-                    db.asistencias.forEach(asis => { if(asis.maestroNombre === currentDetailName) asis.maestroNombre = nuevoNombre; });
-                    currentDetailName = nuevoNombre;
-                }
-                saveDB(db); alert('SISTEMA CEUT:\nPerfil del Docente actualizado correctamente.'); filterMaestroHistory('cuatrimestre');
+                if(nuevoNombre !== currentDetailName) { db.asistencias.forEach(asis => { if(asis.maestroNombre === currentDetailName) asis.maestroNombre = nuevoNombre; }); currentDetailName = nuevoNombre; }
+                window.saveDB(db); alert('SISTEMA CEUT:\nPerfil del Docente actualizado correctamente.'); window.filterMaestroHistory('cuatrimestre');
             }
-        }
+        };
 
-        function filterMaestroHistory(filter) {
+        window.filterMaestroHistory = function(filter) {
             ['hoy', 'mes', 'cuatrimestre'].forEach(f => document.getElementById(`btn-doc-${f}`).className = "px-4 py-1 rounded-full font-black text-[9px] uppercase tracking-widest bg-white/10 hover:bg-white/20 text-white");
             document.getElementById(`btn-doc-${filter}`).className = "px-4 py-1 rounded-full font-black text-[9px] uppercase tracking-widest bg-yellow-500 text-slate-900";
-
-            const hoy = new Date(); const hoyStr = hoy.toLocaleDateString('es-MX');
-            const mesActual = hoy.getMonth(); const anioActual = hoy.getFullYear();
+            const hoy = new Date(); const hoyStr = hoy.toLocaleDateString('es-MX'); const mesActual = hoy.getMonth(); const anioActual = hoy.getFullYear();
 
             let records = db.asistencias.filter(a => a.maestroId === currentDetailId);
             records = records.filter(a => {
                 if(filter === 'hoy') return a.fecha === hoyStr;
-                if(filter === 'mes') {
-                    const partes = a.fecha.split('/');
-                    if(partes.length === 3) return parseInt(partes[1])-1 === mesActual && parseInt(partes[2]) === anioActual;
-                    return false;
-                }
+                if(filter === 'mes') { const partes = a.fecha.split('/'); if(partes.length === 3) return parseInt(partes[1])-1 === mesActual && parseInt(partes[2]) === anioActual; return false; }
                 return true; 
             });
             currentHistoryData = records;
@@ -713,63 +427,48 @@
             const tbody = document.getElementById('det-doc-history'); tbody.innerHTML = '';
             if(records.length === 0) { tbody.innerHTML = `<tr><td colspan="4" class="text-center py-10 opacity-30 text-xs">No hay registros en las clases de este maestro.</td></tr>`; return; }
             [...records].reverse().forEach(a => {
-                tbody.innerHTML += `<tr class="hover:bg-white/5 transition-colors">
-                    <td class="px-4 py-3 font-bold text-yellow-500 text-xs">${a.fecha} <br><span class="opacity-50 text-white font-normal">${a.hora}</span></td>
-                    <td class="px-4 py-3 font-bold text-white">${a.alumnoNombre}</td>
-                    <td class="px-4 py-3 opacity-80 text-xs">${a.materiaNombre} <br><span class="opacity-50">${a.grado} "${a.grupo}"</span></td>
-                    <td class="px-4 py-3 text-right"><button onclick="deleteAssistanceRecord('${a.id}', 'maestro')" class="p-2 bg-red-500/20 hover:bg-red-500 text-red-400 hover:text-white rounded-full transition-colors"><i data-lucide="trash" class="w-4 h-4"></i></button></td>
-                </tr>`;
+                tbody.innerHTML += `<tr class="hover:bg-white/5 transition-colors"><td class="px-4 py-3 font-bold text-yellow-500 text-xs">${a.fecha} <br><span class="opacity-50 text-white font-normal">${a.hora}</span></td><td class="px-4 py-3 font-bold text-white">${a.alumnoNombre}</td><td class="px-4 py-3 opacity-80 text-xs">${a.materiaNombre} <br><span class="opacity-50">${a.grado} "${a.grupo}"</span></td><td class="px-4 py-3 text-right"><button onclick="deleteAssistanceRecord('${a.id}', 'maestro')" class="p-2 bg-red-500/20 hover:bg-red-500 text-red-400 hover:text-white rounded-full transition-colors"><i data-lucide="trash" class="w-4 h-4"></i></button></td></tr>`;
             });
-            lucide.createIcons();
-        }
+            window.lucide.createIcons();
+        };
 
-        function printMaestroHistory() {
-            document.getElementById('print-doc-type').innerText = "Reporte de Asistencia a Clases del Docente";
-            document.getElementById('print-date').innerText = `Impreso el: ${new Date().toLocaleDateString('es-MX')}`;
+        window.printMaestroHistory = function() {
+            document.getElementById('print-doc-type').innerText = "Reporte de Asistencia a Clases del Docente"; document.getElementById('print-date').innerText = `Impreso el: ${new Date().toLocaleDateString('es-MX')}`;
             const info = db.maestros.find(m => m.folio === currentDetailId);
-            document.getElementById('print-user-name').innerText = `Catedrático: ${info.nombre}`;
-            document.getElementById('print-user-details').innerText = `Folio: ${info.folio} | Clases Gestinadas: ${info.materias ? info.materias.length : 0}`;
-            const table = document.getElementById('print-table-content');
-            table.innerHTML = `<tr><th>Fecha</th><th>Hora</th><th>Alumno</th><th>Materia de Clase</th></tr>`;
+            document.getElementById('print-user-name').innerText = `Catedrático: ${info.nombre}`; document.getElementById('print-user-details').innerText = `Folio: ${info.folio} | Clases Gestinadas: ${info.materias ? info.materias.length : 0}`;
+            const table = document.getElementById('print-table-content'); table.innerHTML = `<tr><th>Fecha</th><th>Hora</th><th>Alumno</th><th>Materia de Clase</th></tr>`;
             [...currentHistoryData].reverse().forEach(r => { table.innerHTML += `<tr><td>${r.fecha}</td><td>${r.hora}</td><td><strong>${r.alumnoNombre}</strong> (${r.grado}-${r.grupo})</td><td>${r.materiaNombre}</td></tr>`; });
             window.print();
-        }
+        };
 
-        function deleteAssistanceRecord(recordId, origin) {
+        window.deleteAssistanceRecord = function(recordId, origin) {
             if(confirm("¿Eliminar este registro de asistencia?\nEsta acción afectará los reportes del sistema.")) {
-                refreshDB();
                 db.asistencias = db.asistencias.filter(a => a.id !== recordId);
-                saveDB(db);
-                if(origin === 'alumno') filterAlumnoHistory('cuatrimestre');
-                if(origin === 'maestro') filterMaestroHistory('cuatrimestre');
+                window.saveDB(db);
+                if(origin === 'alumno') window.filterAlumnoHistory('cuatrimestre');
+                if(origin === 'maestro') window.filterMaestroHistory('cuatrimestre');
                 alert("SISTEMA CEUT:\nRegistro de asistencia eliminado.");
             }
-        }
+        };
 
-        function deleteRecord(collection, id) {
+        window.deleteRecord = function(collection, id) {
             if(confirm(`¿Estás seguro de ELIMINAR COMPLETAMENTE a este usuario del sistema?\nEsta acción es irreversible.`)) {
-                refreshDB();
                 if(collection==='alumnos') { db.alumnos = db.alumnos.filter(item => item.folio !== id); }
                 if(collection==='maestros') { db.maestros = db.maestros.filter(item => item.folio !== id); }
-                saveDB(db); navigate(collection); 
+                window.saveDB(db); window.navigate(collection); 
             }
-        }
+        };
 
-        function loadReportes(filter = 'todos') {
+        window.loadReportes = function(filter = 'todos') {
             currentGlobalReportFilter = filter;
             ['hoy', 'mes', 'cuatrimestre'].forEach(f => document.getElementById(`btn-filter-${f}`).className = "bg-white/5 hover:bg-white/10 px-6 py-2 rounded-full font-black text-[10px] uppercase tracking-widest transition-colors");
             document.getElementById(`btn-filter-${filter}`).className = "bg-yellow-500 text-slate-900 px-6 py-2 rounded-full font-black text-[10px] uppercase tracking-widest transition-colors";
 
-            const hoy = new Date(); const hoyStr = hoy.toLocaleDateString('es-MX');
-            const mesActual = hoy.getMonth(); const anioActual = hoy.getFullYear();
+            const hoy = new Date(); const hoyStr = hoy.toLocaleDateString('es-MX'); const mesActual = hoy.getMonth(); const anioActual = hoy.getFullYear();
 
             let records = db.asistencias.filter(a => {
                 if(filter === 'hoy') return a.fecha === hoyStr;
-                if(filter === 'mes') {
-                    const partes = a.fecha.split('/');
-                    if(partes.length === 3) return parseInt(partes[1])-1 === mesActual && parseInt(partes[2]) === anioActual;
-                    return false;
-                }
+                if(filter === 'mes') { const partes = a.fecha.split('/'); if(partes.length === 3) return parseInt(partes[1])-1 === mesActual && parseInt(partes[2]) === anioActual; return false; }
                 return true; 
             });
 
@@ -778,44 +477,18 @@
             const tbody = document.getElementById('reportes-tbody'); tbody.innerHTML = '';
             if(records.length === 0) { tbody.innerHTML = `<tr><td colspan="5" class="text-center py-10 opacity-30 text-xs">No hay asistencias en este periodo.</td></tr>`; return; }
             [...records].reverse().forEach(a => {
-                tbody.innerHTML += `<tr class="hover:bg-white/5 transition-colors">
-                    <td class="px-6 py-4 font-black text-yellow-500 text-xs">${a.fecha} <br><span class="opacity-50 text-white font-normal">${a.hora}</span></td>
-                    <td class="px-6 py-4 font-bold text-white">${a.alumnoNombre} <br><span class="opacity-50 font-normal text-[10px]">${a.grado} "${a.grupo}"</span></td>
-                    <td class="px-6 py-4 opacity-80">${a.materiaNombre}</td>
-                    <td class="px-6 py-4 opacity-60 text-xs">${a.maestroNombre}</td>
-                    <td class="px-6 py-4 text-center">
-                        <button onclick="editAssistanceGlobal('${a.id}')" class="p-2 bg-white/5 hover:bg-yellow-500 hover:text-slate-900 rounded-full transition-colors mr-2" title="Editar"><i data-lucide="edit-2" class="w-4 h-4"></i></button>
-                        <button onclick="deleteAssistanceGlobal('${a.id}')" class="p-2 bg-red-500/20 hover:bg-red-500 text-red-400 hover:text-white rounded-full transition-colors" title="Eliminar"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
-                    </td>
-                </tr>`;
+                tbody.innerHTML += `<tr class="hover:bg-white/5 transition-colors"><td class="px-6 py-4 font-black text-yellow-500 text-xs">${a.fecha} <br><span class="opacity-50 text-white font-normal">${a.hora}</span></td><td class="px-6 py-4 font-bold text-white">${a.alumnoNombre} <br><span class="opacity-50 font-normal text-[10px]">${a.grado} "${a.grupo}"</span></td><td class="px-6 py-4 opacity-80">${a.materiaNombre}</td><td class="px-6 py-4 opacity-60 text-xs">${a.maestroNombre}</td><td class="px-6 py-4 text-center"><button onclick="editAssistanceGlobal('${a.id}')" class="p-2 bg-white/5 hover:bg-yellow-500 hover:text-slate-900 rounded-full transition-colors mr-2" title="Editar"><i data-lucide="edit-2" class="w-4 h-4"></i></button><button onclick="deleteAssistanceGlobal('${a.id}')" class="p-2 bg-red-500/20 hover:bg-red-500 text-red-400 hover:text-white rounded-full transition-colors" title="Eliminar"><i data-lucide="trash-2" class="w-4 h-4"></i></button></td></tr>`;
             });
-            lucide.createIcons();
-        }
+            window.lucide.createIcons();
+        };
 
-        function editAssistanceGlobal(id) {
-            refreshDB();
-            const rec = db.asistencias.find(a => a.id === id);
-            if(!rec) return;
+        window.editAssistanceGlobal = function(id) {
+            const rec = db.asistencias.find(a => a.id === id); if(!rec) return;
+            const html = `<h3 class="text-2xl font-black uppercase text-yellow-500 mb-6 flex items-center gap-2"><i data-lucide="edit-3" class="w-6 h-6"></i> Editar Asistencia</h3><div class="space-y-4 text-left"><div><label class="text-[10px] opacity-50 uppercase font-black ml-2">Alumno</label><input type="text" id="edit-asis-alumno" value="${rec.alumnoNombre}" class="w-full glass-input rounded-xl px-5 py-3 font-bold mt-1 text-sm"></div><div class="grid grid-cols-2 gap-4"><div><label class="text-[10px] opacity-50 uppercase font-black ml-2">Fecha</label><input type="text" id="edit-asis-fecha" value="${rec.fecha}" class="w-full glass-input rounded-xl px-5 py-3 font-bold mt-1 text-sm"></div><div><label class="text-[10px] opacity-50 uppercase font-black ml-2">Hora</label><input type="text" id="edit-asis-hora" value="${rec.hora}" class="w-full glass-input rounded-xl px-5 py-3 font-bold mt-1 text-sm"></div></div><div><label class="text-[10px] opacity-50 uppercase font-black ml-2">Materia</label><input type="text" id="edit-asis-materia" value="${rec.materiaNombre}" class="w-full glass-input rounded-xl px-5 py-3 font-bold mt-1 text-sm"></div><div><label class="text-[10px] opacity-50 uppercase font-black ml-2">Catedrático</label><input type="text" id="edit-asis-maestro" value="${rec.maestroNombre}" class="w-full glass-input rounded-xl px-5 py-3 font-bold mt-1 text-sm"></div></div><button onclick="saveEditAssistanceGlobal('${id}')" class="w-full bg-yellow-500 text-slate-900 font-black uppercase tracking-widest px-6 py-4 rounded-xl hover:scale-105 transition-transform mt-8">Guardar Cambios</button>`;
+            window.openModal(html); window.lucide.createIcons();
+        };
 
-            const html = `
-                <h3 class="text-2xl font-black uppercase text-yellow-500 mb-6 flex items-center gap-2"><i data-lucide="edit-3" class="w-6 h-6"></i> Editar Asistencia</h3>
-                <div class="space-y-4 text-left">
-                    <div><label class="text-[10px] opacity-50 uppercase font-black ml-2">Alumno</label>
-                    <input type="text" id="edit-asis-alumno" value="${rec.alumnoNombre}" class="w-full glass-input rounded-xl px-5 py-3 font-bold mt-1 text-sm"></div>
-                    <div class="grid grid-cols-2 gap-4">
-                        <div><label class="text-[10px] opacity-50 uppercase font-black ml-2">Fecha</label><input type="text" id="edit-asis-fecha" value="${rec.fecha}" class="w-full glass-input rounded-xl px-5 py-3 font-bold mt-1 text-sm"></div>
-                        <div><label class="text-[10px] opacity-50 uppercase font-black ml-2">Hora</label><input type="text" id="edit-asis-hora" value="${rec.hora}" class="w-full glass-input rounded-xl px-5 py-3 font-bold mt-1 text-sm"></div>
-                    </div>
-                    <div><label class="text-[10px] opacity-50 uppercase font-black ml-2">Materia</label><input type="text" id="edit-asis-materia" value="${rec.materiaNombre}" class="w-full glass-input rounded-xl px-5 py-3 font-bold mt-1 text-sm"></div>
-                    <div><label class="text-[10px] opacity-50 uppercase font-black ml-2">Catedrático</label><input type="text" id="edit-asis-maestro" value="${rec.maestroNombre}" class="w-full glass-input rounded-xl px-5 py-3 font-bold mt-1 text-sm"></div>
-                </div>
-                <button onclick="saveEditAssistanceGlobal('${id}')" class="w-full bg-yellow-500 text-slate-900 font-black uppercase tracking-widest px-6 py-4 rounded-xl hover:scale-105 transition-transform mt-8">Guardar Cambios</button>
-            `;
-            openModal(html); lucide.createIcons();
-        }
-
-        function saveEditAssistanceGlobal(id) {
-            refreshDB();
+        window.saveEditAssistanceGlobal = function(id) {
             const idx = db.asistencias.findIndex(a => a.id === id);
             if(idx > -1) {
                 db.asistencias[idx].alumnoNombre = document.getElementById('edit-asis-alumno').value;
@@ -823,57 +496,51 @@
                 db.asistencias[idx].hora = document.getElementById('edit-asis-hora').value;
                 db.asistencias[idx].materiaNombre = document.getElementById('edit-asis-materia').value;
                 db.asistencias[idx].maestroNombre = document.getElementById('edit-asis-maestro').value;
-                saveDB(db); closeModal(); loadReportes(currentGlobalReportFilter); alert("SISTEMA CEUT:\nRegistro de asistencia actualizado exitosamente.");
+                window.saveDB(db); window.closeModal(); window.loadReportes(currentGlobalReportFilter); alert("SISTEMA CEUT:\nRegistro de asistencia actualizado exitosamente.");
             }
-        }
+        };
 
-        function deleteAssistanceGlobal(id) {
+        window.deleteAssistanceGlobal = function(id) {
             if(confirm("¿Eliminar este registro de asistencia global?\nEsta acción es irreversible.")) {
-                refreshDB(); db.asistencias = db.asistencias.filter(a => a.id !== id); saveDB(db); loadReportes(currentGlobalReportFilter); alert("SISTEMA CEUT:\nRegistro de asistencia eliminado.");
+                db.asistencias = db.asistencias.filter(a => a.id !== id); window.saveDB(db); window.loadReportes(currentGlobalReportFilter); alert("SISTEMA CEUT:\nRegistro de asistencia eliminado.");
             }
-        }
+        };
 
-        function downloadGlobalCSV() {
+        window.downloadGlobalCSV = function() {
             if(currentHistoryData.length === 0) { alert('SISTEMA CEUT:\nNo hay datos para exportar.'); return; }
             let csv = "data:text/csv;charset=utf-8,Fecha,Hora,Alumno,Grado,Grupo,Materia,Catedratico\n";
             currentHistoryData.forEach(r => { csv += `"${r.fecha}","${r.hora}","${r.alumnoNombre}","${r.grado}","${r.grupo}","${r.materiaNombre}","${r.maestroNombre}"\n`; });
             const link = document.createElement("a"); link.setAttribute("href", encodeURI(csv)); link.setAttribute("download", `Reporte_Global_CEUT.csv`);
             document.body.appendChild(link); link.click(); document.body.removeChild(link);
-        }
+        };
 
-        function saveCMS() {
-            refreshDB();
-            db.config.ciclo = document.getElementById('cms-ciclo').value.trim();
-            db.config.estado = document.getElementById('cms-estado').value;
-            saveDB(db); applyConfig(); alert('SISTEMA CEUT:\nAjustes guardados exitosamente.');
-        }
+        window.saveCMS = function() {
+            db.config.ciclo = document.getElementById('cms-ciclo').value.trim(); db.config.estado = document.getElementById('cms-estado').value;
+            window.saveDB(db); alert('SISTEMA CEUT:\nAjustes guardados exitosamente.');
+        };
 
-        function clearDatabase(type) {
+        window.clearDatabase = function(type) {
             if(type === 'asistencias') {
-                if(confirm("¿Borrar todo el historial de asistencias de la escuela?")) {
-                    refreshDB(); db.asistencias = []; saveDB(db); alert('SISTEMA CEUT:\nHistorial de asistencias borrado.');
-                }
+                if(confirm("¿Borrar todo el historial de asistencias de la escuela?")) { db.asistencias = []; window.saveDB(db); alert('SISTEMA CEUT:\nHistorial borrado.'); }
             } else if (type === 'all') {
-                if(confirm("PELIGRO: ¿Estás seguro de resetear todo? Se borrarán alumnos, maestros y reportes locales.")) {
-                    localStorage.removeItem(DB_KEYS.ALUMNOS); localStorage.removeItem(DB_KEYS.MAESTROS);
-                    localStorage.removeItem(DB_KEYS.ASISTENCIAS); localStorage.removeItem(DB_KEYS.SESSIONS);
-                    localStorage.removeItem(DB_KEYS.CONFIG); window.location.reload();
+                if(confirm("PELIGRO: ¿Estás seguro de resetear todo? Se borrarán alumnos, maestros y reportes en la nube.")) {
+                    window.saveDB({ alumnos: [], maestros: [], asistencias: [], activeSessions: [], config: { ciclo: '2026-B', estado: 'online' } });
+                    window.location.reload();
                 }
             }
-        }
+        };
 
-        function filterTable(tableId, query) {
-            query = query.toLowerCase(); const table = document.getElementById(tableId);
-            const rows = table.getElementsByTagName('tbody')[0].getElementsByTagName('tr');
+        window.filterTable = function(tableId, query) {
+            query = query.toLowerCase(); const table = document.getElementById(tableId); const rows = table.getElementsByTagName('tbody')[0].getElementsByTagName('tr');
             for (let i = 0; i < rows.length; i++) rows[i].style.display = rows[i].textContent.toLowerCase().includes(query) ? '' : 'none';
-        }
+        };
 
-        function openModal(htmlContent) { document.getElementById('modal-body').innerHTML = htmlContent; document.getElementById('modal-container').classList.remove('hidden-view'); }
-        function closeModal() { document.getElementById('modal-container').classList.add('hidden-view'); }
+        window.openModal = function(htmlContent) { document.getElementById('modal-body').innerHTML = htmlContent; document.getElementById('modal-container').classList.remove('hidden-view'); };
+        window.closeModal = function() { document.getElementById('modal-container').classList.add('hidden-view'); };
 
-        function logoutAdmin() {
-            if(confirm("¿Cerrar sesión de Administrador Central?")) { sessionStorage.removeItem('ceut_admin_auth'); window.location.reload(); }
-        }
+        window.logoutAdmin = function() {
+            if(confirm("¿Cerrar sesión de Administrador Central?")) { sessionStorage.removeItem('ceut_admin_auth'); window.location.href = 'index.html'; }
+        };
     </script>
 </body>
 </html>
