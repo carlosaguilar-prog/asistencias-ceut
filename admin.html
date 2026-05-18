@@ -39,267 +39,425 @@
         .delay-200 { animation-delay: 200ms; }
         
         .hidden-view { display: none !important; }
+
+        /* Estilos de Impresión (PDF) */
+        @media print {
+            body { background: white !important; color: black !important; display: block; overflow: auto; }
+            .no-print { display: none !important; }
+            .print-area { display: block !important; width: 100%; padding: 20px; }
+            .print-header { border-bottom: 4px solid #f5b800; padding-bottom: 20px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; }
+            .print-table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 12px; }
+            .print-table th, .print-table td { border: 1px solid #ddd; padding: 10px; text-align: left; }
+            .print-table th { background-color: #f3f4f6 !important; -webkit-print-color-adjust: exact; color: black; font-weight: bold; text-transform: uppercase; }
+            .print-title { font-size: 24px; font-weight: 900; text-transform: uppercase; margin: 0; }
+            .print-subtitle { font-size: 12px; color: #555; margin: 5px 0 0 0; }
+        }
     </style>
 </head>
 <body>
 
-    <!-- MENSAJE EMERGENTE (MODAL PARA ALERTAS Y EDICIÓN) -->
-    <div id="modal-container" class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm hidden-view">
-        <div class="glass p-10 rounded-[3rem] max-w-lg w-full border-t-4 animate-zoom-in shadow-2xl relative max-h-[90vh] overflow-y-auto" id="modal-content">
-            <button onclick="closeModal()" class="absolute top-6 right-6 text-white/50 hover:text-white"><i data-lucide="x" class="w-6 h-6"></i></button>
-            <div id="modal-body">
-                <!-- Contenido dinámico -->
+    <!-- ÁREA DE IMPRESIÓN (Oculta en pantalla, visible solo al guardar PDF/Imprimir) -->
+    <div id="print-section" class="hidden-view print-area">
+        <div class="print-header">
+            <div><img src="https://drive.google.com/thumbnail?id=17NobXQ3JbRnLGejZe4Mn2x-Jl45F4rPm&sz=w800" style="height: 70px;" alt="Logo CEUT"></div>
+            <div style="text-align: right;">
+                <h1 class="print-title">Centro Universitario de Tehuacán</h1>
+                <p class="print-subtitle" id="print-doc-type">Reporte Administrativo</p>
+                <p class="print-subtitle" id="print-date"></p>
             </div>
         </div>
+        <div style="margin-bottom: 20px;">
+            <h2 style="font-size: 18px; text-transform: uppercase; margin: 0;" id="print-user-name">Nombre</h2>
+            <p style="font-size: 12px; margin: 5px 0 0 0;" id="print-user-details">Detalles</p>
+        </div>
+        <table class="print-table" id="print-table-content">
+            <!-- Llenado dinámicamente -->
+        </table>
     </div>
 
-    <!-- VISTA 0: AUTENTICACIÓN ADMIN -->
-    <div id="view-auth" class="w-full flex flex-col items-center justify-center hidden-view animate-fade-in-up">
-        <div class="text-center mb-10">
-            <img src="https://drive.google.com/thumbnail?id=17NobXQ3JbRnLGejZe4Mn2x-Jl45F4rPm&sz=w800" class="h-24 mx-auto mb-6 drop-shadow-[0_0_20px_rgba(245,184,0,0.3)]" alt="Logo Tigre CEUT">
-            <h2 class="text-4xl font-black italic uppercase">Admin <span class="text-yellow-500">Central</span></h2>
-            <p class="text-[10px] font-bold opacity-40 uppercase tracking-[0.5em] mt-2">Acceso Restringido</p>
-        </div>
+    <!-- CONTENEDOR PRINCIPAL DE LA APP -->
+    <div id="app-wrapper" class="w-full flex h-screen no-print">
 
-        <div class="max-w-md w-full mx-auto glass p-10 rounded-[3rem] border-t-4 border-t-yellow-500 shadow-2xl">
-            <div class="space-y-4 text-left">
-                <div>
-                    <label class="text-[10px] opacity-50 uppercase font-black ml-2">Usuario / Correo Institucional</label>
-                    <input type="text" id="admin-user" placeholder="Ej. usuario@ceut.edu.mx" class="w-full glass-input rounded-xl px-5 py-4 font-bold mt-1">
+        <!-- VISTA 0: AUTENTICACIÓN ADMIN -->
+        <div id="view-auth" class="w-full flex flex-col items-center justify-center hidden-view animate-fade-in-up">
+            <div class="text-center mb-10">
+                <img src="https://drive.google.com/thumbnail?id=17NobXQ3JbRnLGejZe4Mn2x-Jl45F4rPm&sz=w800" class="h-24 mx-auto mb-6 drop-shadow-[0_0_20px_rgba(245,184,0,0.3)]" alt="Logo Tigre CEUT">
+                <h2 class="text-4xl font-black italic uppercase">Admin <span class="text-yellow-500">Central</span></h2>
+                <p class="text-[10px] font-bold opacity-40 uppercase tracking-[0.5em] mt-2">Acceso Restringido</p>
+            </div>
+
+            <div class="max-w-md w-full mx-auto glass p-10 rounded-[3rem] border-t-4 border-t-yellow-500 shadow-2xl">
+                <div class="space-y-4 text-left">
+                    <div>
+                        <label class="text-[10px] opacity-50 uppercase font-black ml-2">Usuario / Correo Institucional</label>
+                        <input type="text" id="admin-user" placeholder="Ej. carlos.aguilar@ceut.edu.mx" class="w-full glass-input rounded-xl px-5 py-4 font-bold mt-1">
+                    </div>
+                    <div>
+                        <label class="text-[10px] opacity-50 uppercase font-black ml-2">Contraseña de Seguridad</label>
+                        <input type="password" id="admin-pass" placeholder="••••••••" class="w-full glass-input rounded-xl px-5 py-4 font-bold mt-1">
+                    </div>
+                    <button onclick="loginAdmin()" class="w-full bg-yellow-500 text-slate-900 font-black uppercase tracking-widest px-6 py-4 rounded-xl hover:scale-[1.02] transition-transform shadow-lg shadow-yellow-500/20 mt-6">Validar Credenciales</button>
                 </div>
-                <div>
-                    <label class="text-[10px] opacity-50 uppercase font-black ml-2">Contraseña de Seguridad</label>
-                    <input type="password" id="admin-pass" placeholder="••••••••" class="w-full glass-input rounded-xl px-5 py-4 font-bold mt-1">
-                </div>
-                <button onclick="loginAdmin()" class="w-full bg-yellow-500 text-slate-900 font-black uppercase tracking-widest px-6 py-4 rounded-xl hover:scale-[1.02] transition-transform shadow-lg shadow-yellow-500/20 mt-6">Validar Credenciales</button>
             </div>
         </div>
+
+        <!-- SIDEBAR NAVEGACIÓN -->
+        <aside id="sidebar" class="w-20 md:w-72 glass border-r border-white/5 flex flex-col animate-slide-left z-10 shrink-0 hidden-view">
+            <div class="p-6 md:p-8 flex items-center justify-center md:justify-start gap-3 mb-8 border-b border-white/5">
+                <img src="https://drive.google.com/thumbnail?id=17NobXQ3JbRnLGejZe4Mn2x-Jl45F4rPm&sz=w800" class="h-10 shrink-0 hover:scale-105 transition-transform" alt="Logo Tigre">
+                <div class="font-black italic uppercase text-[10px] leading-tight hidden md:block">Admin<br><span class="text-yellow-500">Central</span></div>
+            </div>
+            
+            <nav class="space-y-2 flex-1 px-4">
+                <div onclick="navigate('dashboard')" id="nav-dashboard" class="sidebar-item active p-4 opacity-60 font-bold text-[11px] uppercase flex items-center justify-center md:justify-start gap-3 cursor-pointer rounded-2xl">
+                    <i data-lucide="layout-dashboard" class="w-5 h-5 shrink-0"></i> <span class="hidden md:inline">Dashboard</span>
+                </div>
+                <div onclick="navigate('alumnos')" id="nav-alumnos" class="sidebar-item p-4 opacity-60 font-bold text-[11px] uppercase flex items-center justify-center md:justify-start gap-3 cursor-pointer rounded-2xl">
+                    <i data-lucide="graduation-cap" class="w-5 h-5 shrink-0"></i> <span class="hidden md:inline">Alumnos</span>
+                </div>
+                <div onclick="navigate('maestros')" id="nav-maestros" class="sidebar-item p-4 opacity-60 font-bold text-[11px] uppercase flex items-center justify-center md:justify-start gap-3 cursor-pointer rounded-2xl">
+                    <i data-lucide="users" class="w-5 h-5 shrink-0"></i> <span class="hidden md:inline">Maestros</span>
+                </div>
+                <div onclick="navigate('reportes')" id="nav-reportes" class="sidebar-item p-4 opacity-60 font-bold text-[11px] uppercase flex items-center justify-center md:justify-start gap-3 cursor-pointer rounded-2xl">
+                    <i data-lucide="file-spreadsheet" class="w-5 h-5 shrink-0"></i> <span class="hidden md:inline">Reportes</span>
+                </div>
+                <div onclick="navigate('cms')" id="nav-cms" class="sidebar-item p-4 opacity-60 font-bold text-[11px] uppercase flex items-center justify-center md:justify-start gap-3 cursor-pointer rounded-2xl">
+                    <i data-lucide="settings" class="w-5 h-5 shrink-0"></i> <span class="hidden md:inline">Ajustes Sistema</span>
+                </div>
+            </nav>
+            
+            <div class="mt-auto p-6 border-t border-white/5 text-center md:text-left">
+                <div class="flex items-center justify-center md:justify-start gap-3 mb-4 opacity-80">
+                    <div class="w-8 h-8 bg-yellow-500/20 rounded-full flex items-center justify-center text-yellow-500 shrink-0"><i data-lucide="shield" class="w-4 h-4"></i></div>
+                    <div class="text-[9px] font-bold uppercase hidden md:block text-left text-yellow-500">Dirección<br>Académica</div>
+                </div>
+                <button onclick="logoutAdmin()" class="flex items-center justify-center md:justify-start gap-3 w-full opacity-50 hover:opacity-100 hover:text-red-400 transition-colors">
+                    <div class="w-8 h-8 bg-white/10 rounded-full flex items-center justify-center text-xs shrink-0"><i data-lucide="power" class="w-4 h-4"></i></div>
+                    <div class="text-[9px] font-bold uppercase hidden md:block text-left">Cerrar<br>Sesión</div>
+                </button>
+            </div>
+        </aside>
+
+        <!-- CONTENIDO PRINCIPAL -->
+        <main id="main-content" class="flex-1 p-6 md:p-12 h-screen overflow-y-auto w-full relative hidden-view">
+            
+            <!-- HEADER GLOBAl -->
+            <header class="flex flex-col md:flex-row justify-between items-start md:items-center mb-12 gap-4 animate-fade-in-up">
+                <div>
+                    <h1 class="text-3xl md:text-5xl font-black italic uppercase text-white tracking-tighter" id="page-title">Control <span class="text-yellow-500">Global</span></h1>
+                    <p class="text-[10px] font-bold opacity-40 uppercase tracking-widest mt-2" id="page-subtitle">Visión general del sistema</p>
+                </div>
+                <div class="flex items-center gap-4 glass px-6 py-3 rounded-2xl border border-white/10 shadow-[0_0_20px_rgba(245,184,0,0.1)]">
+                    <span class="w-2 h-2 rounded-full animate-pulse shadow-[0_0_10px_currentColor]" id="status-indicator"></span>
+                    <span class="text-[10px] font-bold uppercase tracking-widest opacity-80" id="status-text">Sistemas en Línea</span>
+                </div>
+            </header>
+
+            <!-- VISTA: DASHBOARD -->
+            <div id="view-dashboard" class="space-y-8 hidden-view">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="glass p-10 rounded-[2.5rem] border-l-4 border-l-yellow-500 group hover:-translate-y-2 hover:shadow-2xl transition-all animate-fade-in-up">
+                        <p class="text-[10px] font-black opacity-40 uppercase tracking-[0.2em]">Alumnos Registrados</p>
+                        <div class="text-5xl font-black italic mt-3 text-white group-hover:text-yellow-500 transition-colors" id="dash-alumnos">0</div>
+                    </div>
+                    <div class="glass p-10 rounded-[2.5rem] border-l-4 border-l-yellow-500 group hover:-translate-y-2 hover:shadow-2xl transition-all animate-fade-in-up delay-100">
+                        <p class="text-[10px] font-black opacity-40 uppercase tracking-[0.2em]">Maestros Activos</p>
+                        <div class="text-5xl font-black italic mt-3 text-yellow-500 group-hover:drop-shadow-[0_0_15px_rgba(245,184,0,0.5)] transition-all" id="dash-maestros">0</div>
+                    </div>
+                    <div class="glass p-10 rounded-[2.5rem] border-l-4 border-l-yellow-500 group hover:-translate-y-2 hover:shadow-2xl transition-all animate-fade-in-up delay-200">
+                        <p class="text-[10px] font-black opacity-40 uppercase tracking-[0.2em]">Asistencias Hoy</p>
+                        <div class="text-5xl font-black italic mt-3 text-white group-hover:text-yellow-500 transition-colors" id="dash-asistencias">0</div>
+                    </div>
+                </div>
+
+                <div class="glass p-10 rounded-[3rem] border border-white/5 animate-fade-in-up delay-200">
+                    <div class="flex justify-between items-center mb-6">
+                        <h3 class="text-[11px] font-black uppercase tracking-widest opacity-60 text-yellow-500">Últimos Registros Globales</h3>
+                        <button onclick="navigate('reportes')" class="text-[10px] font-bold uppercase tracking-widest opacity-50 hover:opacity-100 transition-opacity">Ver todos</button>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-sm whitespace-nowrap">
+                            <thead class="bg-white/5 text-[9px] uppercase tracking-widest opacity-60">
+                                <tr>
+                                    <th class="px-4 py-3 rounded-l-xl">Alumno</th>
+                                    <th class="px-4 py-3">Materia</th>
+                                    <th class="px-4 py-3">Fecha/Hora</th>
+                                </tr>
+                            </thead>
+                            <tbody id="dash-recent-table" class="divide-y divide-white/5">
+                                <!-- JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- VISTA: GESTIÓN DE ALUMNOS (LISTA) -->
+            <div id="view-alumnos" class="hidden-view animate-fade-in-up">
+                <div class="glass p-8 md:p-10 rounded-[3rem] border border-white/5">
+                    <div class="flex justify-between items-center mb-8">
+                        <h2 class="text-xl font-black uppercase italic text-yellow-500">Base de Datos <span class="text-white">Alumnos</span></h2>
+                        <div class="relative">
+                            <i data-lucide="search" class="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 opacity-50"></i>
+                            <input type="text" id="search-alumno" onkeyup="filterTable('alumnos-table', this.value)" placeholder="Buscar alumno..." class="glass-input rounded-full pl-12 pr-6 py-3 text-xs font-bold w-full md:w-64">
+                        </div>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-sm whitespace-nowrap" id="alumnos-table">
+                            <thead class="bg-white/5 text-[9px] uppercase tracking-widest opacity-60">
+                                <tr>
+                                    <th class="px-6 py-4 rounded-l-xl">ID / Folio</th>
+                                    <th class="px-6 py-4">Nombre Completo</th>
+                                    <th class="px-6 py-4">Nivel / Grado</th>
+                                    <th class="px-6 py-4 text-center rounded-r-xl">Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="alumnos-tbody" class="divide-y divide-white/5">
+                                <!-- JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- VISTA: DETALLE DE ALUMNO -->
+            <div id="view-alumno-detalle" class="hidden-view animate-zoom-in">
+                <div class="flex items-center justify-between mb-8">
+                    <button onclick="navigate('alumnos')" class="bg-white/10 hover:bg-white/20 text-white px-5 py-3 rounded-2xl font-black text-[10px] uppercase tracking-widest transition-colors flex items-center gap-2"><i data-lucide="arrow-left" class="w-4 h-4"></i> Volver a Lista</button>
+                    <div class="flex gap-2">
+                        <button onclick="deleteRecord('alumnos', currentDetailId)" class="bg-red-500/20 hover:bg-red-500 text-red-400 hover:text-white px-5 py-3 rounded-2xl font-black text-[10px] uppercase tracking-widest transition-colors flex items-center gap-2"><i data-lucide="trash-2" class="w-4 h-4"></i> Eliminar Perfil</button>
+                        <button onclick="printAlumnoHistory()" class="bg-green-500/20 hover:bg-green-500 text-green-400 hover:text-white px-5 py-3 rounded-2xl font-black text-[10px] uppercase tracking-widest transition-colors flex items-center gap-2"><i data-lucide="printer" class="w-4 h-4"></i> Imprimir / PDF</button>
+                    </div>
+                </div>
+
+                <div class="grid md:grid-cols-3 gap-8">
+                    <!-- Formulario de Edición -->
+                    <div class="md:col-span-1 glass p-8 rounded-[3rem] border-t-4 border-t-yellow-500">
+                        <h3 class="text-lg font-black uppercase text-yellow-500 mb-6 flex items-center gap-2"><i data-lucide="user-cog" class="w-5 h-5"></i> Editar Datos</h3>
+                        <div class="space-y-4">
+                            <div><label class="text-[10px] opacity-50 uppercase font-black ml-2">Nombre</label><input type="text" id="det-alu-nombre" class="w-full glass-input rounded-xl px-4 py-3 font-bold mt-1 text-sm"></div>
+                            <div><label class="text-[10px] opacity-50 uppercase font-black ml-2">Nivel Educativo</label><input type="text" id="det-alu-nivel" class="w-full glass-input rounded-xl px-4 py-3 font-bold mt-1 text-sm"></div>
+                            <div class="grid grid-cols-2 gap-2">
+                                <div><label class="text-[10px] opacity-50 uppercase font-black ml-2">Grado</label><input type="text" id="det-alu-grado" class="w-full glass-input rounded-xl px-4 py-3 font-bold mt-1 text-sm"></div>
+                                <div><label class="text-[10px] opacity-50 uppercase font-black ml-2">Grupo</label><input type="text" id="det-alu-grupo" class="w-full glass-input rounded-xl px-4 py-3 font-bold mt-1 text-sm uppercase"></div>
+                            </div>
+                            <div><label class="text-[10px] opacity-50 uppercase font-black ml-2 text-red-400">Contraseña</label><input type="text" id="det-alu-pass" class="w-full glass-input border-red-500/30 rounded-xl px-4 py-3 font-bold mt-1 text-sm"></div>
+                            <button onclick="saveDetailAlumno()" class="w-full bg-yellow-500 text-slate-900 font-black uppercase tracking-widest px-4 py-3 rounded-xl hover:scale-105 transition-transform mt-4 text-xs">Actualizar</button>
+                        </div>
+                    </div>
+
+                    <!-- Historial de Asistencias -->
+                    <div class="md:col-span-2 glass p-8 rounded-[3rem]">
+                        <div class="flex justify-between items-center mb-6">
+                            <div>
+                                <h3 class="text-xl font-black italic uppercase text-white">Historial de <span class="text-yellow-500">Asistencias</span></h3>
+                                <p class="text-[10px] opacity-40 font-bold uppercase tracking-widest mt-1">Registros del alumno</p>
+                            </div>
+                            <div class="flex gap-2">
+                                <button onclick="filterAlumnoHistory('hoy')" id="btn-alu-hoy" class="px-4 py-1 rounded-full font-black text-[9px] uppercase tracking-widest bg-yellow-500 text-slate-900">Hoy</button>
+                                <button onclick="filterAlumnoHistory('mes')" id="btn-alu-mes" class="px-4 py-1 rounded-full font-black text-[9px] uppercase tracking-widest bg-white/10 hover:bg-white/20">Mes</button>
+                                <button onclick="filterAlumnoHistory('cuatrimestre')" id="btn-alu-cuatrimestre" class="px-4 py-1 rounded-full font-black text-[9px] uppercase tracking-widest bg-white/10 hover:bg-white/20">Cuatrimestre</button>
+                            </div>
+                        </div>
+                        <div class="bg-black/20 rounded-2xl overflow-hidden border border-white/5 h-80 overflow-y-auto">
+                            <table class="w-full text-left text-sm whitespace-nowrap">
+                                <thead class="bg-white/5 text-[9px] uppercase tracking-widest opacity-60">
+                                    <tr>
+                                        <th class="px-4 py-3">Fecha/Hora</th>
+                                        <th class="px-4 py-3">Materia</th>
+                                        <th class="px-4 py-3">Maestro</th>
+                                        <th class="px-4 py-3 text-right">Acción</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="det-alu-history" class="divide-y divide-white/5">
+                                    <!-- JS -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- VISTA: GESTIÓN DE MAESTROS (LISTA) -->
+            <div id="view-maestros" class="hidden-view animate-fade-in-up">
+                <div class="glass p-8 md:p-10 rounded-[3rem] border border-white/5">
+                    <div class="flex justify-between items-center mb-8">
+                        <h2 class="text-xl font-black uppercase italic text-yellow-500">Base de Datos <span class="text-white">Docentes</span></h2>
+                        <div class="relative">
+                            <i data-lucide="search" class="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 opacity-50"></i>
+                            <input type="text" id="search-maestro" onkeyup="filterTable('maestros-table', this.value)" placeholder="Buscar maestro..." class="glass-input rounded-full pl-12 pr-6 py-3 text-xs font-bold w-full md:w-64">
+                        </div>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-sm whitespace-nowrap" id="maestros-table">
+                            <thead class="bg-white/5 text-[9px] uppercase tracking-widest opacity-60">
+                                <tr>
+                                    <th class="px-6 py-4 rounded-l-xl">ID / Folio</th>
+                                    <th class="px-6 py-4">Catedrático</th>
+                                    <th class="px-6 py-4 text-center">Clases Asignadas</th>
+                                    <th class="px-6 py-4 text-center rounded-r-xl">Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="maestros-tbody" class="divide-y divide-white/5">
+                                <!-- JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- VISTA: DETALLE DE MAESTRO -->
+            <div id="view-maestro-detalle" class="hidden-view animate-zoom-in">
+                <div class="flex items-center justify-between mb-8">
+                    <button onclick="navigate('maestros')" class="bg-white/10 hover:bg-white/20 text-white px-5 py-3 rounded-2xl font-black text-[10px] uppercase tracking-widest transition-colors flex items-center gap-2"><i data-lucide="arrow-left" class="w-4 h-4"></i> Volver a Lista</button>
+                    <div class="flex gap-2">
+                        <button onclick="deleteRecord('maestros', currentDetailId)" class="bg-red-500/20 hover:bg-red-500 text-red-400 hover:text-white px-5 py-3 rounded-2xl font-black text-[10px] uppercase tracking-widest transition-colors flex items-center gap-2"><i data-lucide="trash-2" class="w-4 h-4"></i> Eliminar Docente</button>
+                        <button onclick="printMaestroHistory()" class="bg-green-500/20 hover:bg-green-500 text-green-400 hover:text-white px-5 py-3 rounded-2xl font-black text-[10px] uppercase tracking-widest transition-colors flex items-center gap-2"><i data-lucide="printer" class="w-4 h-4"></i> Imprimir / PDF</button>
+                    </div>
+                </div>
+
+                <div class="grid md:grid-cols-3 gap-8 mb-8">
+                    <!-- Formulario de Edición Docente -->
+                    <div class="md:col-span-1 glass p-8 rounded-[3rem] border-t-4 border-t-yellow-500">
+                        <h3 class="text-lg font-black uppercase text-yellow-500 mb-6 flex items-center gap-2"><i data-lucide="user-cog" class="w-5 h-5"></i> Editar Docente</h3>
+                        <div class="space-y-4">
+                            <div><label class="text-[10px] opacity-50 uppercase font-black ml-2">Nombre / Título</label><input type="text" id="det-doc-nombre" class="w-full glass-input rounded-xl px-4 py-3 font-bold mt-1 text-sm"></div>
+                            <div><label class="text-[10px] opacity-50 uppercase font-black ml-2 text-red-400">Contraseña</label><input type="text" id="det-doc-pass" class="w-full glass-input border-red-500/30 rounded-xl px-4 py-3 font-bold mt-1 text-sm"></div>
+                            <button onclick="saveDetailMaestro()" class="w-full bg-yellow-500 text-slate-900 font-black uppercase tracking-widest px-4 py-3 rounded-xl hover:scale-105 transition-transform mt-4 text-xs">Actualizar Docente</button>
+                        </div>
+                    </div>
+
+                    <!-- Materias Registradas por el Docente -->
+                    <div class="md:col-span-2 glass p-8 rounded-[3rem]">
+                        <h3 class="text-xl font-black italic uppercase text-white mb-1">Clases / Materias <span class="text-yellow-500">Generadas</span></h3>
+                        <p class="text-[10px] opacity-40 font-bold uppercase tracking-widest mb-6">Administradas por este docente</p>
+                        
+                        <div class="bg-black/20 rounded-2xl overflow-hidden border border-white/5 h-48 overflow-y-auto">
+                            <table class="w-full text-left text-sm whitespace-nowrap">
+                                <thead class="bg-white/5 text-[9px] uppercase tracking-widest opacity-60">
+                                    <tr>
+                                        <th class="px-4 py-3">Folio Clase</th>
+                                        <th class="px-4 py-3">Materia</th>
+                                        <th class="px-4 py-3">Grado/Grupo</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="det-doc-materias" class="divide-y divide-white/5">
+                                    <!-- JS -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Historial de Alumnos que Asistieron con este Maestro -->
+                <div class="glass p-8 rounded-[3rem]">
+                    <div class="flex justify-between items-center mb-6">
+                        <div>
+                            <h3 class="text-xl font-black italic uppercase text-white">Alumnos que <span class="text-yellow-500">Pasaron Lista</span></h3>
+                            <p class="text-[10px] opacity-40 font-bold uppercase tracking-widest mt-1">Registros asociados a las clases de este maestro</p>
+                        </div>
+                        <div class="flex gap-2">
+                            <button onclick="filterMaestroHistory('hoy')" id="btn-doc-hoy" class="px-4 py-1 rounded-full font-black text-[9px] uppercase tracking-widest bg-yellow-500 text-slate-900">Hoy</button>
+                            <button onclick="filterMaestroHistory('mes')" id="btn-doc-mes" class="px-4 py-1 rounded-full font-black text-[9px] uppercase tracking-widest bg-white/10 hover:bg-white/20">Mes</button>
+                            <button onclick="filterMaestroHistory('cuatrimestre')" id="btn-doc-cuatrimestre" class="px-4 py-1 rounded-full font-black text-[9px] uppercase tracking-widest bg-white/10 hover:bg-white/20">Cuatrimestre</button>
+                        </div>
+                    </div>
+                    <div class="bg-black/20 rounded-2xl overflow-hidden border border-white/5 h-64 overflow-y-auto">
+                        <table class="w-full text-left text-sm whitespace-nowrap">
+                            <thead class="bg-white/5 text-[9px] uppercase tracking-widest opacity-60">
+                                <tr>
+                                    <th class="px-4 py-3">Fecha/Hora</th>
+                                    <th class="px-4 py-3">Alumno</th>
+                                    <th class="px-4 py-3">Materia / Clase</th>
+                                    <th class="px-4 py-3 text-right">Acción</th>
+                                </tr>
+                            </thead>
+                            <tbody id="det-doc-history" class="divide-y divide-white/5">
+                                <!-- JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- VISTA: REPORTES GLOBALES -->
+            <div id="view-reportes" class="hidden-view animate-fade-in-up">
+                <div class="glass p-8 md:p-10 rounded-[3rem] border border-white/5">
+                    
+                    <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
+                        <div class="flex flex-wrap gap-2">
+                            <button onclick="loadReportes('hoy')" id="btn-filter-hoy" class="bg-yellow-500 text-slate-900 px-6 py-2 rounded-full font-black text-[10px] uppercase tracking-widest transition-colors">Hoy</button>
+                            <button onclick="loadReportes('mes')" id="btn-filter-mes" class="bg-white/5 hover:bg-white/10 px-6 py-2 rounded-full font-black text-[10px] uppercase tracking-widest transition-colors">Mes</button>
+                            <button onclick="loadReportes('cuatrimestre')" id="btn-filter-cuatrimestre" class="bg-white/5 hover:bg-white/10 px-6 py-2 rounded-full font-black text-[10px] uppercase tracking-widest transition-colors">Cuatrimestre</button>
+                        </div>
+                        <button onclick="downloadGlobalCSV()" class="bg-green-500/20 hover:bg-green-500 text-green-400 hover:text-white px-6 py-3 rounded-xl font-black text-[10px] uppercase tracking-widest transition-colors flex items-center gap-2">
+                            <i data-lucide="download" class="w-4 h-4"></i> Exportar Lista Activa
+                        </button>
+                    </div>
+
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-sm whitespace-nowrap">
+                            <thead class="bg-white/5 text-[9px] uppercase tracking-widest opacity-60">
+                                <tr>
+                                    <th class="px-6 py-4 rounded-l-xl">Fecha / Hora</th>
+                                    <th class="px-6 py-4">Alumno (Grado/Grupo)</th>
+                                    <th class="px-6 py-4">Materia</th>
+                                    <th class="px-6 py-4 rounded-r-xl">Maestro</th>
+                                </tr>
+                            </thead>
+                            <tbody id="reportes-tbody" class="divide-y divide-white/5">
+                                <!-- JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- VISTA: AJUSTES DEL SISTEMA (CMS) -->
+            <div id="view-cms" class="hidden-view animate-fade-in-up">
+                <div class="grid md:grid-cols-2 gap-8">
+                    
+                    <!-- Ajustes Generales -->
+                    <div class="glass p-10 rounded-[3rem] border-t-4 border-t-yellow-500">
+                        <h3 class="text-xl font-black uppercase text-white mb-6">Variables del Sistema</h3>
+                        
+                        <div class="space-y-6">
+                            <div>
+                                <label class="text-[10px] font-black uppercase opacity-60 ml-2">Ciclo Escolar Vigente</label>
+                                <input type="text" id="cms-ciclo" class="w-full glass-input rounded-xl px-5 py-4 font-bold mt-1 text-yellow-500" value="2026-B">
+                                <p class="text-[9px] opacity-40 mt-1 ml-2">Se reflejará en los portales de alumnos y maestros.</p>
+                            </div>
+                            <div>
+                                <label class="text-[10px] font-black uppercase opacity-60 ml-2">Estado de la Plataforma</label>
+                                <select id="cms-estado" class="w-full glass-input rounded-xl px-5 py-4 font-bold mt-1 appearance-none">
+                                    <option value="online" class="bg-slate-900">En Línea (Normal)</option>
+                                    <option value="maintenance" class="bg-slate-900">Modo Mantenimiento</option>
+                                </select>
+                            </div>
+                            <button onclick="saveCMS()" class="bg-yellow-500 text-slate-900 font-black uppercase tracking-widest px-8 py-4 rounded-xl hover:scale-105 transition-transform shadow-lg shadow-yellow-500/20 mt-4 w-full">Guardar Cambios</button>
+                        </div>
+                    </div>
+
+                    <!-- Panel de Peligro -->
+                    <div class="glass p-10 rounded-[3rem] border-t-4 border-t-red-500 bg-red-500/5">
+                        <h3 class="text-xl font-black uppercase text-red-400 mb-6">Zona de Riesgo</h3>
+                        <p class="text-xs opacity-60 mb-6">Acciones destructivas para la base de datos de prueba local. Una vez ejecutadas, no se pueden deshacer.</p>
+                        
+                        <div class="space-y-4">
+                            <button onclick="clearDatabase('asistencias')" class="w-full bg-red-500/20 hover:bg-red-500 text-red-400 hover:text-white px-6 py-4 rounded-xl font-black text-[10px] uppercase tracking-widest transition-colors flex items-center justify-between">
+                                <span>Borrar Historial de Asistencias</span> <i data-lucide="trash-2" class="w-4 h-4"></i>
+                            </button>
+                            <button onclick="clearDatabase('all')" class="w-full bg-red-500/20 hover:bg-red-500 text-red-400 hover:text-white px-6 py-4 rounded-xl font-black text-[10px] uppercase tracking-widest transition-colors flex items-center justify-between">
+                                <span>Formatear Sistema Completo (Reset)</span> <i data-lucide="alert-triangle" class="w-4 h-4"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+        </main>
     </div>
-
-    <!-- SIDEBAR NAVEGACIÓN -->
-    <aside id="sidebar" class="w-20 md:w-72 glass border-r border-white/5 flex flex-col animate-slide-left z-10 shrink-0">
-        <div class="p-6 md:p-8 flex items-center justify-center md:justify-start gap-3 mb-8 border-b border-white/5">
-            <img src="https://drive.google.com/thumbnail?id=17NobXQ3JbRnLGejZe4Mn2x-Jl45F4rPm&sz=w800" class="h-10 shrink-0 hover:scale-105 transition-transform" alt="Logo Tigre">
-            <div class="font-black italic uppercase text-[10px] leading-tight hidden md:block">Admin<br><span class="text-yellow-500">Central</span></div>
-        </div>
-        
-        <nav class="space-y-2 flex-1 px-4">
-            <div onclick="navigate('dashboard')" id="nav-dashboard" class="sidebar-item active p-4 opacity-60 font-bold text-[11px] uppercase flex items-center justify-center md:justify-start gap-3 cursor-pointer rounded-2xl">
-                <i data-lucide="layout-dashboard" class="w-5 h-5 shrink-0"></i> <span class="hidden md:inline">Dashboard</span>
-            </div>
-            <div onclick="navigate('alumnos')" id="nav-alumnos" class="sidebar-item p-4 opacity-60 font-bold text-[11px] uppercase flex items-center justify-center md:justify-start gap-3 cursor-pointer rounded-2xl">
-                <i data-lucide="graduation-cap" class="w-5 h-5 shrink-0"></i> <span class="hidden md:inline">Alumnos</span>
-            </div>
-            <div onclick="navigate('maestros')" id="nav-maestros" class="sidebar-item p-4 opacity-60 font-bold text-[11px] uppercase flex items-center justify-center md:justify-start gap-3 cursor-pointer rounded-2xl">
-                <i data-lucide="users" class="w-5 h-5 shrink-0"></i> <span class="hidden md:inline">Maestros</span>
-            </div>
-            <div onclick="navigate('reportes')" id="nav-reportes" class="sidebar-item p-4 opacity-60 font-bold text-[11px] uppercase flex items-center justify-center md:justify-start gap-3 cursor-pointer rounded-2xl">
-                <i data-lucide="file-spreadsheet" class="w-5 h-5 shrink-0"></i> <span class="hidden md:inline">Reportes</span>
-            </div>
-            <div onclick="navigate('cms')" id="nav-cms" class="sidebar-item p-4 opacity-60 font-bold text-[11px] uppercase flex items-center justify-center md:justify-start gap-3 cursor-pointer rounded-2xl">
-                <i data-lucide="settings" class="w-5 h-5 shrink-0"></i> <span class="hidden md:inline">Ajustes Sistema</span>
-            </div>
-        </nav>
-        
-        <div class="mt-auto p-6 border-t border-white/5 text-center md:text-left">
-            <div class="flex items-center justify-center md:justify-start gap-3 mb-4 opacity-80">
-                <div class="w-8 h-8 bg-yellow-500/20 rounded-full flex items-center justify-center text-yellow-500 shrink-0"><i data-lucide="shield" class="w-4 h-4"></i></div>
-                <div class="text-[9px] font-bold uppercase hidden md:block text-left text-yellow-500">Dirección<br>Académica</div>
-            </div>
-            <button onclick="logoutAdmin()" class="flex items-center justify-center md:justify-start gap-3 w-full opacity-50 hover:opacity-100 hover:text-red-400 transition-colors">
-                <div class="w-8 h-8 bg-white/10 rounded-full flex items-center justify-center text-xs shrink-0"><i data-lucide="power" class="w-4 h-4"></i></div>
-                <div class="text-[9px] font-bold uppercase hidden md:block text-left">Cerrar<br>Sesión</div>
-            </button>
-        </div>
-    </aside>
-
-    <!-- CONTENIDO PRINCIPAL -->
-    <main id="main-content" class="flex-1 p-6 md:p-12 h-screen overflow-y-auto w-full relative">
-        
-        <!-- HEADER GLOBAl -->
-        <header class="flex flex-col md:flex-row justify-between items-start md:items-center mb-12 gap-4 animate-fade-in-up">
-            <div>
-                <h1 class="text-3xl md:text-5xl font-black italic uppercase text-white tracking-tighter" id="page-title">Control <span class="text-yellow-500">Global</span></h1>
-                <p class="text-[10px] font-bold opacity-40 uppercase tracking-widest mt-2" id="page-subtitle">Visión general del sistema</p>
-            </div>
-            <div class="flex items-center gap-4 glass px-6 py-3 rounded-2xl border border-white/10 shadow-[0_0_20px_rgba(245,184,0,0.1)]">
-                <span class="w-2 h-2 rounded-full animate-pulse shadow-[0_0_10px_currentColor]" id="status-indicator"></span>
-                <span class="text-[10px] font-bold uppercase tracking-widest opacity-80" id="status-text">Sistemas en Línea</span>
-            </div>
-        </header>
-
-        <!-- VISTA 1: DASHBOARD -->
-        <div id="view-dashboard" class="space-y-8">
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div class="glass p-10 rounded-[2.5rem] border-l-4 border-l-yellow-500 group hover:-translate-y-2 hover:shadow-2xl transition-all animate-fade-in-up">
-                    <p class="text-[10px] font-black opacity-40 uppercase tracking-[0.2em]">Alumnos Registrados</p>
-                    <div class="text-5xl font-black italic mt-3 text-white group-hover:text-yellow-500 transition-colors" id="dash-alumnos">0</div>
-                </div>
-                <div class="glass p-10 rounded-[2.5rem] border-l-4 border-l-yellow-500 group hover:-translate-y-2 hover:shadow-2xl transition-all animate-fade-in-up delay-100">
-                    <p class="text-[10px] font-black opacity-40 uppercase tracking-[0.2em]">Maestros Activos</p>
-                    <div class="text-5xl font-black italic mt-3 text-yellow-500 group-hover:drop-shadow-[0_0_15px_rgba(245,184,0,0.5)] transition-all" id="dash-maestros">0</div>
-                </div>
-                <div class="glass p-10 rounded-[2.5rem] border-l-4 border-l-yellow-500 group hover:-translate-y-2 hover:shadow-2xl transition-all animate-fade-in-up delay-200">
-                    <p class="text-[10px] font-black opacity-40 uppercase tracking-[0.2em]">Asistencias Hoy</p>
-                    <div class="text-5xl font-black italic mt-3 text-white group-hover:text-yellow-500 transition-colors" id="dash-asistencias">0</div>
-                </div>
-            </div>
-
-            <div class="glass p-10 rounded-[3rem] border border-white/5 animate-fade-in-up delay-200">
-                <div class="flex justify-between items-center mb-6">
-                    <h3 class="text-[11px] font-black uppercase tracking-widest opacity-60 text-yellow-500">Últimos Registros Globales</h3>
-                    <button onclick="navigate('reportes')" class="text-[10px] font-bold uppercase tracking-widest opacity-50 hover:opacity-100 transition-opacity">Ver todos</button>
-                </div>
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left text-sm whitespace-nowrap">
-                        <thead class="bg-white/5 text-[9px] uppercase tracking-widest opacity-60">
-                            <tr>
-                                <th class="px-4 py-3 rounded-l-xl">Alumno</th>
-                                <th class="px-4 py-3">Materia</th>
-                                <th class="px-4 py-3">Fecha/Hora</th>
-                            </tr>
-                        </thead>
-                        <tbody id="dash-recent-table" class="divide-y divide-white/5">
-                            <!-- JS -->
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-
-        <!-- VISTA 2: GESTIÓN DE ALUMNOS -->
-        <div id="view-alumnos" class="hidden-view animate-fade-in-up">
-            <div class="glass p-8 md:p-10 rounded-[3rem] border border-white/5">
-                <div class="flex justify-between items-center mb-8">
-                    <h2 class="text-xl font-black uppercase italic text-yellow-500">Base de Datos <span class="text-white">Alumnos</span></h2>
-                    <div class="relative">
-                        <i data-lucide="search" class="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 opacity-50"></i>
-                        <input type="text" id="search-alumno" onkeyup="filterTable('alumnos-table', this.value)" placeholder="Buscar alumno..." class="glass-input rounded-full pl-12 pr-6 py-3 text-xs font-bold w-full md:w-64">
-                    </div>
-                </div>
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left text-sm whitespace-nowrap" id="alumnos-table">
-                        <thead class="bg-white/5 text-[9px] uppercase tracking-widest opacity-60">
-                            <tr>
-                                <th class="px-6 py-4 rounded-l-xl">ID / Folio</th>
-                                <th class="px-6 py-4">Nombre Completo</th>
-                                <th class="px-6 py-4">Nivel / Grado</th>
-                                <th class="px-6 py-4 text-center rounded-r-xl">Acciones</th>
-                            </tr>
-                        </thead>
-                        <tbody id="alumnos-tbody" class="divide-y divide-white/5">
-                            <!-- JS -->
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-
-        <!-- VISTA 3: GESTIÓN DE MAESTROS -->
-        <div id="view-maestros" class="hidden-view animate-fade-in-up">
-            <div class="glass p-8 md:p-10 rounded-[3rem] border border-white/5">
-                <div class="flex justify-between items-center mb-8">
-                    <h2 class="text-xl font-black uppercase italic text-yellow-500">Base de Datos <span class="text-white">Docentes</span></h2>
-                    <div class="relative">
-                        <i data-lucide="search" class="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 opacity-50"></i>
-                        <input type="text" id="search-maestro" onkeyup="filterTable('maestros-table', this.value)" placeholder="Buscar maestro..." class="glass-input rounded-full pl-12 pr-6 py-3 text-xs font-bold w-full md:w-64">
-                    </div>
-                </div>
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left text-sm whitespace-nowrap" id="maestros-table">
-                        <thead class="bg-white/5 text-[9px] uppercase tracking-widest opacity-60">
-                            <tr>
-                                <th class="px-6 py-4 rounded-l-xl">ID / Folio</th>
-                                <th class="px-6 py-4">Catedrático</th>
-                                <th class="px-6 py-4 text-center">Clases Asignadas</th>
-                                <th class="px-6 py-4 text-center rounded-r-xl">Acciones</th>
-                            </tr>
-                        </thead>
-                        <tbody id="maestros-tbody" class="divide-y divide-white/5">
-                            <!-- JS -->
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-
-        <!-- VISTA 4: REPORTES GLOBALES -->
-        <div id="view-reportes" class="hidden-view animate-fade-in-up">
-            <div class="glass p-8 md:p-10 rounded-[3rem] border border-white/5">
-                
-                <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
-                    <div class="flex flex-wrap gap-2">
-                        <button onclick="loadReportes('hoy')" id="btn-filter-hoy" class="bg-yellow-500 text-slate-900 px-6 py-2 rounded-full font-black text-[10px] uppercase tracking-widest transition-colors">Hoy</button>
-                        <button onclick="loadReportes('mes')" id="btn-filter-mes" class="bg-white/5 hover:bg-white/10 px-6 py-2 rounded-full font-black text-[10px] uppercase tracking-widest transition-colors">Mes</button>
-                        <button onclick="loadReportes('cuatrimestre')" id="btn-filter-cuatrimestre" class="bg-white/5 hover:bg-white/10 px-6 py-2 rounded-full font-black text-[10px] uppercase tracking-widest transition-colors">Cuatrimestre</button>
-                    </div>
-                    <button onclick="downloadGlobalCSV()" class="bg-green-500/20 hover:bg-green-500 text-green-400 hover:text-white px-6 py-3 rounded-xl font-black text-[10px] uppercase tracking-widest transition-colors flex items-center gap-2">
-                        <i data-lucide="download" class="w-4 h-4"></i> Exportar Lista Activa
-                    </button>
-                </div>
-
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left text-sm whitespace-nowrap">
-                        <thead class="bg-white/5 text-[9px] uppercase tracking-widest opacity-60">
-                            <tr>
-                                <th class="px-6 py-4 rounded-l-xl">Fecha / Hora</th>
-                                <th class="px-6 py-4">Alumno (Grado/Grupo)</th>
-                                <th class="px-6 py-4">Materia</th>
-                                <th class="px-6 py-4 rounded-r-xl">Maestro</th>
-                            </tr>
-                        </thead>
-                        <tbody id="reportes-tbody" class="divide-y divide-white/5">
-                            <!-- JS -->
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-
-        <!-- VISTA 5: AJUSTES DEL SISTEMA (CMS) -->
-        <div id="view-cms" class="hidden-view animate-fade-in-up">
-            <div class="grid md:grid-cols-2 gap-8">
-                
-                <!-- Ajustes Generales -->
-                <div class="glass p-10 rounded-[3rem] border-t-4 border-t-yellow-500">
-                    <h3 class="text-xl font-black uppercase text-white mb-6">Variables del Sistema</h3>
-                    
-                    <div class="space-y-6">
-                        <div>
-                            <label class="text-[10px] font-black uppercase opacity-60 ml-2">Ciclo Escolar Vigente</label>
-                            <input type="text" id="cms-ciclo" class="w-full glass-input rounded-xl px-5 py-4 font-bold mt-1 text-yellow-500" value="2026-B">
-                            <p class="text-[9px] opacity-40 mt-1 ml-2">Se reflejará en los portales de alumnos y maestros.</p>
-                        </div>
-                        <div>
-                            <label class="text-[10px] font-black uppercase opacity-60 ml-2">Estado de la Plataforma</label>
-                            <select id="cms-estado" class="w-full glass-input rounded-xl px-5 py-4 font-bold mt-1 appearance-none">
-                                <option value="online" class="bg-slate-900">En Línea (Normal)</option>
-                                <option value="maintenance" class="bg-slate-900">Modo Mantenimiento</option>
-                            </select>
-                        </div>
-                        <button onclick="saveCMS()" class="bg-yellow-500 text-slate-900 font-black uppercase tracking-widest px-8 py-4 rounded-xl hover:scale-105 transition-transform shadow-lg shadow-yellow-500/20 mt-4 w-full">Guardar Cambios</button>
-                    </div>
-                </div>
-
-                <!-- Panel de Peligro -->
-                <div class="glass p-10 rounded-[3rem] border-t-4 border-t-red-500 bg-red-500/5">
-                    <h3 class="text-xl font-black uppercase text-red-400 mb-6">Zona de Riesgo</h3>
-                    <p class="text-xs opacity-60 mb-6">Acciones destructivas para la base de datos de prueba local. Una vez ejecutadas, no se pueden deshacer.</p>
-                    
-                    <div class="space-y-4">
-                        <button onclick="clearDatabase('asistencias')" class="w-full bg-red-500/20 hover:bg-red-500 text-red-400 hover:text-white px-6 py-4 rounded-xl font-black text-[10px] uppercase tracking-widest transition-colors flex items-center justify-between">
-                            <span>Borrar Historial de Asistencias</span> <i data-lucide="trash-2" class="w-4 h-4"></i>
-                        </button>
-                        <button onclick="clearDatabase('all')" class="w-full bg-red-500/20 hover:bg-red-500 text-red-400 hover:text-white px-6 py-4 rounded-xl font-black text-[10px] uppercase tracking-widest transition-colors flex items-center justify-between">
-                            <span>Formatear Sistema Completo (Reset)</span> <i data-lucide="alert-triangle" class="w-4 h-4"></i>
-                        </button>
-                    </div>
-                </div>
-
-            </div>
-        </div>
-
-    </main>
 
     <!-- LÓGICA DE LA APLICACIÓN -->
     <script>
@@ -309,9 +467,11 @@
         const ADMIN_USER = "carlos.aguilar@ceut.edu.mx";
         const ADMIN_PASS = "Jcas1015#";
         let isAdminAuthenticated = sessionStorage.getItem('ceut_admin_auth') === 'true';
+        let currentDetailId = null;
+        let currentDetailName = null;
+        let currentHistoryData = [];
 
         // --- SIMULADOR DE BASE DE DATOS GLOBAL (LocalStorage) ---
-        // Para que el Admin Panel funcione sin backend real, unificamos los datos locales
         let db = {
             alumnos: JSON.parse(localStorage.getItem('admin_db_alumnos')) || [],
             maestros: JSON.parse(localStorage.getItem('admin_db_maestros')) || [],
@@ -319,19 +479,22 @@
             config: JSON.parse(localStorage.getItem('admin_db_config')) || { ciclo: '2026-B', estado: 'online' }
         };
 
-        // Generar datos de prueba iniciales si está vacío (Para poder probar el CMS inmediatamente)
         if(db.alumnos.length === 0 && db.maestros.length === 0) {
+            // Generar un ID único para las asistencias de prueba
+            const asisId1 = Date.now().toString() + "1";
+            const asisId2 = Date.now().toString() + "2";
+
             db.alumnos = [
                 { id: 'ALU-1234', nombre: 'Juan Pérez G.', nivel: 'Licenciatura', grado: '4to Semestre', grupo: 'A', pass: '123456' },
                 { id: 'ALU-5678', nombre: 'María López S.', nivel: 'Preparatoria', grado: '2do Semestre', grupo: 'B', pass: '123456' }
             ];
             db.maestros = [
-                { id: 'DOC-9012', nombre: 'Mtro. Carlos R.', pass: '123456', materias: [{nombre: 'Derecho', id: 'MAT-1'}] },
-                { id: 'DOC-3456', nombre: 'Dra. Ana V.', pass: '123456', materias: [{nombre: 'Criminalística', id: 'MAT-2'}] }
+                { id: 'DOC-9012', nombre: 'Mtro. Carlos R.', pass: '123456', materias: [{nombre: 'Derecho Civil', id: 'MAT-1', grado: '4to Semestre', grupo: 'A', nivel: 'Licenciatura'}] },
+                { id: 'DOC-3456', nombre: 'Dra. Ana V.', pass: '123456', materias: [{nombre: 'Criminalística', id: 'MAT-2', grado: '2do Semestre', grupo: 'B', nivel: 'Preparatoria'}] }
             ];
             db.asistencias = [
-                { fecha: new Date().toLocaleDateString('es-MX'), hora: '08:15', alumno: 'Juan Pérez G.', materia: 'Derecho', maestro: 'Mtro. Carlos R.', grado: '4to Semestre', grupo: 'A' },
-                { fecha: new Date(Date.now() - 86400000 * 5).toLocaleDateString('es-MX'), hora: '10:00', alumno: 'María López S.', materia: 'Historia', maestro: 'Dra. Ana V.', grado: '2do Semestre', grupo: 'B' }
+                { id: asisId1, fecha: new Date().toLocaleDateString('es-MX'), hora: '08:15', alumno: 'Juan Pérez G.', materia: 'Derecho Civil', maestro: 'Mtro. Carlos R.', grado: '4to Semestre', grupo: 'A' },
+                { id: asisId2, fecha: new Date(Date.now() - 86400000 * 5).toLocaleDateString('es-MX'), hora: '10:00', alumno: 'María López S.', materia: 'Criminalística', maestro: 'Dra. Ana V.', grado: '2do Semestre', grupo: 'B' }
             ];
             saveDB();
         }
@@ -354,7 +517,7 @@
                 showApp();
                 navigate('dashboard');
             } else {
-                showToast("Credenciales incorrectas. Acceso denegado.");
+                alert("SISTEMA CEUT:\nCredenciales incorrectas. Acceso denegado.");
             }
         }
 
@@ -370,7 +533,6 @@
             document.getElementById('view-auth').classList.remove('hidden-view');
         }
 
-        // --- NAVEGACIÓN Y RENDERIZADO INICIAL ---
         window.onload = () => {
             applyConfig();
             if (isAdminAuthenticated) {
@@ -382,19 +544,20 @@
         };
 
         function navigate(view) {
-            // Ocultar vistas
-            const views = ['view-dashboard', 'view-alumnos', 'view-maestros', 'view-reportes', 'view-cms'];
+            const views = ['view-dashboard', 'view-alumnos', 'view-alumno-detalle', 'view-maestros', 'view-maestro-detalle', 'view-reportes', 'view-cms'];
             views.forEach(v => document.getElementById(v).classList.add('hidden-view'));
             
-            // Quitar clase activa del sidebar
             document.querySelectorAll('.sidebar-item').forEach(el => el.classList.remove('active', 'bg-yellow-500/10', 'text-yellow-500'));
             
-            // Mostrar seleccionada
             document.getElementById(`view-${view}`).classList.remove('hidden-view');
-            const navItem = document.getElementById(`nav-${view}`);
-            navItem.classList.add('active', 'bg-yellow-500/10', 'text-yellow-500');
+            
+            // Activar botón del menú (Mapeo de vistas secundarias al principal)
+            let navTarget = view;
+            if(view === 'alumno-detalle') navTarget = 'alumnos';
+            if(view === 'maestro-detalle') navTarget = 'maestros';
+            const navItem = document.getElementById(`nav-${navTarget}`);
+            if(navItem) navItem.classList.add('active', 'bg-yellow-500/10', 'text-yellow-500');
 
-            // Actualizar Títulos y Cargar Datos
             const titleEl = document.getElementById('page-title');
             const subtitleEl = document.getElementById('page-subtitle');
 
@@ -404,15 +567,21 @@
                 renderDashboard();
             } else if (view === 'alumnos') {
                 titleEl.innerHTML = `Gestión <span class="text-yellow-500">Alumnos</span>`;
-                subtitleEl.innerText = "Edición y altas";
+                subtitleEl.innerText = "Directorio y perfiles";
                 renderAlumnos();
+            } else if (view === 'alumno-detalle') {
+                titleEl.innerHTML = `Perfil <span class="text-yellow-500">Estudiante</span>`;
+                subtitleEl.innerText = "Detalles y auditoría de asistencias";
             } else if (view === 'maestros') {
                 titleEl.innerHTML = `Gestión <span class="text-yellow-500">Docentes</span>`;
-                subtitleEl.innerText = "Control de plantillas";
+                subtitleEl.innerText = "Plantilla y administración";
                 renderMaestros();
+            } else if (view === 'maestro-detalle') {
+                titleEl.innerHTML = `Perfil <span class="text-yellow-500">Catedrático</span>`;
+                subtitleEl.innerText = "Clases generadas e historial de asistencias";
             } else if (view === 'reportes') {
                 titleEl.innerHTML = `Reportes <span class="text-yellow-500">Centrales</span>`;
-                subtitleEl.innerText = "Auditoría de asistencias";
+                subtitleEl.innerText = "Auditoría global de asistencias";
                 loadReportes('hoy');
             } else if (view === 'cms') {
                 titleEl.innerHTML = `Ajustes <span class="text-yellow-500">Sistema</span>`;
@@ -427,7 +596,7 @@
             const txt = document.getElementById('status-text');
             if(db.config.estado === 'maintenance') {
                 ind.className = "w-2 h-2 rounded-full animate-pulse shadow-[0_0_10px_#ef4444] bg-red-500";
-                txt.innerText = "Modo Mantenimiento (Portales Cerrados)";
+                txt.innerText = "Modo Mantenimiento (Cerrado)";
                 txt.classList.add('text-red-400');
             } else {
                 ind.className = "w-2 h-2 rounded-full animate-pulse shadow-[0_0_10px_#22c55e] bg-green-500";
@@ -436,7 +605,6 @@
             }
         }
 
-        // --- FUNCIONES DEL DASHBOARD ---
         function renderDashboard() {
             document.getElementById('dash-alumnos').innerText = db.alumnos.length;
             document.getElementById('dash-maestros').innerText = db.maestros.length;
@@ -445,7 +613,6 @@
             const asisHoy = db.asistencias.filter(a => a.fecha === hoy).length;
             document.getElementById('dash-asistencias').innerText = asisHoy;
 
-            // Tabla recientes
             const tbody = document.getElementById('dash-recent-table');
             tbody.innerHTML = '';
             const recientes = [...db.asistencias].reverse().slice(0, 4);
@@ -466,7 +633,7 @@
             });
         }
 
-        // --- CONTROL DE ALUMNOS ---
+        // --- MÓDULO ALUMNOS (DETALLE A PANTALLA COMPLETA) ---
         function renderAlumnos() {
             const tbody = document.getElementById('alumnos-tbody');
             tbody.innerHTML = '';
@@ -477,8 +644,97 @@
                         <td class="px-6 py-4 font-bold text-white">${a.nombre}</td>
                         <td class="px-6 py-4 text-xs opacity-60">${a.nivel} • ${a.grado} "${a.grupo}"</td>
                         <td class="px-6 py-4 text-center">
-                            <button onclick="openModalAlumno('${a.id}')" class="p-2 bg-white/5 hover:bg-yellow-500 hover:text-slate-900 rounded-full transition-colors mr-2"><i data-lucide="pencil" class="w-4 h-4"></i></button>
-                            <button onclick="deleteRecord('alumnos', '${a.id}')" class="p-2 bg-white/5 hover:bg-red-500 hover:text-white rounded-full transition-colors"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+                            <button onclick="viewAlumno('${a.id}')" class="px-4 py-2 bg-yellow-500 text-slate-900 font-black text-[10px] uppercase rounded-full hover:scale-105 transition-transform">Ver Perfil</button>
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+
+        function viewAlumno(id) {
+            const a = db.alumnos.find(x => x.id === id);
+            if(!a) return;
+            currentDetailId = a.id;
+            currentDetailName = a.nombre;
+
+            // Llenar Formulario
+            document.getElementById('det-alu-nombre').value = a.nombre;
+            document.getElementById('det-alu-nivel').value = a.nivel;
+            document.getElementById('det-alu-grado').value = a.grado;
+            document.getElementById('det-alu-grupo').value = a.grupo;
+            document.getElementById('det-alu-pass').value = a.pass;
+
+            filterAlumnoHistory('cuatrimestre'); // Cargar historia completa por defecto
+            navigate('alumno-detalle');
+        }
+
+        function saveDetailAlumno() {
+            const idx = db.alumnos.findIndex(a => a.id === currentDetailId);
+            if(idx > -1) {
+                db.alumnos[idx].nombre = document.getElementById('det-alu-nombre').value;
+                db.alumnos[idx].nivel = document.getElementById('det-alu-nivel').value;
+                db.alumnos[idx].grado = document.getElementById('det-alu-grado').value;
+                db.alumnos[idx].grupo = document.getElementById('det-alu-grupo').value;
+                db.alumnos[idx].pass = document.getElementById('det-alu-pass').value;
+                
+                // Si cambió de nombre, deberíamos actualizar en asistencias para consistencia.
+                const nuevoNombre = db.alumnos[idx].nombre;
+                if(nuevoNombre !== currentDetailName) {
+                    db.asistencias.forEach(asis => {
+                        if(asis.alumno === currentDetailName) asis.alumno = nuevoNombre;
+                    });
+                    currentDetailName = nuevoNombre;
+                }
+
+                saveDB();
+                alert('SISTEMA CEUT:\nPerfil de Alumno actualizado correctamente.');
+                filterAlumnoHistory('cuatrimestre'); // Recargar tabla
+            }
+        }
+
+        function filterAlumnoHistory(filter) {
+            // Estilos de botones
+            ['hoy', 'mes', 'cuatrimestre'].forEach(f => {
+                document.getElementById(`btn-alu-${f}`).className = "px-4 py-1 rounded-full font-black text-[9px] uppercase tracking-widest bg-white/10 hover:bg-white/20 text-white";
+            });
+            document.getElementById(`btn-alu-${filter}`).className = "px-4 py-1 rounded-full font-black text-[9px] uppercase tracking-widest bg-yellow-500 text-slate-900";
+
+            const hoy = new Date();
+            const hoyStr = hoy.toLocaleDateString('es-MX');
+            const mesActual = hoy.getMonth();
+            const anioActual = hoy.getFullYear();
+
+            // Filtrar solo las de ESTE alumno
+            let records = db.asistencias.filter(a => a.alumno === currentDetailName);
+
+            records = records.filter(a => {
+                if(filter === 'hoy') return a.fecha === hoyStr;
+                if(filter === 'mes') {
+                    const partes = a.fecha.split('/');
+                    if(partes.length === 3) return parseInt(partes[1])-1 === mesActual && parseInt(partes[2]) === anioActual;
+                    return false;
+                }
+                return true; 
+            });
+
+            currentHistoryData = records; // Guardar para la impresión
+
+            const tbody = document.getElementById('det-alu-history');
+            tbody.innerHTML = '';
+            
+            if(records.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="4" class="text-center py-10 opacity-30 text-xs">No hay asistencias en este periodo.</td></tr>`;
+                return;
+            }
+
+            [...records].reverse().forEach(a => {
+                tbody.innerHTML += `
+                    <tr class="hover:bg-white/5 transition-colors">
+                        <td class="px-4 py-3 font-bold text-yellow-500 text-xs">${a.fecha} <br><span class="opacity-50 text-white font-normal">${a.hora}</span></td>
+                        <td class="px-4 py-3 font-bold text-white">${a.materia}</td>
+                        <td class="px-4 py-3 opacity-80 text-xs">${a.maestro}</td>
+                        <td class="px-4 py-3 text-right">
+                            <button onclick="deleteAssistanceRecord('${a.id}', 'alumno')" class="p-2 bg-red-500/20 hover:bg-red-500 text-red-400 hover:text-white rounded-full transition-colors"><i data-lucide="trash" class="w-4 h-4"></i></button>
                         </td>
                     </tr>
                 `;
@@ -486,46 +742,25 @@
             lucide.createIcons();
         }
 
-        function openModalAlumno(id) {
-            const alumno = db.alumnos.find(a => a.id === id);
-            if(!alumno) return;
+        function printAlumnoHistory() {
+            document.getElementById('print-doc-type').innerText = "Historial Académico de Asistencia";
+            document.getElementById('print-date').innerText = `Impreso el: ${new Date().toLocaleDateString('es-MX')}`;
+            
+            const alumnoInfo = db.alumnos.find(a => a.id === currentDetailId);
+            document.getElementById('print-user-name').innerText = `Alumno: ${alumnoInfo.nombre}`;
+            document.getElementById('print-user-details').innerText = `Folio: ${alumnoInfo.id} | Grado/Grupo: ${alumnoInfo.grado} "${alumnoInfo.grupo}" | Nivel: ${alumnoInfo.nivel}`;
 
-            const html = `
-                <h3 class="text-2xl font-black uppercase text-yellow-500 mb-6">Editar Alumno</h3>
-                <div class="space-y-4 text-left">
-                    <div><label class="text-[10px] opacity-50 uppercase font-black ml-2">Nombre Completo</label>
-                    <input type="text" id="edit-alu-nombre" value="${alumno.nombre}" class="w-full glass-input rounded-xl px-5 py-3 font-bold mt-1"></div>
-                    
-                    <div class="grid grid-cols-2 gap-4">
-                        <div><label class="text-[10px] opacity-50 uppercase font-black ml-2">Grado</label>
-                        <input type="text" id="edit-alu-grado" value="${alumno.grado}" class="w-full glass-input rounded-xl px-5 py-3 font-bold mt-1"></div>
-                        <div><label class="text-[10px] opacity-50 uppercase font-black ml-2">Grupo</label>
-                        <input type="text" id="edit-alu-grupo" value="${alumno.grupo}" class="w-full glass-input rounded-xl px-5 py-3 font-bold mt-1 uppercase"></div>
-                    </div>
-                    
-                    <div><label class="text-[10px] opacity-50 uppercase font-black ml-2 text-red-400">Contraseña de Acceso (Sobreescribir)</label>
-                    <input type="text" id="edit-alu-pass" value="${alumno.pass}" class="w-full glass-input rounded-xl px-5 py-3 font-bold mt-1 border-red-500/30"></div>
-                </div>
-                <button onclick="saveEditAlumno('${id}')" class="w-full bg-yellow-500 text-slate-900 font-black uppercase tracking-widest px-6 py-4 rounded-xl hover:scale-105 transition-transform mt-8">Guardar Cambios</button>
-            `;
-            openModal(html);
+            const table = document.getElementById('print-table-content');
+            table.innerHTML = `<tr><th>Fecha</th><th>Hora</th><th>Materia</th><th>Catedrático</th></tr>`;
+            
+            [...currentHistoryData].reverse().forEach(r => {
+                table.innerHTML += `<tr><td>${r.fecha}</td><td>${r.hora}</td><td><strong>${r.materia}</strong></td><td>${r.maestro}</td></tr>`;
+            });
+
+            window.print();
         }
 
-        function saveEditAlumno(id) {
-            const idx = db.alumnos.findIndex(a => a.id === id);
-            if(idx > -1) {
-                db.alumnos[idx].nombre = document.getElementById('edit-alu-nombre').value;
-                db.alumnos[idx].grado = document.getElementById('edit-alu-grado').value;
-                db.alumnos[idx].grupo = document.getElementById('edit-alu-grupo').value;
-                db.alumnos[idx].pass = document.getElementById('edit-alu-pass').value;
-                saveDB();
-                closeModal();
-                renderAlumnos();
-                showToast('Alumno actualizado exitosamente');
-            }
-        }
-
-        // --- CONTROL DE MAESTROS ---
+        // --- MÓDULO MAESTROS (DETALLE A PANTALLA COMPLETA) ---
         function renderMaestros() {
             const tbody = document.getElementById('maestros-tbody');
             tbody.innerHTML = '';
@@ -535,12 +770,109 @@
                     <tr class="hover:bg-white/5 transition-colors">
                         <td class="px-6 py-4 font-black text-yellow-500">${m.id}</td>
                         <td class="px-6 py-4 font-bold text-white">${m.nombre}</td>
+                        <td class="px-6 py-4 text-center"><span class="bg-white/10 px-3 py-1 rounded-full text-xs font-bold">${totalClases} Materias</span></td>
                         <td class="px-6 py-4 text-center">
-                            <span class="bg-white/10 px-3 py-1 rounded-full text-xs font-bold">${totalClases} Materias</span>
+                            <button onclick="viewMaestro('${m.id}')" class="px-4 py-2 bg-yellow-500 text-slate-900 font-black text-[10px] uppercase rounded-full hover:scale-105 transition-transform">Ver Perfil</button>
                         </td>
-                        <td class="px-6 py-4 text-center">
-                            <button onclick="openModalMaestro('${m.id}')" class="p-2 bg-white/5 hover:bg-yellow-500 hover:text-slate-900 rounded-full transition-colors mr-2"><i data-lucide="pencil" class="w-4 h-4"></i></button>
-                            <button onclick="deleteRecord('maestros', '${m.id}')" class="p-2 bg-white/5 hover:bg-red-500 hover:text-white rounded-full transition-colors"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+                    </tr>
+                `;
+            });
+        }
+
+        function viewMaestro(id) {
+            const m = db.maestros.find(x => x.id === id);
+            if(!m) return;
+            currentDetailId = m.id;
+            currentDetailName = m.nombre;
+
+            // Formulario
+            document.getElementById('det-doc-nombre').value = m.nombre;
+            document.getElementById('det-doc-pass').value = m.pass;
+
+            // Materias
+            const matTable = document.getElementById('det-doc-materias');
+            matTable.innerHTML = '';
+            if(!m.materias || m.materias.length === 0) {
+                matTable.innerHTML = `<tr><td colspan="3" class="text-center py-4 opacity-30 text-xs">No ha generado clases</td></tr>`;
+            } else {
+                m.materias.forEach(mat => {
+                    matTable.innerHTML += `
+                        <tr class="hover:bg-white/5">
+                            <td class="px-4 py-3 font-bold text-yellow-500 text-xs">${mat.id}</td>
+                            <td class="px-4 py-3 text-white">${mat.nombre}</td>
+                            <td class="px-4 py-3 opacity-60 text-xs">${mat.grado} "${mat.grupo}"</td>
+                        </tr>
+                    `;
+                });
+            }
+
+            filterMaestroHistory('cuatrimestre');
+            navigate('maestro-detalle');
+        }
+
+        function saveDetailMaestro() {
+            const idx = db.maestros.findIndex(m => m.id === currentDetailId);
+            if(idx > -1) {
+                db.maestros[idx].nombre = document.getElementById('det-doc-nombre').value;
+                db.maestros[idx].pass = document.getElementById('det-doc-pass').value;
+
+                // Propagar cambio de nombre a asistencias
+                const nuevoNombre = db.maestros[idx].nombre;
+                if(nuevoNombre !== currentDetailName) {
+                    db.asistencias.forEach(asis => {
+                        if(asis.maestro === currentDetailName) asis.maestro = nuevoNombre;
+                    });
+                    currentDetailName = nuevoNombre;
+                }
+
+                saveDB();
+                alert('SISTEMA CEUT:\nPerfil del Docente actualizado correctamente.');
+                filterMaestroHistory('cuatrimestre');
+            }
+        }
+
+        function filterMaestroHistory(filter) {
+            ['hoy', 'mes', 'cuatrimestre'].forEach(f => {
+                document.getElementById(`btn-doc-${f}`).className = "px-4 py-1 rounded-full font-black text-[9px] uppercase tracking-widest bg-white/10 hover:bg-white/20 text-white";
+            });
+            document.getElementById(`btn-doc-${filter}`).className = "px-4 py-1 rounded-full font-black text-[9px] uppercase tracking-widest bg-yellow-500 text-slate-900";
+
+            const hoy = new Date();
+            const hoyStr = hoy.toLocaleDateString('es-MX');
+            const mesActual = hoy.getMonth();
+            const anioActual = hoy.getFullYear();
+
+            // Filtrar solo las de ESTE maestro
+            let records = db.asistencias.filter(a => a.maestro === currentDetailName);
+
+            records = records.filter(a => {
+                if(filter === 'hoy') return a.fecha === hoyStr;
+                if(filter === 'mes') {
+                    const partes = a.fecha.split('/');
+                    if(partes.length === 3) return parseInt(partes[1])-1 === mesActual && parseInt(partes[2]) === anioActual;
+                    return false;
+                }
+                return true; 
+            });
+
+            currentHistoryData = records;
+
+            const tbody = document.getElementById('det-doc-history');
+            tbody.innerHTML = '';
+            
+            if(records.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="4" class="text-center py-10 opacity-30 text-xs">No hay registros en las clases de este maestro.</td></tr>`;
+                return;
+            }
+
+            [...records].reverse().forEach(a => {
+                tbody.innerHTML += `
+                    <tr class="hover:bg-white/5 transition-colors">
+                        <td class="px-4 py-3 font-bold text-yellow-500 text-xs">${a.fecha} <br><span class="opacity-50 text-white font-normal">${a.hora}</span></td>
+                        <td class="px-4 py-3 font-bold text-white">${a.alumno}</td>
+                        <td class="px-4 py-3 opacity-80 text-xs">${a.materia} <br><span class="opacity-50">${a.grado} "${a.grupo}"</span></td>
+                        <td class="px-4 py-3 text-right">
+                            <button onclick="deleteAssistanceRecord('${a.id}', 'maestro')" class="p-2 bg-red-500/20 hover:bg-red-500 text-red-400 hover:text-white rounded-full transition-colors"><i data-lucide="trash" class="w-4 h-4"></i></button>
                         </td>
                     </tr>
                 `;
@@ -548,53 +880,46 @@
             lucide.createIcons();
         }
 
-        function openModalMaestro(id) {
-            const maestro = db.maestros.find(m => m.id === id);
-            if(!maestro) return;
+        function printMaestroHistory() {
+            document.getElementById('print-doc-type').innerText = "Reporte de Asistencia a Clases del Docente";
+            document.getElementById('print-date').innerText = `Impreso el: ${new Date().toLocaleDateString('es-MX')}`;
+            
+            const maestroInfo = db.maestros.find(m => m.id === currentDetailId);
+            document.getElementById('print-user-name').innerText = `Catedrático: ${maestroInfo.nombre}`;
+            document.getElementById('print-user-details').innerText = `Folio: ${maestroInfo.id} | Clases Gestinadas: ${maestroInfo.materias ? maestroInfo.materias.length : 0}`;
 
-            const html = `
-                <h3 class="text-2xl font-black uppercase text-yellow-500 mb-6">Editar Docente</h3>
-                <div class="space-y-4 text-left">
-                    <div><label class="text-[10px] opacity-50 uppercase font-black ml-2">Catedrático</label>
-                    <input type="text" id="edit-doc-nombre" value="${maestro.nombre}" class="w-full glass-input rounded-xl px-5 py-3 font-bold mt-1"></div>
-                    
-                    <div><label class="text-[10px] opacity-50 uppercase font-black ml-2 text-red-400">Contraseña de Acceso (Sobreescribir)</label>
-                    <input type="text" id="edit-doc-pass" value="${maestro.pass}" class="w-full glass-input rounded-xl px-5 py-3 font-bold mt-1 border-red-500/30"></div>
-                </div>
-                <button onclick="saveEditMaestro('${id}')" class="w-full bg-yellow-500 text-slate-900 font-black uppercase tracking-widest px-6 py-4 rounded-xl hover:scale-105 transition-transform mt-8">Guardar Cambios</button>
-            `;
-            openModal(html);
+            const table = document.getElementById('print-table-content');
+            table.innerHTML = `<tr><th>Fecha</th><th>Hora</th><th>Alumno</th><th>Materia de Clase</th></tr>`;
+            
+            [...currentHistoryData].reverse().forEach(r => {
+                table.innerHTML += `<tr><td>${r.fecha}</td><td>${r.hora}</td><td><strong>${r.alumno}</strong> (${r.grado}-${r.grupo})</td><td>${r.materia}</td></tr>`;
+            });
+
+            window.print();
         }
 
-        function saveEditMaestro(id) {
-            const idx = db.maestros.findIndex(m => m.id === id);
-            if(idx > -1) {
-                db.maestros[idx].nombre = document.getElementById('edit-doc-nombre').value;
-                db.maestros[idx].pass = document.getElementById('edit-doc-pass').value;
+        function deleteAssistanceRecord(recordId, origin) {
+            if(confirm("¿Eliminar este registro de asistencia?\nEsta acción afectará los reportes del sistema.")) {
+                db.asistencias = db.asistencias.filter(a => a.id !== recordId);
                 saveDB();
-                closeModal();
-                renderMaestros();
-                showToast('Docente actualizado exitosamente');
+                if(origin === 'alumno') filterAlumnoHistory('cuatrimestre');
+                if(origin === 'maestro') filterMaestroHistory('cuatrimestre');
+                alert("SISTEMA CEUT:\nRegistro de asistencia eliminado.");
             }
         }
 
+        // --- FUNCIONES GLOBALES / CMS ---
         function deleteRecord(collection, id) {
-            if(confirm(`¿Estás seguro de eliminar el registro ${id}?\nEsta acción es irreversible.`)) {
+            if(confirm(`¿Estás seguro de ELIMINAR COMPLETAMENTE a este usuario del sistema?\nEsta acción es irreversible.`)) {
                 db[collection] = db[collection].filter(item => item.id !== id);
                 saveDB();
-                if(collection === 'alumnos') renderAlumnos();
-                if(collection === 'maestros') renderMaestros();
-                showToast('Registro eliminado');
+                navigate(collection); // regresa a la lista
             }
         }
 
-        // --- REPORTES FILTRADOS ---
-        let currentReportData = [];
-
         function loadReportes(filter = 'todos') {
-            // Estilos de botones
-            document.querySelectorAll('[id^="btn-filter-"]').forEach(btn => {
-                btn.className = "bg-white/5 hover:bg-white/10 px-6 py-2 rounded-full font-black text-[10px] uppercase tracking-widest transition-colors";
+            ['hoy', 'mes', 'cuatrimestre'].forEach(f => {
+                document.getElementById(`btn-filter-${f}`).className = "bg-white/5 hover:bg-white/10 px-6 py-2 rounded-full font-black text-[10px] uppercase tracking-widest transition-colors";
             });
             document.getElementById(`btn-filter-${filter}`).className = "bg-yellow-500 text-slate-900 px-6 py-2 rounded-full font-black text-[10px] uppercase tracking-widest transition-colors";
 
@@ -603,29 +928,27 @@
             const mesActual = hoy.getMonth();
             const anioActual = hoy.getFullYear();
 
-            currentReportData = db.asistencias.filter(a => {
+            let records = db.asistencias.filter(a => {
                 if(filter === 'hoy') return a.fecha === hoyStr;
                 if(filter === 'mes') {
-                    // Parsea la fecha simple (ej. "15/5/2026")
                     const partes = a.fecha.split('/');
-                    if(partes.length === 3) {
-                        return parseInt(partes[1])-1 === mesActual && parseInt(partes[2]) === anioActual;
-                    }
+                    if(partes.length === 3) return parseInt(partes[1])-1 === mesActual && parseInt(partes[2]) === anioActual;
                     return false;
                 }
-                return true; // Cuatrimestre (Muestra todos en la DB simulada temporal)
+                return true; 
             });
+
+            currentHistoryData = records;
 
             const tbody = document.getElementById('reportes-tbody');
             tbody.innerHTML = '';
             
-            if(currentReportData.length === 0) {
+            if(records.length === 0) {
                 tbody.innerHTML = `<tr><td colspan="4" class="text-center py-10 opacity-30 text-xs">No hay asistencias en este periodo.</td></tr>`;
                 return;
             }
 
-            // Invertir para mostrar lo más nuevo arriba
-            [...currentReportData].reverse().forEach(a => {
+            [...records].reverse().forEach(a => {
                 tbody.innerHTML += `
                     <tr class="hover:bg-white/5 transition-colors">
                         <td class="px-6 py-4 font-black text-yellow-500 text-xs">${a.fecha} <br><span class="opacity-50 text-white font-normal">${a.hora}</span></td>
@@ -638,16 +961,12 @@
         }
 
         function downloadGlobalCSV() {
-            if(currentReportData.length === 0) {
-                showToast('No hay datos para exportar en el filtro actual.');
+            if(currentHistoryData.length === 0) {
+                alert('SISTEMA CEUT:\nNo hay datos para exportar.');
                 return;
             }
-
             let csv = "data:text/csv;charset=utf-8,Fecha,Hora,Alumno,Grado,Grupo,Materia,Catedratico\n";
-            currentReportData.forEach(r => {
-                csv += `"${r.fecha}","${r.hora}","${r.alumno}","${r.grado}","${r.grupo}","${r.materia}","${r.maestro}"\n`;
-            });
-
+            currentHistoryData.forEach(r => { csv += `"${r.fecha}","${r.hora}","${r.alumno}","${r.grado}","${r.grupo}","${r.materia}","${r.maestro}"\n`; });
             const encodedUri = encodeURI(csv);
             const link = document.createElement("a");
             link.setAttribute("href", encodedUri);
@@ -657,13 +976,12 @@
             document.body.removeChild(link);
         }
 
-        // --- CMS / AJUSTES ---
         function saveCMS() {
             db.config.ciclo = document.getElementById('cms-ciclo').value.trim();
             db.config.estado = document.getElementById('cms-estado').value;
             saveDB();
             applyConfig();
-            showToast('Ajustes del sistema guardados (El CMS actualizó las variables).');
+            alert('SISTEMA CEUT:\nAjustes guardados exitosamente.');
         }
 
         function clearDatabase(type) {
@@ -671,7 +989,7 @@
                 if(confirm("¿Borrar todo el historial de asistencias de la escuela?")) {
                     db.asistencias = [];
                     saveDB();
-                    showToast('Historial de asistencias borrado.');
+                    alert('SISTEMA CEUT:\nHistorial de asistencias borrado.');
                 }
             } else if (type === 'all') {
                 if(confirm("PELIGRO: ¿Estás seguro de resetear todo? Se borrarán alumnos, maestros y reportes locales.")) {
@@ -684,30 +1002,14 @@
             }
         }
 
-        // --- UTILIDADES ---
         function filterTable(tableId, query) {
             query = query.toLowerCase();
             const table = document.getElementById(tableId);
             const rows = table.getElementsByTagName('tbody')[0].getElementsByTagName('tr');
-            
             for (let i = 0; i < rows.length; i++) {
                 const text = rows[i].textContent.toLowerCase();
                 rows[i].style.display = text.includes(query) ? '' : 'none';
             }
-        }
-
-        function openModal(htmlContent) {
-            document.getElementById('modal-body').innerHTML = htmlContent;
-            document.getElementById('modal-container').classList.remove('hidden-view');
-        }
-
-        function closeModal() {
-            document.getElementById('modal-container').classList.add('hidden-view');
-        }
-
-        function showToast(msg) {
-            // Alerta nativa simple para feedback rápido en el admin
-            alert(`SISTEMA CEUT:\n${msg}`);
         }
 
         function logoutAdmin() {
@@ -716,23 +1018,6 @@
                 window.location.reload(); 
             }
         }
-    </script>
-
-    <!-- Configuración e Inicialización de Firebase -->
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
-        
-        const firebaseConfig = {
-            apiKey: "AIzaSyCefP6qEqaCMpo8ZpUiLpN4e_-E4ZNTp94",
-            authDomain: "asistencias-ceut.firebaseapp.com",
-            projectId: "asistencias-ceut",
-            storageBucket: "asistencias-ceut.firebasestorage.app",
-            messagingSenderId: "130615246146",
-            appId: "1:130615246146:web:6ae2c17c828fb28a809cdb"
-        };
-
-        const app = initializeApp(firebaseConfig);
-        console.log("🔥 Firebase inicializado en: Admin Central");
     </script>
 </body>
 </html>
