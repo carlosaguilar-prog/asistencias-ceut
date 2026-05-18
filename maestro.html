@@ -6,9 +6,7 @@
     <title>CEUT | Maestros</title>
     <link rel="icon" type="image/png" href="https://drive.google.com/thumbnail?id=17NobXQ3JbRnLGejZe4Mn2x-Jl45F4rPm&sz=w64">
     <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = { theme: { extend: { colors: { yellow: { 500: '#f5b800' } } } } }
-    </script>
+    <script>tailwind.config = { theme: { extend: { colors: { yellow: { 500: '#f5b800' } } } } }</script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
@@ -34,6 +32,12 @@
 </head>
 <body class="p-4 md:p-8 relative">
 
+    <div id="loading-overlay" class="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-[#020617] text-white transition-opacity duration-500">
+        <img src="https://drive.google.com/thumbnail?id=17NobXQ3JbRnLGejZe4Mn2x-Jl45F4rPm&sz=w800" class="h-24 mb-6 animate-pulse" alt="Logo">
+        <h2 class="text-2xl font-black italic uppercase text-yellow-500 mb-2">Conectando...</h2>
+        <p class="text-[10px] font-bold opacity-50 uppercase tracking-[0.3em]">Sincronizando con la nube</p>
+    </div>
+
     <div id="print-section" class="hidden-view print-area">
         <div class="print-header">
             <div><img src="https://drive.google.com/thumbnail?id=17NobXQ3JbRnLGejZe4Mn2x-Jl45F4rPm&sz=w800" style="height: 80px;" alt="Logo CEUT"></div>
@@ -55,7 +59,6 @@
         </div>
     </div>
 
-    <!-- MODALES -->
     <div id="modal-alert" class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm hidden-view no-print">
         <div class="glass p-10 rounded-[3rem] max-w-md w-full text-center border-t-4 animate-zoom-in shadow-2xl" id="modal-content">
             <div id="modal-icon" class="w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6"></div>
@@ -81,7 +84,6 @@
         </div>
     </div>
 
-    <!-- CONTENEDOR APP -->
     <div class="max-w-6xl mx-auto no-print" id="app-container">
         
         <header id="main-header" class="flex justify-between items-center mb-10 hidden-view animate-fade-in-up">
@@ -95,7 +97,6 @@
             <button onclick="logout()" class="p-3 bg-white/5 hover:bg-red-500/20 hover:text-red-400 rounded-full transition-colors"><i data-lucide="log-out" class="w-5 h-5"></i></button>
         </header>
 
-        <!-- AUTH -->
         <div id="view-auth" class="animate-fade-in-up mt-10 md:mt-20 relative">
             <a href="index.html" class="absolute -top-10 md:-top-16 left-0 flex items-center gap-2 text-white/50 hover:text-white transition-colors font-black text-[10px] uppercase tracking-widest bg-white/5 hover:bg-white/10 px-4 py-2 rounded-full z-50">
                 <i data-lucide="arrow-left" class="w-4 h-4"></i> Volver al Inicio
@@ -126,7 +127,6 @@
             </div>
         </div>
 
-        <!-- DASHBOARD -->
         <div id="view-dashboard" class="hidden-view">
             <div class="glass p-12 rounded-[4rem] border-t-4 border-t-yellow-500 shadow-2xl animate-fade-in-up">
                 <div class="flex flex-col md:flex-row justify-between items-start md:items-end mb-10 gap-4">
@@ -142,7 +142,6 @@
             </div>
         </div>
 
-        <!-- FORMULARIO MATERIA -->
         <div id="view-class-form" class="glass p-10 md:p-14 rounded-[4rem] border-t-4 border-t-yellow-500 shadow-2xl hidden-view animate-zoom-in">
             <div class="flex items-center gap-4 mb-10">
                 <button onclick="navigate('dashboard')" class="p-3 bg-white/5 hover:bg-white/10 rounded-full transition-colors"><i data-lucide="arrow-left" class="w-5 h-5"></i></button>
@@ -168,7 +167,6 @@
             </div>
         </div>
 
-        <!-- PASE DE LISTA EN VIVO -->
         <div id="view-live-session" class="hidden-view animate-zoom-in">
             <div class="flex items-center justify-between mb-8">
                 <button onclick="stopSession()" class="bg-white/10 hover:bg-red-500 hover:text-white text-white px-6 py-3 rounded-2xl font-black text-[10px] uppercase tracking-widest transition-colors flex items-center gap-2"><i data-lucide="square-user-round" class="w-4 h-4"></i> Finalizar Sesión</button>
@@ -198,7 +196,6 @@
             </div>
         </div>
 
-        <!-- REPORTES DE CLASE -->
         <div id="view-class-reports" class="glass p-8 md:p-14 rounded-[4rem] border-t-4 border-t-yellow-500 shadow-2xl hidden-view animate-zoom-in">
             <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 gap-6">
                 <div class="flex items-center gap-4">
@@ -227,9 +224,10 @@
         </div>
     </div>
 
-    <!-- LÓGICA CON CONEXIÓN A FIREBASE -->
+    <!-- LÓGICA DE NUBE -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+        import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
         import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
         const firebaseConfig = {
@@ -241,34 +239,41 @@
             appId: "1:130615246146:web:6ae2c17c828fb28a809cdb"
         };
         const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
         const dbFS = getFirestore(app);
 
         window.lucide.createIcons();
-
-        // Estado Global Base
         window.db = { alumnos: [], maestros: [], asistencias: [], activeSessions: [], config: { ciclo: '2026-B', estado: 'online' } };
         window.currentView = 'auth';
+        window.isDbLoaded = false;
 
-        // Escucha cambios en tiempo real
-        onSnapshot(doc(dbFS, "ceut", "database"), (docSnap) => {
-            if (docSnap.exists()) {
-                window.db = docSnap.data();
-                window.db.alumnos = window.db.alumnos || []; window.db.maestros = window.db.maestros || [];
-                window.db.asistencias = window.db.asistencias || []; window.db.activeSessions = window.db.activeSessions || [];
-                window.db.config = window.db.config || { ciclo: '2026-B', estado: 'online' };
+        signInAnonymously(auth).then(() => {
+            onSnapshot(doc(dbFS, "ceut", "database"), (docSnap) => {
+                if (docSnap.exists()) {
+                    window.db = docSnap.data();
+                    window.db.alumnos = window.db.alumnos || []; window.db.maestros = window.db.maestros || [];
+                    window.db.asistencias = window.db.asistencias || []; window.db.activeSessions = window.db.activeSessions || [];
+                    window.db.config = window.db.config || { ciclo: '2026-B', estado: 'online' };
 
-                if(window.liveSessionClass) { window.pollLiveStudents(); } // Refleja alumnos en vivo al instante!
-                if(window.currentTeacher && window.currentView !== 'auth') { window.navigate(window.currentView, false); }
-            } else {
-                window.saveDB(window.db);
-            }
-        });
+                    if(window.liveSessionClass) { window.pollLiveStudents(); }
+                    if(window.currentTeacher && window.currentView !== 'auth') { window.navigate(window.currentView, false); }
+                } else { window.saveDB(window.db); }
+
+                if(!window.isDbLoaded) {
+                    window.isDbLoaded = true;
+                    document.getElementById('loading-overlay').style.opacity = '0';
+                    setTimeout(() => document.getElementById('loading-overlay').classList.add('hidden-view'), 500);
+                }
+            }, (error) => {
+                console.error(error); alert("SISTEMA CEUT:\nFirebase bloqueó la conexión.\nRevisa las reglas de Firestore.");
+                document.getElementById('loading-overlay').classList.add('hidden-view');
+            });
+        }).catch(e => { console.error(e); document.getElementById('loading-overlay').classList.add('hidden-view'); });
 
         window.saveDB = function(database) {
-            setDoc(doc(dbFS, "ceut", "database"), database).catch(e => console.error("Asegúrate de permitir lecturas/escrituras en las reglas de Firestore.", e));
+            setDoc(doc(dbFS, "ceut", "database"), database).catch(e => alert("Error al guardar en la nube. Revisa Reglas de Firestore."));
         };
 
-        // --- LÓGICA DOCENTE ---
         window.currentTeacher = JSON.parse(sessionStorage.getItem('ceut_maestro_session')) || null;
         window.editingClassId = null; window.liveSessionClass = null; window.timerInterval = null;
         window.currentReportClassId = null; window.currentReportFilter = 'hoy'; window.currentFilteredRecords = [];
