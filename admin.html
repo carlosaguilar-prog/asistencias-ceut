@@ -547,6 +547,11 @@
             } else {
                 hideApp();
             }
+
+            // --- LISTENERS PARA TECLA ENTER ---
+            const executeLoginOnEnter = (e) => { if (e.key === 'Enter') loginAdmin(); };
+            document.getElementById('admin-user').addEventListener('keypress', executeLoginOnEnter);
+            document.getElementById('admin-pass').addEventListener('keypress', executeLoginOnEnter);
         };
 
         function navigate(view) {
