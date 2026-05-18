@@ -116,11 +116,13 @@
     </div>
 
     <footer class="mt-20 opacity-20 text-[10px] font-black uppercase tracking-[0.5em] animate-fade-in delay-500">
-        © 2026 CEUT Tehuacán
+        © <span id="current-year"></span> CEUT Tehuacán
     </footer>
 
     <script>
         lucide.createIcons();
+        // Script para actualizar el año dinámicamente
+        document.getElementById('current-year').textContent = new Date().getFullYear();
     </script>
 
     <!-- Configuración e Inicialización de Firebase -->
