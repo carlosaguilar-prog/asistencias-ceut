@@ -4,7 +4,19 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CEUT | Sistema Integral</title>
+    <link rel="icon" type="image/png" href="https://drive.google.com/thumbnail?id=17NobXQ3JbRnLGejZe4Mn2x-Jl45F4rPm&sz=w64">
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        yellow: { 500: '#f5b800' }
+                    }
+                }
+            }
+        }
+    </script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
@@ -17,6 +29,7 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
+            overflow-x: hidden;
         }
         .glass-card {
             background: rgba(255, 255, 255, 0.03);
@@ -41,13 +54,29 @@
             filter: drop-shadow(0 0 40px rgba(245, 184, 0, 0.3));
             margin-bottom: 2rem;
         }
+
+        /* --- Animaciones Premium --- */
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        .animate-fade-in-up { animation: fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards; opacity: 0; }
+        .animate-fade-in { animation: fadeIn 1s ease-out forwards; opacity: 0; }
+        .delay-100 { animation-delay: 100ms; }
+        .delay-200 { animation-delay: 200ms; }
+        .delay-300 { animation-delay: 300ms; }
+        .delay-500 { animation-delay: 500ms; }
     </style>
 </head>
 <body class="p-6">
-    <div class="text-center mb-14">
-        <img src="Gemini_Generated_Image_ob1grpob1grpob1g-removebg-preview.png" 
-             class="logo-ceut mx-auto" 
-             alt="Logo CEUT"
+    <div class="text-center mb-14 animate-fade-in-up">
+        <img src="https://drive.google.com/thumbnail?id=17NobXQ3JbRnLGejZe4Mn2x-Jl45F4rPm&sz=w800" 
+             class="logo-ceut mx-auto hover:scale-105 transition-transform duration-500" 
+             alt="Logo Tigre CEUT"
              onerror="this.src='https://ui-avatars.com/api/?name=CEUT&background=f5b800&color=020617&size=200&bold=true'">
         
         <h1 class="text-5xl md:text-7xl font-black italic uppercase tracking-tighter leading-none">
@@ -60,38 +89,56 @@
 
     <div class="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl w-full">
         
-        <a href="alumno.html" class="glass-card p-10 rounded-[3.5rem] text-center group">
-            <div class="w-16 h-16 bg-yellow-500/10 rounded-2xl flex items-center justify-center mx-auto mb-6 text-yellow-500">
+        <a href="alumno.html" class="glass-card p-10 rounded-[3.5rem] text-center group animate-fade-in-up delay-100">
+            <div class="w-16 h-16 bg-yellow-500/10 rounded-2xl flex items-center justify-center mx-auto mb-6 text-yellow-500 group-hover:scale-110 group-hover:bg-yellow-500 group-hover:text-[#020617] transition-all duration-300">
                 <i data-lucide="graduation-cap" class="w-8 h-8"></i>
             </div>
             <h3 class="text-2xl font-black italic uppercase mb-2 text-white">Alumnos</h3>
-            <p class="text-[10px] opacity-40 font-bold uppercase tracking-widest">Acceso a Credencial</p>
+            <p class="text-[10px] opacity-40 font-bold uppercase tracking-widest group-hover:opacity-100 transition-opacity">Acceso a Credencial</p>
         </a>
 
-        <a href="docente.html" class="glass-card p-10 rounded-[3.5rem] text-center group border-b-4 border-b-yellow-500">
-            <div class="w-16 h-16 bg-yellow-500/10 rounded-2xl flex items-center justify-center mx-auto mb-6 text-yellow-500">
+        <a href="maestro.html" class="glass-card p-10 rounded-[3.5rem] text-center group border-b-4 border-b-yellow-500 animate-fade-in-up delay-200">
+            <div class="w-16 h-16 bg-yellow-500/10 rounded-2xl flex items-center justify-center mx-auto mb-6 text-yellow-500 group-hover:scale-110 group-hover:bg-yellow-500 group-hover:text-[#020617] transition-all duration-300">
                 <i data-lucide="presentation" class="w-8 h-8"></i>
             </div>
             <h3 class="text-2xl font-black italic uppercase mb-2 text-white">Maestros</h3>
-            <p class="text-[10px] opacity-40 font-bold uppercase tracking-widest">Pase de Lista</p>
+            <p class="text-[10px] opacity-40 font-bold uppercase tracking-widest group-hover:opacity-100 transition-opacity">Pase de Lista</p>
         </a>
 
-        <a href="admin.html" class="glass-card p-10 rounded-[3.5rem] text-center group">
-            <div class="w-16 h-16 bg-yellow-500/10 rounded-2xl flex items-center justify-center mx-auto mb-6 text-yellow-500">
+        <a href="admin.html" class="glass-card p-10 rounded-[3.5rem] text-center group animate-fade-in-up delay-300">
+            <div class="w-16 h-16 bg-yellow-500/10 rounded-2xl flex items-center justify-center mx-auto mb-6 text-yellow-500 group-hover:scale-110 group-hover:bg-yellow-500 group-hover:text-[#020617] transition-all duration-300">
                 <i data-lucide="shield-check" class="w-8 h-8"></i>
             </div>
             <h3 class="text-2xl font-black italic uppercase mb-2 text-white">Admin</h3>
-            <p class="text-[10px] opacity-40 font-bold uppercase tracking-widest">Gestión de Sistema</p>
+            <p class="text-[10px] opacity-40 font-bold uppercase tracking-widest group-hover:opacity-100 transition-opacity">Gestión de Sistema</p>
         </a>
 
     </div>
 
-    <footer class="mt-20 opacity-20 text-[10px] font-black uppercase tracking-[0.5em]">
-        © 2024 CEUT Tehuacán
+    <footer class="mt-20 opacity-20 text-[10px] font-black uppercase tracking-[0.5em] animate-fade-in delay-500">
+        © 2026 CEUT Tehuacán
     </footer>
 
     <script>
         lucide.createIcons();
+    </script>
+
+    <!-- Configuración e Inicialización de Firebase -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+        
+        const firebaseConfig = {
+            apiKey: "AIzaSyCefP6qEqaCMpo8ZpUiLpN4e_-E4ZNTp94",
+            authDomain: "asistencias-ceut.firebaseapp.com",
+            projectId: "asistencias-ceut",
+            storageBucket: "asistencias-ceut.firebasestorage.app",
+            messagingSenderId: "130615246146",
+            appId: "1:130615246146:web:6ae2c17c828fb28a809cdb"
+        };
+
+        // Inicializar Firebase
+        const app = initializeApp(firebaseConfig);
+        console.log("🔥 Firebase inicializado en: Sistema Integral (Inicio)");
     </script>
 </body>
 </html>
