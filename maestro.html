@@ -7,15 +7,7 @@
     <link rel="icon" type="image/png" href="https://drive.google.com/thumbnail?id=17NobXQ3JbRnLGejZe4Mn2x-Jl45F4rPm&sz=w64">
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        yellow: { 500: '#f5b800' }
-                    }
-                }
-            }
-        }
+        tailwind.config = { theme: { extend: { colors: { yellow: { 500: '#f5b800' } } } } }
     </script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
@@ -24,18 +16,11 @@
         .glass { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.1); }
         .glass-input { background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); color: white; transition: all 0.3s; }
         .glass-input:focus { border-color: #f5b800; background: rgba(255, 255, 255, 0.1); outline: none; }
-        
-        /* Animaciones */
         @keyframes fadeInUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
         @keyframes zoomIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
         .animate-fade-in-up { animation: fadeInUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
         .animate-zoom-in { animation: zoomIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
-        .delay-100 { animation-delay: 100ms; }
-        .delay-200 { animation-delay: 200ms; }
-        
         .hidden-view { display: none !important; }
-
-        /* Estilos específicos para impresión (Hoja Membretada) */
         @media print {
             body { background: white !important; color: black !important; display: block; overflow: auto; }
             .no-print { display: none !important; }
@@ -44,23 +29,18 @@
             .print-table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 12px; }
             .print-table th, .print-table td { border: 1px solid #ddd; padding: 10px; text-align: left; }
             .print-table th { background-color: #f3f4f6 !important; -webkit-print-color-adjust: exact; color: black; font-weight: bold; text-transform: uppercase; }
-            .print-title { font-size: 24px; font-weight: 900; text-transform: uppercase; margin: 0; }
-            .print-subtitle { font-size: 12px; color: #555; margin: 5px 0 0 0; }
         }
     </style>
 </head>
 <body class="p-4 md:p-8 relative">
 
-    <!-- ÁREA DE IMPRESIÓN (Hoja Membretada) -->
     <div id="print-section" class="hidden-view print-area">
         <div class="print-header">
-            <div>
-                <img src="https://drive.google.com/thumbnail?id=17NobXQ3JbRnLGejZe4Mn2x-Jl45F4rPm&sz=w800" style="height: 80px;" alt="Logo CEUT">
-            </div>
+            <div><img src="https://drive.google.com/thumbnail?id=17NobXQ3JbRnLGejZe4Mn2x-Jl45F4rPm&sz=w800" style="height: 80px;" alt="Logo CEUT"></div>
             <div style="text-align: right;">
-                <h1 class="print-title">Centro Universitario de Tehuacán</h1>
-                <p class="print-subtitle">Reporte Oficial de Asistencia Académica</p>
-                <p class="print-subtitle" id="print-date"></p>
+                <h1 style="font-size: 24px; font-weight: 900; text-transform: uppercase; margin: 0;">Centro Universitario de Tehuacán</h1>
+                <p style="font-size: 12px; color: #555; margin: 5px 0 0 0;">Reporte Oficial de Asistencia Académica</p>
+                <p style="font-size: 12px; color: #555; margin: 5px 0 0 0;" id="print-date"></p>
             </div>
         </div>
         <div style="margin-bottom: 20px;">
@@ -68,20 +48,14 @@
             <p style="font-size: 14px; margin: 5px 0 0 0;" id="print-materia-details">Catedrático: --- | Grado/Grupo: --- | Nivel: ---</p>
             <p style="font-size: 12px; margin: 5px 0 0 0; font-style: italic;" id="print-materia-filter">Filtro: ---</p>
         </div>
-        <table class="print-table" id="print-table-content">
-            <!-- Llenado dinámicamente -->
-        </table>
+        <table class="print-table" id="print-table-content"></table>
         <div style="margin-top: 80px; width: 100%; display: flex; justify-content: space-around; text-align: center;">
-            <div>
-                <div style="border-top: 1px solid black; width: 250px; margin: 0 auto; padding-top: 10px; font-size: 12px; font-weight: bold;" id="print-sign-teacher">Firma del Catedrático</div>
-            </div>
-            <div>
-                <div style="border-top: 1px solid black; width: 250px; margin: 0 auto; padding-top: 10px; font-size: 12px; font-weight: bold;">Sello de Control Escolar</div>
-            </div>
+            <div><div style="border-top: 1px solid black; width: 250px; margin: 0 auto; padding-top: 10px; font-size: 12px; font-weight: bold;" id="print-sign-teacher">Firma del Catedrático</div></div>
+            <div><div style="border-top: 1px solid black; width: 250px; margin: 0 auto; padding-top: 10px; font-size: 12px; font-weight: bold;">Sello de Control Escolar</div></div>
         </div>
     </div>
 
-    <!-- MENSAJE EMERGENTE (MODAL ALERTA) -->
+    <!-- MODALES -->
     <div id="modal-alert" class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm hidden-view no-print">
         <div class="glass p-10 rounded-[3rem] max-w-md w-full text-center border-t-4 animate-zoom-in shadow-2xl" id="modal-content">
             <div id="modal-icon" class="w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6"></div>
@@ -91,39 +65,28 @@
         </div>
     </div>
 
-    <!-- MODAL PARA EDITAR REGISTRO DE ASISTENCIA -->
     <div id="modal-edit-record" class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm hidden-view no-print">
         <div class="glass p-10 rounded-[3rem] max-w-lg w-full border-t-4 border-t-yellow-500 animate-zoom-in shadow-2xl relative">
             <button onclick="closeEditModal()" class="absolute top-6 right-6 text-white/50 hover:text-white"><i data-lucide="x" class="w-6 h-6"></i></button>
             <h3 class="text-2xl font-black uppercase text-yellow-500 mb-6"><i data-lucide="edit-3" class="inline-block w-6 h-6 -mt-2 mr-2"></i>Editar Asistencia</h3>
             <div class="space-y-4">
                 <input type="hidden" id="edit-rec-id">
-                <div>
-                    <label class="text-[10px] opacity-50 uppercase font-black ml-2">Nombre del Alumno</label>
-                    <input type="text" id="edit-rec-alumno" class="w-full glass-input rounded-xl px-5 py-3 font-bold mt-1 text-sm">
-                </div>
+                <div><label class="text-[10px] opacity-50 uppercase font-black ml-2">Nombre del Alumno</label><input type="text" id="edit-rec-alumno" class="w-full glass-input rounded-xl px-5 py-3 font-bold mt-1 text-sm"></div>
                 <div class="grid grid-cols-2 gap-4">
-                    <div>
-                        <label class="text-[10px] opacity-50 uppercase font-black ml-2">Fecha (DD/MM/AAAA)</label>
-                        <input type="text" id="edit-rec-fecha" placeholder="Ej. 18/05/2026" class="w-full glass-input rounded-xl px-5 py-3 font-bold mt-1 text-sm">
-                    </div>
-                    <div>
-                        <label class="text-[10px] opacity-50 uppercase font-black ml-2">Hora (HH:MM)</label>
-                        <input type="text" id="edit-rec-hora" placeholder="Ej. 08:15" class="w-full glass-input rounded-xl px-5 py-3 font-bold mt-1 text-sm">
-                    </div>
+                    <div><label class="text-[10px] opacity-50 uppercase font-black ml-2">Fecha (DD/MM/AAAA)</label><input type="text" id="edit-rec-fecha" placeholder="Ej. 18/05/2026" class="w-full glass-input rounded-xl px-5 py-3 font-bold mt-1 text-sm"></div>
+                    <div><label class="text-[10px] opacity-50 uppercase font-black ml-2">Hora (HH:MM)</label><input type="text" id="edit-rec-hora" placeholder="Ej. 08:15" class="w-full glass-input rounded-xl px-5 py-3 font-bold mt-1 text-sm"></div>
                 </div>
             </div>
             <button onclick="saveEditRecord()" class="w-full bg-yellow-500 text-slate-900 font-black uppercase tracking-widest px-6 py-4 rounded-xl hover:scale-105 transition-transform mt-8">Guardar Cambios</button>
         </div>
     </div>
 
-    <!-- CONTENEDOR PRINCIPAL INTERFAZ -->
+    <!-- CONTENEDOR APP -->
     <div class="max-w-6xl mx-auto no-print" id="app-container">
         
-        <!-- HEADER COMÚN -->
         <header id="main-header" class="flex justify-between items-center mb-10 hidden-view animate-fade-in-up">
             <div class="flex items-center gap-5">
-                <img src="https://drive.google.com/thumbnail?id=17NobXQ3JbRnLGejZe4Mn2x-Jl45F4rPm&sz=w800" class="h-16 hover:scale-105 transition-transform" alt="Logo Tigre CEUT" onerror="this.src='https://ui-avatars.com/api/?name=CEUT&background=f5b800&color=020617&size=200&bold=true'">
+                <img src="https://drive.google.com/thumbnail?id=17NobXQ3JbRnLGejZe4Mn2x-Jl45F4rPm&sz=w800" class="h-16 hover:scale-105 transition-transform" alt="Logo Tigre CEUT">
                 <div>
                     <h1 class="text-2xl font-black italic uppercase leading-none">Panel <span class="text-yellow-500">Docente</span></h1>
                     <p id="header-folio" class="text-[9px] font-bold opacity-30 uppercase tracking-[0.3em]">ID: ---</p>
@@ -132,20 +95,15 @@
             <button onclick="logout()" class="p-3 bg-white/5 hover:bg-red-500/20 hover:text-red-400 rounded-full transition-colors"><i data-lucide="log-out" class="w-5 h-5"></i></button>
         </header>
 
-        <!-- VISTA 1: AUTENTICACIÓN (LOGIN / REGISTRO) -->
+        <!-- AUTH -->
         <div id="view-auth" class="animate-fade-in-up mt-10 md:mt-20 relative">
-            
-            <!-- Botón Volver al Inicio -->
             <a href="index.html" class="absolute -top-10 md:-top-16 left-0 flex items-center gap-2 text-white/50 hover:text-white transition-colors font-black text-[10px] uppercase tracking-widest bg-white/5 hover:bg-white/10 px-4 py-2 rounded-full z-50">
                 <i data-lucide="arrow-left" class="w-4 h-4"></i> Volver al Inicio
             </a>
-
             <div class="text-center mb-10">
-                <img src="https://drive.google.com/thumbnail?id=17NobXQ3JbRnLGejZe4Mn2x-Jl45F4rPm&sz=w800" class="h-24 mx-auto mb-6 drop-shadow-[0_0_20px_rgba(245,184,0,0.3)]" alt="Logo Tigre CEUT">
+                <img src="https://drive.google.com/thumbnail?id=17NobXQ3JbRnLGejZe4Mn2x-Jl45F4rPm&sz=w800" class="h-24 mx-auto mb-6 drop-shadow-[0_0_20px_rgba(245,184,0,0.3)]">
                 <h2 class="text-4xl font-black italic uppercase">Portal <span class="text-yellow-500">Docentes</span></h2>
             </div>
-
-            <!-- Login -->
             <div id="form-login" class="max-w-md mx-auto glass p-10 rounded-[3rem] border-t-4 border-t-yellow-500 shadow-2xl">
                 <h3 class="text-xl font-black uppercase mb-6 text-center opacity-80">Iniciar Sesión</h3>
                 <div class="space-y-4">
@@ -153,82 +111,45 @@
                     <input type="password" id="login-pass" placeholder="Contraseña" class="w-full glass-input rounded-xl px-5 py-4 font-bold">
                     <button onclick="loginTeacher()" class="w-full bg-yellow-500 text-slate-900 font-black uppercase tracking-widest px-6 py-4 rounded-xl hover:scale-[1.02] transition-transform shadow-lg shadow-yellow-500/20 mt-2">Ingresar al Panel</button>
                 </div>
-                <div class="mt-8 text-center">
-                    <p class="text-xs opacity-50 font-bold mb-2">¿Nuevo Catedrático?</p>
-                    <button onclick="toggleAuth('register')" class="text-yellow-500 font-black uppercase text-[10px] tracking-widest hover:underline">Registrarme por única ocasión</button>
-                </div>
+                <div class="mt-8 text-center"><p class="text-xs opacity-50 font-bold mb-2">¿Nuevo Catedrático?</p><button onclick="toggleAuth('register')" class="text-yellow-500 font-black uppercase text-[10px] tracking-widest hover:underline">Registrarme por única ocasión</button></div>
             </div>
-
-            <!-- Registro (Única Ocasión) -->
             <div id="form-register" class="max-w-md mx-auto glass p-10 rounded-[3rem] border-t-4 border-t-yellow-500 shadow-2xl hidden-view">
                 <h3 class="text-xl font-black uppercase mb-2 text-center text-yellow-500">Registro Docente</h3>
                 <p class="text-[10px] font-bold text-center opacity-50 uppercase tracking-widest mb-8">Captura tus datos para obtener tu folio</p>
-                
                 <div class="space-y-4">
-                    <div>
-                        <label class="text-[10px] font-black uppercase opacity-40 ml-2">Nombre Completo (Con Título)</label>
-                        <input type="text" id="reg-nombre" placeholder="Ej. Mtro. Juan Pérez" class="w-full glass-input rounded-xl px-5 py-3 font-bold mt-1">
-                    </div>
-                    <div>
-                        <label class="text-[10px] font-black uppercase opacity-40 ml-2">Crear Contraseña</label>
-                        <input type="password" id="reg-pass" placeholder="Mínimo 6 caracteres" class="w-full glass-input rounded-xl px-5 py-3 font-bold mt-1">
-                    </div>
-                    <div>
-                        <label class="text-[10px] font-black uppercase opacity-40 ml-2">Confirmar Contraseña</label>
-                        <input type="password" id="reg-pass-confirm" placeholder="Repite la contraseña" class="w-full glass-input rounded-xl px-5 py-3 font-bold mt-1">
-                    </div>
+                    <div><label class="text-[10px] font-black uppercase opacity-40 ml-2">Nombre Completo (Con Título)</label><input type="text" id="reg-nombre" placeholder="Ej. Mtro. Juan Pérez" class="w-full glass-input rounded-xl px-5 py-3 font-bold mt-1"></div>
+                    <div><label class="text-[10px] font-black uppercase opacity-40 ml-2">Crear Contraseña</label><input type="password" id="reg-pass" placeholder="Mínimo 6 caracteres" class="w-full glass-input rounded-xl px-5 py-3 font-bold mt-1"></div>
+                    <div><label class="text-[10px] font-black uppercase opacity-40 ml-2">Confirmar Contraseña</label><input type="password" id="reg-pass-confirm" placeholder="Repite la contraseña" class="w-full glass-input rounded-xl px-5 py-3 font-bold mt-1"></div>
                 </div>
-
                 <button onclick="registerTeacher()" class="w-full bg-yellow-500 text-slate-900 font-black uppercase tracking-widest px-6 py-4 rounded-xl hover:scale-[1.02] transition-transform shadow-lg shadow-yellow-500/20 mt-8">Generar Folio de Acceso</button>
-                <div class="mt-6 text-center">
-                    <button onclick="toggleAuth('login')" class="opacity-50 hover:opacity-100 font-black uppercase text-[10px] tracking-widest transition-opacity">Volver al Login</button>
-                </div>
+                <div class="mt-6 text-center"><button onclick="toggleAuth('login')" class="opacity-50 hover:opacity-100 font-black uppercase text-[10px] tracking-widest transition-opacity">Volver al Login</button></div>
             </div>
         </div>
 
-        <!-- VISTA 2: DASHBOARD (MIS MATERIAS) -->
+        <!-- DASHBOARD -->
         <div id="view-dashboard" class="hidden-view">
             <div class="glass p-12 rounded-[4rem] border-t-4 border-t-yellow-500 shadow-2xl animate-fade-in-up">
                 <div class="flex flex-col md:flex-row justify-between items-start md:items-end mb-10 gap-4">
-                    <div>
-                        <h2 class="text-3xl font-black italic uppercase text-white">Mis Clases <span class="text-yellow-500 text-sm opacity-50 ml-2">Asignadas</span></h2>
-                        <p id="dash-teacher-name" class="text-xs font-bold opacity-50 uppercase tracking-widest mt-1">Mtro. Nombre</p>
-                    </div>
-                    <button onclick="openClassForm()" class="bg-white/10 hover:bg-white/20 text-white px-6 py-3 rounded-2xl font-black text-[10px] uppercase tracking-widest transition-colors flex items-center gap-2">
-                        <i data-lucide="plus" class="w-4 h-4"></i> Agregar Materia
-                    </button>
+                    <div><h2 class="text-3xl font-black italic uppercase text-white">Mis Clases <span class="text-yellow-500 text-sm opacity-50 ml-2">Asignadas</span></h2><p id="dash-teacher-name" class="text-xs font-bold opacity-50 uppercase tracking-widest mt-1">Mtro. Nombre</p></div>
+                    <button onclick="openClassForm()" class="bg-white/10 hover:bg-white/20 text-white px-6 py-3 rounded-2xl font-black text-[10px] uppercase tracking-widest transition-colors flex items-center gap-2"><i data-lucide="plus" class="w-4 h-4"></i> Agregar Materia</button>
                 </div>
-
-                <!-- Lista de Materias -->
-                <div class="grid gap-6" id="classes-list">
-                    <!-- Se llena con JS -->
-                </div>
-                
+                <div class="grid gap-6" id="classes-list"></div>
                 <div id="classes-empty" class="text-center py-12 opacity-40 hidden-view">
                     <i data-lucide="book-dashed" class="w-16 h-16 mx-auto mb-4"></i>
                     <p class="text-sm font-black uppercase tracking-widest">No tienes materias registradas</p>
-                    <p class="text-[10px] font-bold mt-2">Haz clic en "Agregar Materia" para comenzar</p>
                 </div>
             </div>
         </div>
 
-        <!-- VISTA 3: FORMULARIO DE MATERIA (AGREGAR / EDITAR) -->
+        <!-- FORMULARIO MATERIA -->
         <div id="view-class-form" class="glass p-10 md:p-14 rounded-[4rem] border-t-4 border-t-yellow-500 shadow-2xl hidden-view animate-zoom-in">
             <div class="flex items-center gap-4 mb-10">
                 <button onclick="navigate('dashboard')" class="p-3 bg-white/5 hover:bg-white/10 rounded-full transition-colors"><i data-lucide="arrow-left" class="w-5 h-5"></i></button>
-                <div>
-                    <h2 class="text-2xl font-black italic uppercase text-white" id="form-class-title">Registrar <span class="text-yellow-500">Materia</span></h2>
-                    <p class="text-[10px] opacity-40 font-bold uppercase tracking-widest">Configuración de la clase</p>
-                </div>
+                <div><h2 class="text-2xl font-black italic uppercase text-white" id="form-class-title">Registrar <span class="text-yellow-500">Materia</span></h2><p class="text-[10px] opacity-40 font-bold uppercase tracking-widest">Configuración de la clase</p></div>
             </div>
-
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div class="md:col-span-2">
-                    <label class="text-[10px] font-black uppercase opacity-40 ml-2">Nombre de la Materia</label>
-                    <input type="text" id="mat-nombre" placeholder="Ej. Derecho Civil I" class="w-full glass-input rounded-xl px-5 py-4 font-bold mt-1">
-                </div>
-                <div>
-                    <label class="text-[10px] font-black uppercase opacity-40 ml-2">Nivel Educativo</label>
+                <div class="md:col-span-2"><label class="text-[10px] font-black uppercase opacity-40 ml-2">Nombre de la Materia</label><input type="text" id="mat-nombre" class="w-full glass-input rounded-xl px-5 py-4 font-bold mt-1"></div>
+                <div><label class="text-[10px] font-black uppercase opacity-40 ml-2">Nivel Educativo</label>
                     <select id="mat-nivel" class="w-full glass-input rounded-xl px-5 py-4 font-bold mt-1 appearance-none">
                         <option value="Preparatoria" class="bg-slate-900">Preparatoria</option>
                         <option value="Licenciatura Escolarizada" class="bg-slate-900">Licenciatura Escolarizada</option>
@@ -236,168 +157,120 @@
                         <option value="Maestría" class="bg-slate-900">Maestría</option>
                     </select>
                 </div>
-                <div>
-                    <label class="text-[10px] font-black uppercase opacity-40 ml-2">Carrera / Programa (Si aplica)</label>
-                    <input type="text" id="mat-carrera" placeholder="Ej. Derecho" class="w-full glass-input rounded-xl px-5 py-4 font-bold mt-1">
-                </div>
-                <div>
-                    <label class="text-[10px] font-black uppercase opacity-40 ml-2">Grado / Semestre</label>
-                    <input type="text" id="mat-grado" placeholder="Ej. 4to Semestre" class="w-full glass-input rounded-xl px-5 py-4 font-bold mt-1">
-                </div>
-                <div>
-                    <label class="text-[10px] font-black uppercase opacity-40 ml-2">Grupo</label>
-                    <input type="text" id="mat-grupo" placeholder="Ej. A" class="w-full glass-input rounded-xl px-5 py-4 font-bold mt-1 uppercase">
-                </div>
+                <div><label class="text-[10px] font-black uppercase opacity-40 ml-2">Carrera / Programa</label><input type="text" id="mat-carrera" class="w-full glass-input rounded-xl px-5 py-4 font-bold mt-1"></div>
+                <div><label class="text-[10px] font-black uppercase opacity-40 ml-2">Grado / Semestre</label><input type="text" id="mat-grado" class="w-full glass-input rounded-xl px-5 py-4 font-bold mt-1"></div>
+                <div><label class="text-[10px] font-black uppercase opacity-40 ml-2">Grupo</label><input type="text" id="mat-grupo" class="w-full glass-input rounded-xl px-5 py-4 font-bold mt-1 uppercase"></div>
             </div>
-
             <div class="mt-10 flex gap-4">
-                <button onclick="saveClass()" class="bg-yellow-500 text-slate-900 font-black uppercase tracking-widest px-8 py-4 rounded-xl hover:scale-105 transition-transform shadow-lg shadow-yellow-500/20">Guardar Materia</button>
-                <button id="btn-delete-class" onclick="deleteClass()" class="bg-red-500/20 text-red-400 font-black uppercase tracking-widest px-8 py-4 rounded-xl hover:bg-red-500 hover:text-white transition-colors hidden-view">Eliminar</button>
+                <button onclick="saveClass()" class="bg-yellow-500 text-slate-900 font-black uppercase tracking-widest px-8 py-4 rounded-xl hover:scale-105 transition-transform">Guardar Materia</button>
+                <button id="btn-delete-class" onclick="deleteClass()" class="bg-red-500/20 text-red-400 font-black uppercase tracking-widest px-8 py-4 rounded-xl hover:bg-red-500 hover:text-white hidden-view">Eliminar</button>
             </div>
         </div>
 
-        <!-- VISTA 4: SESIÓN EN VIVO (PASE DE LISTA) -->
+        <!-- PASE DE LISTA EN VIVO -->
         <div id="view-live-session" class="hidden-view animate-zoom-in">
             <div class="flex items-center justify-between mb-8">
-                <button onclick="stopSession()" class="bg-white/10 hover:bg-red-500 hover:text-white text-white px-6 py-3 rounded-2xl font-black text-[10px] uppercase tracking-widest transition-colors flex items-center gap-2">
-                    <i data-lucide="square-user-round" class="w-4 h-4"></i> Finalizar Sesión
-                </button>
+                <button onclick="stopSession()" class="bg-white/10 hover:bg-red-500 hover:text-white text-white px-6 py-3 rounded-2xl font-black text-[10px] uppercase tracking-widest transition-colors flex items-center gap-2"><i data-lucide="square-user-round" class="w-4 h-4"></i> Finalizar Sesión</button>
             </div>
-
             <div class="grid md:grid-cols-3 gap-8">
-                <!-- Panel de Código -->
                 <div class="md:col-span-1 glass p-10 rounded-[3rem] text-center border-t-4 border-t-yellow-500 flex flex-col justify-center relative overflow-hidden">
                     <p class="text-[10px] font-black opacity-50 uppercase tracking-widest mb-4">Código de Asistencia</p>
                     <div id="live-code" class="text-6xl font-black italic text-yellow-500 tracking-[0.2em] mb-4 drop-shadow-[0_0_20px_rgba(245,184,0,0.5)]">------</div>
-                    
-                    <div class="w-full bg-white/10 h-2 rounded-full overflow-hidden mt-4">
-                        <div id="timer-bar" class="bg-yellow-500 h-full w-full transition-all duration-1000 ease-linear"></div>
-                    </div>
+                    <div class="w-full bg-white/10 h-2 rounded-full overflow-hidden mt-4"><div id="timer-bar" class="bg-yellow-500 h-full w-full transition-all duration-1000 ease-linear"></div></div>
                     <p class="text-[9px] font-bold opacity-40 uppercase tracking-widest mt-3">Cambia en <span id="timer-text">30</span>s</p>
                 </div>
-
-                <!-- Lista en Tiempo Real -->
                 <div class="md:col-span-2 glass p-8 rounded-[3rem]">
                     <div class="flex justify-between items-end mb-6">
-                        <div>
-                            <h3 class="text-xl font-black italic uppercase text-white" id="live-materia-name">Materia</h3>
-                            <p class="text-[10px] opacity-40 font-bold uppercase tracking-widest mt-1" id="live-materia-details">Grado • Grupo</p>
-                        </div>
-                        <div class="flex items-center gap-2 bg-green-500/10 px-4 py-2 rounded-xl border border-green-500/20">
-                            <span class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
-                            <span class="text-[9px] font-black uppercase text-green-400 tracking-widest">En Vivo</span>
-                        </div>
+                        <div><h3 class="text-xl font-black italic uppercase text-white" id="live-materia-name">Materia</h3><p class="text-[10px] opacity-40 font-bold uppercase tracking-widest mt-1" id="live-materia-details">Grado • Grupo</p></div>
+                        <div class="flex items-center gap-2 bg-green-500/10 px-4 py-2 rounded-xl border border-green-500/20"><span class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span><span class="text-[9px] font-black uppercase text-green-400 tracking-widest">En Vivo</span></div>
                     </div>
-
                     <div class="bg-black/20 rounded-2xl overflow-hidden border border-white/5 h-64 overflow-y-auto">
                         <table class="w-full text-left text-sm">
-                            <thead class="bg-white/5 text-[9px] uppercase tracking-widest opacity-60">
-                                <tr>
-                                    <th class="px-6 py-4">Alumno Registrado</th>
-                                    <th class="px-6 py-4">Grado/Grupo</th>
-                                    <th class="px-6 py-4 text-right">Hora</th>
-                                </tr>
-                            </thead>
-                            <tbody id="live-students-list" class="divide-y divide-white/5">
-                                <!-- Se llena en tiempo real -->
-                            </tbody>
+                            <thead class="bg-white/5 text-[9px] uppercase tracking-widest opacity-60"><tr><th class="px-6 py-4">Alumno</th><th class="px-6 py-4">Grado/Grupo</th><th class="px-6 py-4 text-right">Hora</th></tr></thead>
+                            <tbody id="live-students-list" class="divide-y divide-white/5"></tbody>
                         </table>
                         <div id="live-empty" class="text-center py-10 opacity-30">
-                            <i data-lucide="users" class="w-8 h-8 mx-auto mb-2"></i>
-                            <p class="text-[10px] font-bold uppercase tracking-widest">Esperando alumnos...</p>
+                            <i data-lucide="users" class="w-8 h-8 mx-auto mb-2"></i><p class="text-[10px] font-bold uppercase tracking-widest">Esperando alumnos que ingresen el código...</p>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- VISTA 5: REPORTES POR MATERIA (VER, EDITAR, DESCARGAR, IMPRIMIR) -->
+        <!-- REPORTES DE CLASE -->
         <div id="view-class-reports" class="glass p-8 md:p-14 rounded-[4rem] border-t-4 border-t-yellow-500 shadow-2xl hidden-view animate-zoom-in">
-            
             <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 gap-6">
                 <div class="flex items-center gap-4">
                     <button onclick="navigate('dashboard')" class="p-3 bg-white/5 hover:bg-white/10 rounded-full transition-colors"><i data-lucide="arrow-left" class="w-5 h-5"></i></button>
-                    <div>
-                        <h2 class="text-2xl font-black italic uppercase text-white" id="report-class-title">Reportes de <span class="text-yellow-500">Materia</span></h2>
-                        <p class="text-[10px] opacity-40 font-bold uppercase tracking-widest" id="report-class-subtitle">Grado • Grupo</p>
-                    </div>
+                    <div><h2 class="text-2xl font-black italic uppercase text-white" id="report-class-title">Reportes</h2><p class="text-[10px] opacity-40 font-bold uppercase tracking-widest" id="report-class-subtitle">Detalles</p></div>
                 </div>
-                
                 <div class="flex gap-2">
-                    <button onclick="downloadClassCSV()" class="bg-green-500/20 hover:bg-green-500 text-green-400 hover:text-white px-5 py-3 rounded-xl font-black text-[10px] uppercase tracking-widest transition-colors flex items-center gap-2">
-                        <i data-lucide="sheet" class="w-4 h-4"></i> Descargar CSV
-                    </button>
-                    <button onclick="printClassReport()" class="bg-white/10 hover:bg-white text-white hover:text-slate-900 px-5 py-3 rounded-xl font-black text-[10px] uppercase tracking-widest transition-colors flex items-center gap-2">
-                        <i data-lucide="printer" class="w-4 h-4"></i> Imprimir / PDF
-                    </button>
+                    <button onclick="downloadClassCSV()" class="bg-green-500/20 hover:bg-green-500 text-green-400 hover:text-white px-5 py-3 rounded-xl font-black text-[10px] uppercase tracking-widest transition-colors flex items-center gap-2"><i data-lucide="sheet" class="w-4 h-4"></i> Descargar CSV</button>
+                    <button onclick="printClassReport()" class="bg-white/10 hover:bg-white text-white hover:text-slate-900 px-5 py-3 rounded-xl font-black text-[10px] uppercase tracking-widest transition-colors flex items-center gap-2"><i data-lucide="printer" class="w-4 h-4"></i> Imprimir / PDF</button>
                 </div>
             </div>
-
-            <!-- Filtros Simples -->
             <div class="flex flex-wrap gap-2 mb-8">
                 <button onclick="loadClassReports('hoy')" id="btn-rep-hoy" class="bg-yellow-500 text-slate-900 px-6 py-2 rounded-full font-black text-[10px] uppercase tracking-widest transition-colors">Hoy</button>
                 <button onclick="loadClassReports('mes')" id="btn-rep-mes" class="bg-white/5 hover:bg-white/10 px-6 py-2 rounded-full font-black text-[10px] uppercase tracking-widest transition-colors">Mes</button>
                 <button onclick="loadClassReports('cuatrimestre')" id="btn-rep-cuatrimestre" class="bg-white/5 hover:bg-white/10 px-6 py-2 rounded-full font-black text-[10px] uppercase tracking-widest transition-colors">Cuatrimestre</button>
             </div>
-
             <div class="bg-black/20 rounded-2xl overflow-hidden border border-white/5">
                 <table class="w-full text-left text-sm whitespace-nowrap">
                     <thead class="bg-white/5 text-[9px] uppercase tracking-widest opacity-60">
-                        <tr>
-                            <th class="px-6 py-4">No.</th>
-                            <th class="px-6 py-4">Alumno</th>
-                            <th class="px-6 py-4">Fecha</th>
-                            <th class="px-6 py-4">Hora</th>
-                            <th class="px-6 py-4 text-center">Acciones</th>
-                        </tr>
+                        <tr><th class="px-6 py-4">No.</th><th class="px-6 py-4">Alumno</th><th class="px-6 py-4">Fecha</th><th class="px-6 py-4">Hora</th><th class="px-6 py-4 text-center">Acciones</th></tr>
                     </thead>
-                    <tbody id="class-report-tbody" class="divide-y divide-white/5">
-                        <!-- Se llena con JS -->
-                    </tbody>
+                    <tbody id="class-report-tbody" class="divide-y divide-white/5"></tbody>
                 </table>
-                <div id="class-report-empty" class="text-center py-10 opacity-30 hidden-view">
-                    <p class="text-[10px] font-bold uppercase tracking-widest">No hay registros para este filtro.</p>
-                </div>
+                <div id="class-report-empty" class="text-center py-10 opacity-30 hidden-view"><p class="text-[10px] font-bold uppercase tracking-widest">No hay registros para este filtro.</p></div>
             </div>
         </div>
-
     </div>
 
-    <!-- LÓGICA DE LA APLICACIÓN (JS) -->
+    <!-- LÓGICA DE BASE DE DATOS UNIFICADA -->
     <script>
         lucide.createIcons();
 
-        // --- BASE DE DATOS SIMULADA (LocalStorage) ---
-        let currentTeacher = JSON.parse(localStorage.getItem('ceut_maestro_session')) || null;
-        let editingClassId = null;
-        let liveSessionClass = null;
-        let timerInterval = null;
-        let mockStudentInterval = null;
+        // LLAVES DE DB CENTRAL
+        const DB_KEYS = {
+            ALUMNOS: 'ceut_db_alumnos',
+            MAESTROS: 'ceut_db_maestros',
+            ASISTENCIAS: 'ceut_db_asistencias',
+            SESSIONS: 'ceut_db_active_sessions',
+            CONFIG: 'ceut_db_config'
+        };
 
-        // Variables Módulo Reportes
-        let currentReportClassId = null;
-        let currentReportFilter = 'hoy';
-        let currentFilteredRecords = [];
+        function getDB() {
+            return {
+                alumnos: JSON.parse(localStorage.getItem(DB_KEYS.ALUMNOS)) || [],
+                maestros: JSON.parse(localStorage.getItem(DB_KEYS.MAESTROS)) || [],
+                asistencias: JSON.parse(localStorage.getItem(DB_KEYS.ASISTENCIAS)) || [],
+                activeSessions: JSON.parse(localStorage.getItem(DB_KEYS.SESSIONS)) || [],
+                config: JSON.parse(localStorage.getItem(DB_KEYS.CONFIG)) || { ciclo: '2026-B', estado: 'online' }
+            };
+        }
 
-        // --- INICIALIZACIÓN ---
+        function saveDB(database) {
+            localStorage.setItem(DB_KEYS.ALUMNOS, JSON.stringify(database.alumnos));
+            localStorage.setItem(DB_KEYS.MAESTROS, JSON.stringify(database.maestros));
+            localStorage.setItem(DB_KEYS.ASISTENCIAS, JSON.stringify(database.asistencias));
+            localStorage.setItem(DB_KEYS.SESSIONS, JSON.stringify(database.activeSessions));
+            localStorage.setItem(DB_KEYS.CONFIG, JSON.stringify(database.config));
+        }
+
+        let currentTeacher = JSON.parse(sessionStorage.getItem('ceut_maestro_session')) || null;
+        let editingClassId = null, liveSessionClass = null, timerInterval = null, livePollInterval = null;
+        let currentReportClassId = null, currentReportFilter = 'hoy', currentFilteredRecords = [];
+
         window.onload = () => {
-            if (currentTeacher) {
-                navigate('dashboard');
-            } else {
-                document.getElementById('view-auth').classList.remove('hidden-view');
-            }
-
-            // --- LISTENERS PARA TECLA ENTER ---
+            if (currentTeacher) { navigate('dashboard'); } else { document.getElementById('view-auth').classList.remove('hidden-view'); }
             const loginOnEnter = (e) => { if (e.key === 'Enter') loginTeacher(); };
             document.getElementById('login-folio').addEventListener('keypress', loginOnEnter);
             document.getElementById('login-pass').addEventListener('keypress', loginOnEnter);
-
             const registerOnEnter = (e) => { if (e.key === 'Enter') registerTeacher(); };
             document.getElementById('reg-pass').addEventListener('keypress', registerOnEnter);
             document.getElementById('reg-pass-confirm').addEventListener('keypress', registerOnEnter);
         };
 
-        // --- NAVEGACIÓN ---
         function hideAllViews() {
             const views = ['view-auth', 'view-dashboard', 'view-class-form', 'view-live-session', 'view-class-reports', 'main-header'];
             views.forEach(v => document.getElementById(v).classList.add('hidden-view'));
@@ -409,518 +282,304 @@
                 document.getElementById('main-header').classList.remove('hidden-view');
                 document.getElementById('header-folio').innerText = `ID: ${currentTeacher.folio}`;
             }
-
             if (view === 'dashboard') {
                 document.getElementById('view-dashboard').classList.remove('hidden-view');
                 document.getElementById('dash-teacher-name').innerText = currentTeacher.nombre;
                 renderClasses();
-            } else if (view === 'class-form') {
-                document.getElementById('view-class-form').classList.remove('hidden-view');
-            } else if (view === 'live-session') {
-                document.getElementById('view-live-session').classList.remove('hidden-view');
-            } else if (view === 'class-reports') {
-                document.getElementById('view-class-reports').classList.remove('hidden-view');
-            }
+            } else if (view === 'class-form') { document.getElementById('view-class-form').classList.remove('hidden-view');
+            } else if (view === 'live-session') { document.getElementById('view-live-session').classList.remove('hidden-view');
+            } else if (view === 'class-reports') { document.getElementById('view-class-reports').classList.remove('hidden-view'); }
         }
 
         function toggleAuth(type) {
-            if (type === 'register') {
-                document.getElementById('form-login').classList.add('hidden-view');
-                document.getElementById('form-register').classList.remove('hidden-view');
-            } else {
-                document.getElementById('form-register').classList.add('hidden-view');
-                document.getElementById('form-login').classList.remove('hidden-view');
-            }
+            if (type === 'register') { document.getElementById('form-login').classList.add('hidden-view'); document.getElementById('form-register').classList.remove('hidden-view'); } 
+            else { document.getElementById('form-register').classList.add('hidden-view'); document.getElementById('form-login').classList.remove('hidden-view'); }
         }
 
-        // --- FUNCIONES DE AUTENTICACIÓN ---
         function registerTeacher() {
             const nombre = document.getElementById('reg-nombre').value.trim();
             const pass = document.getElementById('reg-pass').value;
             const passConfirm = document.getElementById('reg-pass-confirm').value;
 
-            if(!nombre || !pass || pass.length < 6) {
-                showModal('Error', 'Ingresa tu nombre completo y una contraseña de al menos 6 caracteres.', 'error');
-                return;
-            }
-
-            if(pass !== passConfirm) {
-                showModal('Error', 'Las contraseñas no coinciden. Inténtalo de nuevo.', 'error');
-                return;
-            }
+            if(!nombre || !pass || pass.length < 6) { showModal('Error', 'Ingresa tu nombre completo y una contraseña de al menos 6 caracteres.', 'error'); return; }
+            if(pass !== passConfirm) { showModal('Error', 'Las contraseñas no coinciden. Inténtalo de nuevo.', 'error'); return; }
 
             const folio = 'DOC-' + Math.floor(1000 + Math.random() * 9000);
+            const db = getDB();
+            
+            const newTeacher = { folio, nombre, pass, materias: [] };
+            db.maestros.push(newTeacher);
+            saveDB(db);
 
-            currentTeacher = {
-                nombre, pass, folio,
-                materias: [], 
-                asistenciasGuardadas: [] 
-            };
-
-            localStorage.setItem('ceut_maestro_session', JSON.stringify(currentTeacher));
+            currentTeacher = newTeacher;
+            sessionStorage.setItem('ceut_maestro_session', JSON.stringify(currentTeacher));
             showModal('¡Registro Exitoso!', `Tu folio de Catedrático es:\n\n<span class="text-3xl text-yellow-500 font-black tracking-widest">${folio}</span>\n\nGuárdalo bien para iniciar sesión.`, 'success', () => navigate('dashboard'));
         }
 
         function loginTeacher() {
             const folio = document.getElementById('login-folio').value.trim().toUpperCase();
             const pass = document.getElementById('login-pass').value;
+            const db = getDB();
             
-            const savedData = JSON.parse(localStorage.getItem('ceut_maestro_session'));
-            
-            if (savedData && savedData.folio === folio && savedData.pass === pass) {
-                currentTeacher = savedData;
+            const match = db.maestros.find(m => m.folio === folio && m.pass === pass);
+            if (match) {
+                currentTeacher = match;
+                sessionStorage.setItem('ceut_maestro_session', JSON.stringify(currentTeacher));
                 navigate('dashboard');
-            } else {
-                showModal('Error', 'Folio o contraseña incorrectos.', 'error');
-            }
+            } else { showModal('Error', 'Folio o contraseña incorrectos.', 'error'); }
         }
 
         function logout() {
-            stopSession(true); 
-            currentTeacher = null;
-            
-            // LÍNEA AGREGADA: Borra la sesión de la memoria del navegador
-            localStorage.removeItem('ceut_maestro_session'); 
-            
-            hideAllViews();
-            document.getElementById('view-auth').classList.remove('hidden-view');
-            toggleAuth('login');
-            document.getElementById('login-folio').value = '';
-            document.getElementById('login-pass').value = '';
-            document.getElementById('reg-pass').value = '';
-            document.getElementById('reg-pass-confirm').value = '';
+            stopSession(true); currentTeacher = null; sessionStorage.removeItem('ceut_maestro_session'); 
+            hideAllViews(); document.getElementById('view-auth').classList.remove('hidden-view'); toggleAuth('login');
+            document.getElementById('login-folio').value = ''; document.getElementById('login-pass').value = '';
+            document.getElementById('reg-pass').value = ''; document.getElementById('reg-pass-confirm').value = '';
         }
 
-        // --- GESTIÓN DE MATERIAS ---
         function renderClasses() {
-            const container = document.getElementById('classes-list');
-            const empty = document.getElementById('classes-empty');
-            container.innerHTML = '';
+            const db = getDB();
+            currentTeacher = db.maestros.find(m => m.folio === currentTeacher.folio); // Refresh
+            sessionStorage.setItem('ceut_maestro_session', JSON.stringify(currentTeacher));
 
-            if (currentTeacher.materias.length === 0) {
-                empty.classList.remove('hidden-view');
-            } else {
+            const container = document.getElementById('classes-list'); const empty = document.getElementById('classes-empty'); container.innerHTML = '';
+            if (!currentTeacher.materias || currentTeacher.materias.length === 0) { empty.classList.remove('hidden-view'); } 
+            else {
                 empty.classList.add('hidden-view');
                 currentTeacher.materias.forEach(mat => {
-                    const div = document.createElement('div');
-                    div.className = "glass p-8 md:p-10 rounded-[2.5rem] border-l-8 border-l-yellow-500 flex flex-col md:flex-row justify-between items-center hover:bg-white/5 transition-all group gap-6 md:gap-0";
-                    div.innerHTML = `
-                        <div class="w-full md:w-auto">
-                            <div class="flex items-center gap-3">
-                                <h3 class="text-2xl font-black italic uppercase text-yellow-500">${mat.nombre}</h3>
-                                <button onclick="openClassForm('${mat.id}')" class="p-2 bg-white/5 hover:bg-white/20 rounded-full text-white opacity-50 hover:opacity-100 transition-all" title="Editar Materia"><i data-lucide="pencil" class="w-4 h-4"></i></button>
+                    container.innerHTML += `
+                        <div class="glass p-8 md:p-10 rounded-[2.5rem] border-l-8 border-l-yellow-500 flex flex-col md:flex-row justify-between items-center hover:bg-white/5 transition-all group gap-6 md:gap-0">
+                            <div class="w-full md:w-auto">
+                                <div class="flex items-center gap-3"><h3 class="text-2xl font-black italic uppercase text-yellow-500">${mat.nombre}</h3><button onclick="openClassForm('${mat.id}')" class="p-2 bg-white/5 hover:bg-white/20 rounded-full text-white opacity-50 hover:opacity-100 transition-all"><i data-lucide="pencil" class="w-4 h-4"></i></button></div>
+                                <div class="flex flex-wrap gap-4 mt-2">
+                                    <span class="text-[10px] opacity-60 font-bold uppercase flex items-center gap-2"><i data-lucide="layers" class="w-3 h-3"></i> ${mat.nivel}</span>
+                                    <span class="text-[10px] opacity-60 font-bold uppercase flex items-center gap-2"><i data-lucide="graduation-cap" class="w-3 h-3"></i> Grado: ${mat.grado} | Grupo: ${mat.grupo}</span>
+                                </div>
                             </div>
-                            <div class="flex flex-wrap gap-4 mt-2">
-                                <span class="text-[10px] opacity-60 font-bold uppercase flex items-center gap-2"><i data-lucide="layers" class="w-3 h-3"></i> ${mat.nivel}</span>
-                                <span class="text-[10px] opacity-60 font-bold uppercase flex items-center gap-2"><i data-lucide="graduation-cap" class="w-3 h-3"></i> Grado: ${mat.grado} | Grupo: ${mat.grupo}</span>
-                                <span class="text-[10px] opacity-40 font-bold uppercase flex items-center gap-2"><i data-lucide="fingerprint" class="w-3 h-3"></i> Folio Mat: ${mat.id}</span>
+                            <div class="flex gap-3 w-full md:w-auto">
+                                <button onclick="openClassReports('${mat.id}')" class="flex-1 md:flex-none bg-white/10 text-white px-6 py-4 rounded-2xl font-black text-xs uppercase tracking-tighter hover:bg-white/20 hover:scale-105 transition-all whitespace-nowrap"><i data-lucide="file-spreadsheet" class="w-4 h-4 inline-block mr-1 -mt-1"></i> Reportes</button>
+                                <button onclick="startSession('${mat.id}')" class="flex-1 md:flex-none bg-yellow-500 text-slate-900 px-6 py-4 rounded-2xl font-black text-xs uppercase tracking-tighter hover:scale-105 transition-transform shadow-lg shadow-yellow-500/20 whitespace-nowrap"><i data-lucide="play" class="w-4 h-4 inline-block mr-1 -mt-1"></i> Iniciar Clase</button>
                             </div>
-                        </div>
-                        <div class="flex gap-3 w-full md:w-auto">
-                            <button onclick="openClassReports('${mat.id}')" class="flex-1 md:flex-none bg-white/10 text-white px-6 py-4 rounded-2xl font-black text-xs uppercase tracking-tighter hover:bg-white/20 hover:scale-105 transition-all whitespace-nowrap"><i data-lucide="file-spreadsheet" class="w-4 h-4 inline-block mr-1 -mt-1"></i> Reportes</button>
-                            <button onclick="startSession('${mat.id}')" class="flex-1 md:flex-none bg-yellow-500 text-slate-900 px-6 py-4 rounded-2xl font-black text-xs uppercase tracking-tighter hover:scale-105 transition-transform shadow-lg shadow-yellow-500/20 whitespace-nowrap"><i data-lucide="play" class="w-4 h-4 inline-block mr-1 -mt-1"></i> Iniciar Clase</button>
-                        </div>
-                    `;
-                    container.appendChild(div);
+                        </div>`;
                 });
                 lucide.createIcons();
             }
         }
 
         function openClassForm(id = null) {
-            editingClassId = id;
-            document.getElementById('btn-delete-class').classList.add('hidden-view');
+            editingClassId = id; document.getElementById('btn-delete-class').classList.add('hidden-view');
             document.getElementById('form-class-title').innerHTML = `Registrar <span class="text-yellow-500">Materia</span>`;
-            
             if (id) {
                 const mat = currentTeacher.materias.find(m => m.id === id);
                 if(mat) {
-                    document.getElementById('mat-nombre').value = mat.nombre;
-                    document.getElementById('mat-nivel').value = mat.nivel;
-                    document.getElementById('mat-carrera').value = mat.carrera;
-                    document.getElementById('mat-grado').value = mat.grado;
+                    document.getElementById('mat-nombre').value = mat.nombre; document.getElementById('mat-nivel').value = mat.nivel;
+                    document.getElementById('mat-carrera').value = mat.carrera; document.getElementById('mat-grado').value = mat.grado;
                     document.getElementById('mat-grupo').value = mat.grupo;
                     document.getElementById('btn-delete-class').classList.remove('hidden-view');
                     document.getElementById('form-class-title').innerHTML = `Editar <span class="text-yellow-500">Materia</span>`;
                 }
             } else {
-                document.getElementById('mat-nombre').value = '';
-                document.getElementById('mat-nivel').value = 'Preparatoria';
-                document.getElementById('mat-carrera').value = '';
-                document.getElementById('mat-grado').value = '';
-                document.getElementById('mat-grupo').value = '';
+                document.getElementById('mat-nombre').value = ''; document.getElementById('mat-nivel').value = 'Preparatoria';
+                document.getElementById('mat-carrera').value = ''; document.getElementById('mat-grado').value = ''; document.getElementById('mat-grupo').value = '';
             }
             navigate('class-form');
         }
 
         function saveClass() {
-            const nombre = document.getElementById('mat-nombre').value.trim();
-            const nivel = document.getElementById('mat-nivel').value;
-            const carrera = document.getElementById('mat-carrera').value.trim();
-            const grado = document.getElementById('mat-grado').value.trim();
+            const nombre = document.getElementById('mat-nombre').value.trim(); const nivel = document.getElementById('mat-nivel').value;
+            const carrera = document.getElementById('mat-carrera').value.trim(); const grado = document.getElementById('mat-grado').value.trim();
             const grupo = document.getElementById('mat-grupo').value.trim();
+            if(!nombre || !grado || !grupo) { showModal('Campos Incompletos', 'Llena el nombre, grado y grupo.', 'error'); return; }
 
-            if(!nombre || !grado || !grupo) {
-                showModal('Campos Incompletos', 'Por favor llena el nombre, grado y grupo de la materia.', 'error');
-                return;
-            }
+            const db = getDB();
+            const maestroIdx = db.maestros.findIndex(m => m.folio === currentTeacher.folio);
+            if(maestroIdx === -1) return;
 
             if (editingClassId) {
-                const idx = currentTeacher.materias.findIndex(m => m.id === editingClassId);
-                if(idx !== -1) {
-                    // Actualizar
-                    const oldNombre = currentTeacher.materias[idx].nombre;
-                    currentTeacher.materias[idx] = { ...currentTeacher.materias[idx], nombre, nivel, carrera, grado, grupo };
-                    
-                    // Actualizar nombre de materia en historial de asistencias si cambió
-                    if(oldNombre !== nombre) {
-                        currentTeacher.asistenciasGuardadas.forEach(a => {
-                            if(a.materiaId === editingClassId) a.materiaNombre = nombre;
-                        });
-                    }
-
-                    showModal('Materia Actualizada', 'Los datos se guardaron correctamente.', 'success', () => navigate('dashboard'));
+                const matIdx = db.maestros[maestroIdx].materias.findIndex(m => m.id === editingClassId);
+                if(matIdx > -1) {
+                    const oldNombre = db.maestros[maestroIdx].materias[matIdx].nombre;
+                    db.maestros[maestroIdx].materias[matIdx] = { ...db.maestros[maestroIdx].materias[matIdx], nombre, nivel, carrera, grado, grupo };
+                    if(oldNombre !== nombre) { db.asistencias.forEach(a => { if(a.materiaId === editingClassId) a.materiaNombre = nombre; }); }
+                    saveDB(db); showModal('Actualizada', 'Los datos se guardaron correctamente.', 'success', () => navigate('dashboard'));
                 }
             } else {
                 const newId = 'MAT-' + Math.floor(10000 + Math.random() * 90000);
-                currentTeacher.materias.push({ id: newId, nombre, nivel, carrera, grado, grupo });
-                showModal('¡Materia Registrada!', `Se creó la materia con éxito.\nFolio interno asignado: <b>${newId}</b>`, 'success', () => navigate('dashboard'));
+                db.maestros[maestroIdx].materias.push({ id: newId, nombre, nivel, carrera, grado, grupo });
+                saveDB(db); showModal('Registrada', `Se creó la materia con éxito.`, 'success', () => navigate('dashboard'));
             }
-            localStorage.setItem('ceut_maestro_session', JSON.stringify(currentTeacher));
         }
 
         function deleteClass() {
             if(editingClassId) {
-                currentTeacher.materias = currentTeacher.materias.filter(m => m.id !== editingClassId);
-                // Opcional: Eliminar sus asistencias
-                // currentTeacher.asistenciasGuardadas = currentTeacher.asistenciasGuardadas.filter(a => a.materiaId !== editingClassId);
-                localStorage.setItem('ceut_maestro_session', JSON.stringify(currentTeacher));
-                showModal('Eliminada', 'La materia ha sido eliminada de tu panel.', 'success', () => navigate('dashboard'));
+                const db = getDB(); const maestroIdx = db.maestros.findIndex(m => m.folio === currentTeacher.folio);
+                db.maestros[maestroIdx].materias = db.maestros[maestroIdx].materias.filter(m => m.id !== editingClassId);
+                saveDB(db); showModal('Eliminada', 'La materia ha sido eliminada de tu panel.', 'success', () => navigate('dashboard'));
             }
         }
 
-        // --- SESIÓN EN VIVO (PASE DE LISTA) ---
+        // --- SISTEMA EN VIVO Y CÓDIGOS ---
         function startSession(id) {
             liveSessionClass = currentTeacher.materias.find(m => m.id === id);
             if(!liveSessionClass) return;
-
             document.getElementById('live-materia-name').innerText = liveSessionClass.nombre;
             document.getElementById('live-materia-details').innerText = `Grado: ${liveSessionClass.grado} • Grupo: ${liveSessionClass.grupo}`;
             document.getElementById('live-students-list').innerHTML = '';
             document.getElementById('live-empty').classList.remove('hidden-view');
-
             navigate('live-session');
             generateNewCode();
-            mockStudentInterval = setInterval(mockIncomingStudent, 5000);
+            livePollInterval = setInterval(pollLiveStudents, 2000); // Polling real
         }
 
         function stopSession(silent = false) {
-            clearInterval(timerInterval);
-            clearInterval(mockStudentInterval);
-            if(!silent && liveSessionClass) {
-                showModal('Sesión Finalizada', 'La recepción de asistencias ha sido cerrada.', 'success', () => navigate('dashboard'));
-                liveSessionClass = null;
-            }
+            clearInterval(timerInterval); clearInterval(livePollInterval);
+            const db = getDB();
+            db.activeSessions = db.activeSessions.filter(s => s.maestroId !== currentTeacher.folio);
+            saveDB(db);
+            if(!silent && liveSessionClass) { showModal('Sesión Finalizada', 'Recepción de asistencias cerrada.', 'success', () => navigate('dashboard')); liveSessionClass = null; }
         }
 
         function generateNewCode() {
-            const codeEl = document.getElementById('live-code');
-            const bar = document.getElementById('timer-bar');
-            const text = document.getElementById('timer-text');
+            const codeEl = document.getElementById('live-code'); const bar = document.getElementById('timer-bar'); const text = document.getElementById('timer-text');
+            const newCode = Math.floor(100000 + Math.random() * 900000).toString(); codeEl.innerText = newCode;
             
-            const newCode = Math.floor(100000 + Math.random() * 900000);
-            codeEl.innerText = newCode;
-            
-            let timeLeft = 30;
-            bar.style.transition = 'none';
-            bar.style.width = '100%';
-            void bar.offsetWidth; 
-            bar.style.transition = 'width 30s linear';
-            bar.style.width = '0%';
-            text.innerText = timeLeft;
+            const db = getDB();
+            db.activeSessions = db.activeSessions.filter(s => s.maestroId !== currentTeacher.folio);
+            db.activeSessions.push({ code: newCode, materiaId: liveSessionClass.id, materiaNombre: liveSessionClass.nombre, maestroId: currentTeacher.folio, maestroNombre: currentTeacher.nombre });
+            saveDB(db);
 
-            clearInterval(timerInterval);
-            timerInterval = setInterval(() => {
-                timeLeft--;
-                text.innerText = timeLeft;
-                if(timeLeft <= 0) generateNewCode();
-            }, 1000);
+            let timeLeft = 30; bar.style.transition = 'none'; bar.style.width = '100%'; void bar.offsetWidth; 
+            bar.style.transition = 'width 30s linear'; bar.style.width = '0%'; text.innerText = timeLeft;
+            clearInterval(timerInterval); timerInterval = setInterval(() => { timeLeft--; text.innerText = timeLeft; if(timeLeft <= 0) generateNewCode(); }, 1000);
         }
 
-        function mockIncomingStudent() {
-            if(Math.random() > 0.6) return; // 40% chance
-            const nombres = ["Ana G.", "Luis M.", "Carlos R.", "María S.", "José V.", "Elena P."];
-            const name = nombres[Math.floor(Math.random() * nombres.length)];
-            const time = new Date().toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit' });
-            
-            const record = {
-                id: 'REC-' + Date.now() + Math.floor(Math.random()*1000), // ID Único
-                materiaId: liveSessionClass.id,
-                materiaNombre: liveSessionClass.nombre,
-                alumno: name,
-                grado: liveSessionClass.grado,
-                grupo: liveSessionClass.grupo,
-                fecha: new Date().toLocaleDateString('es-MX'),
-                hora: time
-            };
-            if(!currentTeacher.asistenciasGuardadas) currentTeacher.asistenciasGuardadas = [];
-            currentTeacher.asistenciasGuardadas.push(record);
-            localStorage.setItem('ceut_maestro_session', JSON.stringify(currentTeacher));
-
-            document.getElementById('live-empty').classList.add('hidden-view');
-            const tr = document.createElement('tr');
-            tr.className = "animate-fade-in-up bg-yellow-500/10";
-            tr.innerHTML = `<td class="px-6 py-4 font-bold text-white">${name}</td><td class="px-6 py-4 text-xs opacity-70">${liveSessionClass.grado} "${liveSessionClass.grupo}"</td><td class="px-6 py-4 text-right font-black text-yellow-500">${time}</td>`;
-            const tbody = document.getElementById('live-students-list');
-            tbody.insertBefore(tr, tbody.firstChild);
-            setTimeout(() => tr.classList.remove('bg-yellow-500/10'), 1000);
+        function pollLiveStudents() {
+            if(!liveSessionClass) return;
+            const db = getDB(); const today = new Date().toLocaleDateString('es-MX');
+            const records = db.asistencias.filter(a => a.materiaId === liveSessionClass.id && a.fecha === today);
+            const tbody = document.getElementById('live-students-list'); tbody.innerHTML = '';
+            if(records.length === 0) { document.getElementById('live-empty').classList.remove('hidden-view'); }
+            else {
+                document.getElementById('live-empty').classList.add('hidden-view');
+                [...records].reverse().forEach(r => {
+                    tbody.innerHTML += `<tr class="bg-white/5 border-b border-white/5">
+                        <td class="px-6 py-4 font-bold text-white">${r.alumnoNombre}</td>
+                        <td class="px-6 py-4 text-xs opacity-70">${r.grado} "${r.grupo}"</td>
+                        <td class="px-6 py-4 text-right font-black text-yellow-500">${r.hora}</td>
+                    </tr>`;
+                });
+            }
         }
 
-        // --- MÓDULO: REPORTES POR MATERIA (VER, EDITAR, EXPORTAR, IMPRIMIR) ---
+        // --- REPORTES ---
         function openClassReports(materiaId) {
-            currentReportClassId = materiaId;
-            const mat = currentTeacher.materias.find(m => m.id === materiaId);
+            currentReportClassId = materiaId; const mat = currentTeacher.materias.find(m => m.id === materiaId);
             if(!mat) return;
-
             document.getElementById('report-class-title').innerHTML = `Reporte: <span class="text-yellow-500">${mat.nombre}</span>`;
             document.getElementById('report-class-subtitle').innerText = `Grado: ${mat.grado} • Grupo: ${mat.grupo} • Nivel: ${mat.nivel}`;
-            
-            navigate('class-reports');
-            loadClassReports('hoy'); // Default
+            navigate('class-reports'); loadClassReports('hoy');
         }
 
         function loadClassReports(filter) {
             currentReportFilter = filter;
-            
-            // Actualizar UI Botones
-            ['hoy', 'mes', 'cuatrimestre'].forEach(f => {
-                document.getElementById(`btn-rep-${f}`).className = "bg-white/5 hover:bg-white/10 px-6 py-2 rounded-full font-black text-[10px] uppercase tracking-widest transition-colors text-white";
-            });
+            ['hoy', 'mes', 'cuatrimestre'].forEach(f => document.getElementById(`btn-rep-${f}`).className = "bg-white/5 hover:bg-white/10 px-6 py-2 rounded-full font-black text-[10px] uppercase tracking-widest transition-colors text-white");
             document.getElementById(`btn-rep-${filter}`).className = "bg-yellow-500 text-slate-900 px-6 py-2 rounded-full font-black text-[10px] uppercase tracking-widest transition-colors";
 
-            const hoy = new Date();
-            const hoyStr = hoy.toLocaleDateString('es-MX');
-            const mesActual = hoy.getMonth();
-            const anioActual = hoy.getFullYear();
+            const hoy = new Date(); const hoyStr = hoy.toLocaleDateString('es-MX');
+            const mesActual = hoy.getMonth(); const anioActual = hoy.getFullYear();
 
-            // Filtrar Base
-            let records = (currentTeacher.asistenciasGuardadas || []).filter(a => a.materiaId === currentReportClassId);
-
-            // Filtrar por Tiempo
+            const db = getDB();
+            let records = db.asistencias.filter(a => a.materiaId === currentReportClassId);
             records = records.filter(a => {
                 if(filter === 'hoy') return a.fecha === hoyStr;
-                if(filter === 'mes') {
-                    const partes = a.fecha.split('/');
-                    if(partes.length === 3) return parseInt(partes[1])-1 === mesActual && parseInt(partes[2]) === anioActual;
-                    return false;
-                }
+                if(filter === 'mes') { const partes = a.fecha.split('/'); if(partes.length===3) return parseInt(partes[1])-1===mesActual && parseInt(partes[2])===anioActual; return false; }
                 return true; 
             });
-
             currentFilteredRecords = records;
 
-            // Renderizar Tabla
-            const tbody = document.getElementById('class-report-tbody');
-            const empty = document.getElementById('class-report-empty');
-            tbody.innerHTML = '';
-            
-            if(records.length === 0) {
-                empty.classList.remove('hidden-view');
-            } else {
-                empty.classList.add('hidden-view');
-                // Más reciente arriba
-                let counter = records.length;
+            const tbody = document.getElementById('class-report-tbody'); const empty = document.getElementById('class-report-empty'); tbody.innerHTML = '';
+            if(records.length === 0) { empty.classList.remove('hidden-view'); } 
+            else {
+                empty.classList.add('hidden-view'); let counter = records.length;
                 [...records].reverse().forEach(rec => {
-                    const tr = document.createElement('tr');
-                    tr.className = "hover:bg-white/5 transition-colors";
-                    tr.innerHTML = `
-                        <td class="px-6 py-4 opacity-50 text-xs">${counter--}</td>
-                        <td class="px-6 py-4 font-bold text-yellow-500">${rec.alumno}</td>
-                        <td class="px-6 py-4 text-white text-xs">${rec.fecha}</td>
-                        <td class="px-6 py-4 text-white text-xs">${rec.hora}</td>
-                        <td class="px-6 py-4 text-center">
-                            <button onclick="editRecord('${rec.id}')" class="p-2 bg-white/5 hover:bg-yellow-500 hover:text-slate-900 rounded-full transition-colors mr-2"><i data-lucide="edit-2" class="w-4 h-4"></i></button>
-                            <button onclick="deleteRecord('${rec.id}')" class="p-2 bg-red-500/20 hover:bg-red-500 text-red-400 hover:text-white rounded-full transition-colors"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
-                        </td>
-                    `;
-                    tbody.appendChild(tr);
+                    tbody.innerHTML += `
+                        <tr class="hover:bg-white/5 transition-colors">
+                            <td class="px-6 py-4 opacity-50 text-xs">${counter--}</td>
+                            <td class="px-6 py-4 font-bold text-yellow-500">${rec.alumnoNombre}</td>
+                            <td class="px-6 py-4 text-white text-xs">${rec.fecha}</td>
+                            <td class="px-6 py-4 text-white text-xs">${rec.hora}</td>
+                            <td class="px-6 py-4 text-center">
+                                <button onclick="editRecord('${rec.id}')" class="p-2 bg-white/5 hover:bg-yellow-500 hover:text-slate-900 rounded-full transition-colors mr-2"><i data-lucide="edit-2" class="w-4 h-4"></i></button>
+                                <button onclick="deleteRecord('${rec.id}')" class="p-2 bg-red-500/20 hover:bg-red-500 text-red-400 hover:text-white rounded-full transition-colors"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+                            </td>
+                        </tr>`;
                 });
                 lucide.createIcons();
             }
         }
 
-        // --- EDICIÓN Y ELIMINACIÓN DE REGISTRO ---
         function editRecord(id) {
-            const rec = currentTeacher.asistenciasGuardadas.find(r => r.id === id);
-            if(!rec) return;
-
-            document.getElementById('edit-rec-id').value = rec.id;
-            document.getElementById('edit-rec-alumno').value = rec.alumno;
-            document.getElementById('edit-rec-fecha').value = rec.fecha;
-            document.getElementById('edit-rec-hora').value = rec.hora;
-            
+            const db = getDB(); const rec = db.asistencias.find(r => r.id === id); if(!rec) return;
+            document.getElementById('edit-rec-id').value = rec.id; document.getElementById('edit-rec-alumno').value = rec.alumnoNombre;
+            document.getElementById('edit-rec-fecha').value = rec.fecha; document.getElementById('edit-rec-hora').value = rec.hora;
             document.getElementById('modal-edit-record').classList.remove('hidden-view');
         }
 
-        function closeEditModal() {
-            document.getElementById('modal-edit-record').classList.add('hidden-view');
-        }
+        function closeEditModal() { document.getElementById('modal-edit-record').classList.add('hidden-view'); }
 
         function saveEditRecord() {
-            const id = document.getElementById('edit-rec-id').value;
-            const alumno = document.getElementById('edit-rec-alumno').value.trim();
-            const fecha = document.getElementById('edit-rec-fecha').value.trim();
-            const hora = document.getElementById('edit-rec-hora').value.trim();
+            const id = document.getElementById('edit-rec-id').value; const alumnoNombre = document.getElementById('edit-rec-alumno').value.trim();
+            const fecha = document.getElementById('edit-rec-fecha').value.trim(); const hora = document.getElementById('edit-rec-hora').value.trim();
+            if(!alumnoNombre || !fecha || !hora) { alert("Completa los campos."); return; }
 
-            if(!alumno || !fecha || !hora) {
-                alert("Completa todos los campos para actualizar la asistencia.");
-                return;
-            }
-
-            const idx = currentTeacher.asistenciasGuardadas.findIndex(r => r.id === id);
+            const db = getDB(); const idx = db.asistencias.findIndex(r => r.id === id);
             if(idx > -1) {
-                currentTeacher.asistenciasGuardadas[idx].alumno = alumno;
-                currentTeacher.asistenciasGuardadas[idx].fecha = fecha;
-                currentTeacher.asistenciasGuardadas[idx].hora = hora;
-                
-                localStorage.setItem('ceut_maestro_session', JSON.stringify(currentTeacher));
-                closeEditModal();
-                loadClassReports(currentReportFilter); // Recargar
-                
-                // Pequeño feedback
-                const btn = document.getElementById(`btn-rep-${currentReportFilter}`);
-                const oldColor = btn.className;
-                btn.className = "bg-green-500 text-white px-6 py-2 rounded-full font-black text-[10px] uppercase tracking-widest";
-                btn.innerText = "¡Actualizado!";
-                setTimeout(() => {
-                    btn.className = oldColor;
-                    btn.innerText = currentReportFilter.toUpperCase();
-                }, 1500);
+                db.asistencias[idx].alumnoNombre = alumnoNombre; db.asistencias[idx].fecha = fecha; db.asistencias[idx].hora = hora;
+                saveDB(db); closeEditModal(); loadClassReports(currentReportFilter);
+                const btn = document.getElementById(`btn-rep-${currentReportFilter}`); const oldColor = btn.className;
+                btn.className = "bg-green-500 text-white px-6 py-2 rounded-full font-black text-[10px] uppercase tracking-widest"; btn.innerText = "¡Actualizado!";
+                setTimeout(() => { btn.className = oldColor; btn.innerText = currentReportFilter.toUpperCase(); }, 1500);
             }
         }
 
         function deleteRecord(id) {
-            if(confirm("¿Eliminar este registro de asistencia?\nEsta acción es irreversible.")) {
-                currentTeacher.asistenciasGuardadas = currentTeacher.asistenciasGuardadas.filter(r => r.id !== id);
-                localStorage.setItem('ceut_maestro_session', JSON.stringify(currentTeacher));
-                loadClassReports(currentReportFilter);
+            if(confirm("¿Eliminar este registro de asistencia?")) {
+                const db = getDB(); db.asistencias = db.asistencias.filter(r => r.id !== id); saveDB(db); loadClassReports(currentReportFilter);
             }
         }
 
-        // --- DESCARGA E IMPRESIÓN ---
         function downloadClassCSV() {
-            if(currentFilteredRecords.length === 0) {
-                showModal('Sin Datos', 'No hay asistencias en la vista actual para exportar.', 'error');
-                return;
-            }
-
-            let csvContent = "data:text/csv;charset=utf-8,Materia,Alumno,Grado,Grupo,Fecha,Hora\n";
-            [...currentFilteredRecords].reverse().forEach(r => {
-                csvContent += `"${r.materiaNombre}","${r.alumno}","${r.grado}","${r.grupo}","${r.fecha}","${r.hora}"\n`;
-            });
-
-            const encodedUri = encodeURI(csvContent);
-            const link = document.createElement("a");
-            link.setAttribute("href", encodedUri);
-            link.setAttribute("download", `Asistencias_${currentReportFilter}_${new Date().toISOString().split('T')[0]}.csv`);
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
+            if(currentFilteredRecords.length === 0) { showModal('Sin Datos', 'No hay asistencias.', 'error'); return; }
+            let csv = "data:text/csv;charset=utf-8,Materia,Alumno,Grado,Grupo,Fecha,Hora\n";
+            [...currentFilteredRecords].reverse().forEach(r => { csv += `"${r.materiaNombre}","${r.alumnoNombre}","${r.grado}","${r.grupo}","${r.fecha}","${r.hora}"\n`; });
+            const link = document.createElement("a"); link.setAttribute("href", encodeURI(csv)); link.setAttribute("download", `Asistencias_${currentReportFilter}_CEUT.csv`);
+            document.body.appendChild(link); link.click(); document.body.removeChild(link);
         }
 
         function printClassReport() {
-            if(currentFilteredRecords.length === 0) {
-                showModal('Sin Datos', 'La lista actual está vacía, no se puede generar el PDF.', 'error');
-                return;
-            }
-
+            if(currentFilteredRecords.length === 0) { showModal('Sin Datos', 'Lista vacía.', 'error'); return; }
             const mat = currentTeacher.materias.find(m => m.id === currentReportClassId);
-
-            // Preparar Membrete
             document.getElementById('print-date').innerText = `Fecha de Emisión: ${new Date().toLocaleDateString('es-MX')}`;
             document.getElementById('print-materia-name').innerText = mat.nombre;
             document.getElementById('print-materia-details').innerText = `Catedrático: ${currentTeacher.nombre} | Nivel: ${mat.nivel} | Grado: ${mat.grado} "${mat.grupo}"`;
-            
-            let filterText = currentReportFilter === 'hoy' ? 'Diario' : currentReportFilter === 'mes' ? 'Mensual' : 'Cuatrimestral';
-            document.getElementById('print-materia-filter').innerText = `Filtro de Reporte: ${filterText} | Total: ${currentFilteredRecords.length} Asistencias`;
-
-            // Nombre Firma
+            let f = currentReportFilter === 'hoy' ? 'Diario' : currentReportFilter === 'mes' ? 'Mensual' : 'Cuatrimestral';
+            document.getElementById('print-materia-filter').innerText = `Filtro: ${f} | Total: ${currentFilteredRecords.length} Asistencias`;
             document.getElementById('print-sign-teacher').innerText = `Firma: ${currentTeacher.nombre}`;
 
-            // Llenar Tabla
             const table = document.getElementById('print-table-content');
-            table.innerHTML = `
-                <tr>
-                    <th style="width: 5%;">No.</th>
-                    <th style="width: 45%;">Nombre del Alumno</th>
-                    <th style="width: 25%;">Fecha</th>
-                    <th style="width: 25%;">Hora de Ingreso</th>
-                </tr>
-            `;
-            
-            let counter = 1;
-            // Mostrar del más antiguo al más nuevo en la impresión o viceversa
-            [...currentFilteredRecords].reverse().forEach(r => {
-                table.innerHTML += `
-                    <tr>
-                        <td>${counter++}</td>
-                        <td><strong>${r.alumno}</strong></td>
-                        <td>${r.fecha}</td>
-                        <td>${r.hora}</td>
-                    </tr>
-                `;
-            });
-
-            // Imprimir (Desencadena el @media print que oculta la UI oscura)
+            table.innerHTML = `<tr><th style="width: 5%;">No.</th><th style="width: 45%;">Nombre del Alumno</th><th style="width: 25%;">Fecha</th><th style="width: 25%;">Hora de Ingreso</th></tr>`;
+            let counter = 1; [...currentFilteredRecords].reverse().forEach(r => { table.innerHTML += `<tr><td>${counter++}</td><td><strong>${r.alumnoNombre}</strong></td><td>${r.fecha}</td><td>${r.hora}</td></tr>`; });
             window.print();
         }
 
-        // --- UTILIDADES MODAL DE ALERTA ---
         let modalCallback = null;
         function showModal(title, text, type, callback = null) {
-            document.getElementById('modal-title').innerText = title;
-            document.getElementById('modal-text').innerHTML = text; 
-            
+            document.getElementById('modal-title').innerText = title; document.getElementById('modal-text').innerHTML = text; 
             const iconDiv = document.getElementById('modal-icon');
-            if(type === 'success') {
-                iconDiv.className = "w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6 bg-green-500/20 text-green-500";
-                iconDiv.innerHTML = '<i data-lucide="check-circle" class="w-10 h-10"></i>';
-                document.getElementById('modal-content').className = "glass p-10 rounded-[3rem] max-w-md w-full text-center border-t-4 border-t-green-500 animate-zoom-in shadow-[0_0_50px_rgba(34,197,94,0.2)]";
-            } else {
-                iconDiv.className = "w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6 bg-red-500/20 text-red-500";
-                iconDiv.innerHTML = '<i data-lucide="x-circle" class="w-10 h-10"></i>';
-                document.getElementById('modal-content').className = "glass p-10 rounded-[3rem] max-w-md w-full text-center border-t-4 border-t-red-500 animate-zoom-in shadow-[0_0_50px_rgba(239,68,68,0.2)]";
-            }
-            lucide.createIcons();
-            
-            modalCallback = callback;
-            document.getElementById('modal-alert').classList.remove('hidden-view');
+            if(type === 'success') { iconDiv.className = "w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6 bg-green-500/20 text-green-500"; iconDiv.innerHTML = '<i data-lucide="check-circle" class="w-10 h-10"></i>'; document.getElementById('modal-content').className = "glass p-10 rounded-[3rem] max-w-md w-full text-center border-t-4 border-t-green-500 animate-zoom-in shadow-[0_0_50px_rgba(34,197,94,0.2)]"; } 
+            else { iconDiv.className = "w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6 bg-red-500/20 text-red-500"; iconDiv.innerHTML = '<i data-lucide="x-circle" class="w-10 h-10"></i>'; document.getElementById('modal-content').className = "glass p-10 rounded-[3rem] max-w-md w-full text-center border-t-4 border-t-red-500 animate-zoom-in shadow-[0_0_50px_rgba(239,68,68,0.2)]"; }
+            lucide.createIcons(); modalCallback = callback; document.getElementById('modal-alert').classList.remove('hidden-view');
         }
-
-        function closeModal() {
-            document.getElementById('modal-alert').classList.add('hidden-view');
-            if (modalCallback) {
-                modalCallback();
-                modalCallback = null;
-            }
-        }
-    </script>
-
-    <!-- Configuración e Inicialización de Firebase -->
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
-        
-        const firebaseConfig = {
-            apiKey: "AIzaSyCefP6qEqaCMpo8ZpUiLpN4e_-E4ZNTp94",
-            authDomain: "asistencias-ceut.firebaseapp.com",
-            projectId: "asistencias-ceut",
-            storageBucket: "asistencias-ceut.firebasestorage.app",
-            messagingSenderId: "130615246146",
-            appId: "1:130615246146:web:6ae2c17c828fb28a809cdb"
-        };
-
-        const app = initializeApp(firebaseConfig);
-        console.log("🔥 Firebase inicializado en: Panel Docente");
+        function closeModal() { document.getElementById('modal-alert').classList.add('hidden-view'); if (modalCallback) { modalCallback(); modalCallback = null; } }
     </script>
 </body>
 </html>
