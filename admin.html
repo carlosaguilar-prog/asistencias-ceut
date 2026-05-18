@@ -75,6 +75,16 @@
         </table>
     </div>
 
+    <!-- MENSAJE EMERGENTE (MODAL PARA ALERTAS Y EDICIÓN) -->
+    <div id="modal-container" class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm hidden-view no-print">
+        <div class="glass p-10 rounded-[3rem] max-w-lg w-full border-t-4 animate-zoom-in shadow-2xl relative max-h-[90vh] overflow-y-auto" id="modal-content">
+            <button onclick="closeModal()" class="absolute top-6 right-6 text-white/50 hover:text-white"><i data-lucide="x" class="w-6 h-6"></i></button>
+            <div id="modal-body">
+                <!-- Contenido dinámico -->
+            </div>
+        </div>
+    </div>
+
     <!-- CONTENEDOR PRINCIPAL DE LA APP -->
     <div id="app-wrapper" class="w-full flex h-screen no-print">
 
@@ -408,7 +418,8 @@
                                     <th class="px-6 py-4 rounded-l-xl">Fecha / Hora</th>
                                     <th class="px-6 py-4">Alumno (Grado/Grupo)</th>
                                     <th class="px-6 py-4">Materia</th>
-                                    <th class="px-6 py-4 rounded-r-xl">Maestro</th>
+                                    <th class="px-6 py-4">Maestro</th>
+                                    <th class="px-6 py-4 rounded-r-xl text-center">Acciones</th>
                                 </tr>
                             </thead>
                             <tbody id="reportes-tbody" class="divide-y divide-white/5">
@@ -476,6 +487,7 @@
         let currentDetailId = null;
         let currentDetailName = null;
         let currentHistoryData = [];
+        let currentGlobalReportFilter = 'hoy';
 
         // --- SIMULADOR DE BASE DE DATOS GLOBAL (LocalStorage) ---
         let db = {
@@ -929,6 +941,8 @@
         }
 
         function loadReportes(filter = 'todos') {
+            currentGlobalReportFilter = filter;
+
             ['hoy', 'mes', 'cuatrimestre'].forEach(f => {
                 document.getElementById(`btn-filter-${f}`).className = "bg-white/5 hover:bg-white/10 px-6 py-2 rounded-full font-black text-[10px] uppercase tracking-widest transition-colors";
             });
@@ -955,7 +969,7 @@
             tbody.innerHTML = '';
             
             if(records.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="4" class="text-center py-10 opacity-30 text-xs">No hay asistencias en este periodo.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="5" class="text-center py-10 opacity-30 text-xs">No hay asistencias en este periodo.</td></tr>`;
                 return;
             }
 
@@ -966,9 +980,68 @@
                         <td class="px-6 py-4 font-bold text-white">${a.alumno} <br><span class="opacity-50 font-normal text-[10px]">${a.grado} "${a.grupo}"</span></td>
                         <td class="px-6 py-4 opacity-80">${a.materia}</td>
                         <td class="px-6 py-4 opacity-60 text-xs">${a.maestro}</td>
+                        <td class="px-6 py-4 text-center">
+                            <button onclick="editAssistanceGlobal('${a.id}')" class="p-2 bg-white/5 hover:bg-yellow-500 hover:text-slate-900 rounded-full transition-colors mr-2" title="Editar"><i data-lucide="edit-2" class="w-4 h-4"></i></button>
+                            <button onclick="deleteAssistanceGlobal('${a.id}')" class="p-2 bg-red-500/20 hover:bg-red-500 text-red-400 hover:text-white rounded-full transition-colors" title="Eliminar"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+                        </td>
                     </tr>
                 `;
             });
+            lucide.createIcons();
+        }
+
+        // --- EDICIÓN Y ELIMINACIÓN GLOBAL DE ASISTENCIAS ---
+        function editAssistanceGlobal(id) {
+            const rec = db.asistencias.find(a => a.id === id);
+            if(!rec) return;
+
+            const html = `
+                <h3 class="text-2xl font-black uppercase text-yellow-500 mb-6 flex items-center gap-2"><i data-lucide="edit-3" class="w-6 h-6"></i> Editar Asistencia</h3>
+                <div class="space-y-4 text-left">
+                    <div><label class="text-[10px] opacity-50 uppercase font-black ml-2">Alumno</label>
+                    <input type="text" id="edit-asis-alumno" value="${rec.alumno}" class="w-full glass-input rounded-xl px-5 py-3 font-bold mt-1 text-sm"></div>
+
+                    <div class="grid grid-cols-2 gap-4">
+                        <div><label class="text-[10px] opacity-50 uppercase font-black ml-2">Fecha</label>
+                        <input type="text" id="edit-asis-fecha" value="${rec.fecha}" class="w-full glass-input rounded-xl px-5 py-3 font-bold mt-1 text-sm"></div>
+                        <div><label class="text-[10px] opacity-50 uppercase font-black ml-2">Hora</label>
+                        <input type="text" id="edit-asis-hora" value="${rec.hora}" class="w-full glass-input rounded-xl px-5 py-3 font-bold mt-1 text-sm"></div>
+                    </div>
+
+                    <div><label class="text-[10px] opacity-50 uppercase font-black ml-2">Materia</label>
+                    <input type="text" id="edit-asis-materia" value="${rec.materia}" class="w-full glass-input rounded-xl px-5 py-3 font-bold mt-1 text-sm"></div>
+
+                    <div><label class="text-[10px] opacity-50 uppercase font-black ml-2">Catedrático</label>
+                    <input type="text" id="edit-asis-maestro" value="${rec.maestro}" class="w-full glass-input rounded-xl px-5 py-3 font-bold mt-1 text-sm"></div>
+                </div>
+                <button onclick="saveEditAssistanceGlobal('${id}')" class="w-full bg-yellow-500 text-slate-900 font-black uppercase tracking-widest px-6 py-4 rounded-xl hover:scale-105 transition-transform mt-8">Guardar Cambios</button>
+            `;
+            openModal(html);
+            lucide.createIcons();
+        }
+
+        function saveEditAssistanceGlobal(id) {
+            const idx = db.asistencias.findIndex(a => a.id === id);
+            if(idx > -1) {
+                db.asistencias[idx].alumno = document.getElementById('edit-asis-alumno').value;
+                db.asistencias[idx].fecha = document.getElementById('edit-asis-fecha').value;
+                db.asistencias[idx].hora = document.getElementById('edit-asis-hora').value;
+                db.asistencias[idx].materia = document.getElementById('edit-asis-materia').value;
+                db.asistencias[idx].maestro = document.getElementById('edit-asis-maestro').value;
+                saveDB();
+                closeModal();
+                loadReportes(currentGlobalReportFilter);
+                alert("SISTEMA CEUT:\nRegistro de asistencia actualizado exitosamente.");
+            }
+        }
+
+        function deleteAssistanceGlobal(id) {
+            if(confirm("¿Eliminar este registro de asistencia global?\nEsta acción es irreversible y afectará las estadísticas en los reportes de maestros y alumnos.")) {
+                db.asistencias = db.asistencias.filter(a => a.id !== id);
+                saveDB();
+                loadReportes(currentGlobalReportFilter);
+                alert("SISTEMA CEUT:\nRegistro de asistencia eliminado.");
+            }
         }
 
         function downloadGlobalCSV() {
@@ -1021,6 +1094,15 @@
                 const text = rows[i].textContent.toLowerCase();
                 rows[i].style.display = text.includes(query) ? '' : 'none';
             }
+        }
+
+        function openModal(htmlContent) {
+            document.getElementById('modal-body').innerHTML = htmlContent;
+            document.getElementById('modal-container').classList.remove('hidden-view');
+        }
+
+        function closeModal() {
+            document.getElementById('modal-container').classList.add('hidden-view');
         }
 
         function logoutAdmin() {
