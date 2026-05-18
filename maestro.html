@@ -137,6 +137,7 @@
                 <div id="classes-empty" class="text-center py-12 opacity-40 hidden-view">
                     <i data-lucide="book-dashed" class="w-16 h-16 mx-auto mb-4"></i>
                     <p class="text-sm font-black uppercase tracking-widest">No tienes materias registradas</p>
+                    <p class="text-[10px] font-bold mt-2">Haz clic en "Agregar Materia" para comenzar</p>
                 </div>
             </div>
         </div>
@@ -226,360 +227,290 @@
         </div>
     </div>
 
-    <!-- LÓGICA DE BASE DE DATOS UNIFICADA -->
-    <script>
-        lucide.createIcons();
+    <!-- LÓGICA CON CONEXIÓN A FIREBASE -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+        import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
-        // LLAVES DE DB CENTRAL
-        const DB_KEYS = {
-            ALUMNOS: 'ceut_db_alumnos',
-            MAESTROS: 'ceut_db_maestros',
-            ASISTENCIAS: 'ceut_db_asistencias',
-            SESSIONS: 'ceut_db_active_sessions',
-            CONFIG: 'ceut_db_config'
+        const firebaseConfig = {
+            apiKey: "AIzaSyCefP6qEqaCMpo8ZpUiLpN4e_-E4ZNTp94",
+            authDomain: "asistencias-ceut.firebaseapp.com",
+            projectId: "asistencias-ceut",
+            storageBucket: "asistencias-ceut.firebasestorage.app",
+            messagingSenderId: "130615246146",
+            appId: "1:130615246146:web:6ae2c17c828fb28a809cdb"
+        };
+        const app = initializeApp(firebaseConfig);
+        const dbFS = getFirestore(app);
+
+        window.lucide.createIcons();
+
+        // Estado Global Base
+        window.db = { alumnos: [], maestros: [], asistencias: [], activeSessions: [], config: { ciclo: '2026-B', estado: 'online' } };
+        window.currentView = 'auth';
+
+        // Escucha cambios en tiempo real
+        onSnapshot(doc(dbFS, "ceut", "database"), (docSnap) => {
+            if (docSnap.exists()) {
+                window.db = docSnap.data();
+                window.db.alumnos = window.db.alumnos || []; window.db.maestros = window.db.maestros || [];
+                window.db.asistencias = window.db.asistencias || []; window.db.activeSessions = window.db.activeSessions || [];
+                window.db.config = window.db.config || { ciclo: '2026-B', estado: 'online' };
+
+                if(window.liveSessionClass) { window.pollLiveStudents(); } // Refleja alumnos en vivo al instante!
+                if(window.currentTeacher && window.currentView !== 'auth') { window.navigate(window.currentView, false); }
+            } else {
+                window.saveDB(window.db);
+            }
+        });
+
+        window.saveDB = function(database) {
+            setDoc(doc(dbFS, "ceut", "database"), database).catch(e => console.error("Asegúrate de permitir lecturas/escrituras en las reglas de Firestore.", e));
         };
 
-        function getDB() {
-            return {
-                alumnos: JSON.parse(localStorage.getItem(DB_KEYS.ALUMNOS)) || [],
-                maestros: JSON.parse(localStorage.getItem(DB_KEYS.MAESTROS)) || [],
-                asistencias: JSON.parse(localStorage.getItem(DB_KEYS.ASISTENCIAS)) || [],
-                activeSessions: JSON.parse(localStorage.getItem(DB_KEYS.SESSIONS)) || [],
-                config: JSON.parse(localStorage.getItem(DB_KEYS.CONFIG)) || { ciclo: '2026-B', estado: 'online' }
-            };
-        }
-
-        function saveDB(database) {
-            localStorage.setItem(DB_KEYS.ALUMNOS, JSON.stringify(database.alumnos));
-            localStorage.setItem(DB_KEYS.MAESTROS, JSON.stringify(database.maestros));
-            localStorage.setItem(DB_KEYS.ASISTENCIAS, JSON.stringify(database.asistencias));
-            localStorage.setItem(DB_KEYS.SESSIONS, JSON.stringify(database.activeSessions));
-            localStorage.setItem(DB_KEYS.CONFIG, JSON.stringify(database.config));
-        }
-
-        let currentTeacher = JSON.parse(sessionStorage.getItem('ceut_maestro_session')) || null;
-        let editingClassId = null, liveSessionClass = null, timerInterval = null, livePollInterval = null;
-        let currentReportClassId = null, currentReportFilter = 'hoy', currentFilteredRecords = [];
+        // --- LÓGICA DOCENTE ---
+        window.currentTeacher = JSON.parse(sessionStorage.getItem('ceut_maestro_session')) || null;
+        window.editingClassId = null; window.liveSessionClass = null; window.timerInterval = null;
+        window.currentReportClassId = null; window.currentReportFilter = 'hoy'; window.currentFilteredRecords = [];
 
         window.onload = () => {
-            if (currentTeacher) { navigate('dashboard'); } else { document.getElementById('view-auth').classList.remove('hidden-view'); }
-            const loginOnEnter = (e) => { if (e.key === 'Enter') loginTeacher(); };
-            document.getElementById('login-folio').addEventListener('keypress', loginOnEnter);
-            document.getElementById('login-pass').addEventListener('keypress', loginOnEnter);
-            const registerOnEnter = (e) => { if (e.key === 'Enter') registerTeacher(); };
-            document.getElementById('reg-pass').addEventListener('keypress', registerOnEnter);
-            document.getElementById('reg-pass-confirm').addEventListener('keypress', registerOnEnter);
+            if (window.currentTeacher) { window.navigate('dashboard'); } else { document.getElementById('view-auth').classList.remove('hidden-view'); }
+            const loginOnEnter = (e) => { if (e.key === 'Enter') window.loginTeacher(); };
+            document.getElementById('login-folio').addEventListener('keypress', loginOnEnter); document.getElementById('login-pass').addEventListener('keypress', loginOnEnter);
+            const registerOnEnter = (e) => { if (e.key === 'Enter') window.registerTeacher(); };
+            document.getElementById('reg-pass').addEventListener('keypress', registerOnEnter); document.getElementById('reg-pass-confirm').addEventListener('keypress', registerOnEnter);
         };
 
-        function hideAllViews() {
+        window.hideAllViews = function() {
             const views = ['view-auth', 'view-dashboard', 'view-class-form', 'view-live-session', 'view-class-reports', 'main-header'];
             views.forEach(v => document.getElementById(v).classList.add('hidden-view'));
-        }
+        };
 
-        function navigate(view) {
-            hideAllViews();
-            if (view !== 'auth') {
-                document.getElementById('main-header').classList.remove('hidden-view');
-                document.getElementById('header-folio').innerText = `ID: ${currentTeacher.folio}`;
-            }
+        window.navigate = function(view, updateState = true) {
+            if(updateState) window.currentView = view;
+            window.hideAllViews();
+            if (view !== 'auth') { document.getElementById('main-header').classList.remove('hidden-view'); document.getElementById('header-folio').innerText = `ID: ${window.currentTeacher.folio}`; }
             if (view === 'dashboard') {
-                document.getElementById('view-dashboard').classList.remove('hidden-view');
-                document.getElementById('dash-teacher-name').innerText = currentTeacher.nombre;
-                renderClasses();
+                window.currentTeacher = window.db.maestros.find(m => m.folio === window.currentTeacher.folio) || window.currentTeacher;
+                document.getElementById('view-dashboard').classList.remove('hidden-view'); document.getElementById('dash-teacher-name').innerText = window.currentTeacher.nombre; window.renderClasses();
             } else if (view === 'class-form') { document.getElementById('view-class-form').classList.remove('hidden-view');
             } else if (view === 'live-session') { document.getElementById('view-live-session').classList.remove('hidden-view');
             } else if (view === 'class-reports') { document.getElementById('view-class-reports').classList.remove('hidden-view'); }
-        }
+        };
 
-        function toggleAuth(type) {
+        window.toggleAuth = function(type) {
             if (type === 'register') { document.getElementById('form-login').classList.add('hidden-view'); document.getElementById('form-register').classList.remove('hidden-view'); } 
             else { document.getElementById('form-register').classList.add('hidden-view'); document.getElementById('form-login').classList.remove('hidden-view'); }
-        }
+        };
 
-        function registerTeacher() {
-            const nombre = document.getElementById('reg-nombre').value.trim();
-            const pass = document.getElementById('reg-pass').value;
-            const passConfirm = document.getElementById('reg-pass-confirm').value;
-
-            if(!nombre || !pass || pass.length < 6) { showModal('Error', 'Ingresa tu nombre completo y una contraseña de al menos 6 caracteres.', 'error'); return; }
-            if(pass !== passConfirm) { showModal('Error', 'Las contraseñas no coinciden. Inténtalo de nuevo.', 'error'); return; }
+        window.registerTeacher = function() {
+            const nombre = document.getElementById('reg-nombre').value.trim(); const pass = document.getElementById('reg-pass').value; const passConfirm = document.getElementById('reg-pass-confirm').value;
+            if(!nombre || !pass || pass.length < 6) { window.showModal('Error', 'Ingresa tu nombre y una contraseña de al menos 6 caracteres.', 'error'); return; }
+            if(pass !== passConfirm) { window.showModal('Error', 'Las contraseñas no coinciden.', 'error'); return; }
 
             const folio = 'DOC-' + Math.floor(1000 + Math.random() * 9000);
-            const db = getDB();
-            
             const newTeacher = { folio, nombre, pass, materias: [] };
-            db.maestros.push(newTeacher);
-            saveDB(db);
+            window.db.maestros.push(newTeacher); window.saveDB(window.db);
 
-            currentTeacher = newTeacher;
-            sessionStorage.setItem('ceut_maestro_session', JSON.stringify(currentTeacher));
-            showModal('¡Registro Exitoso!', `Tu folio de Catedrático es:\n\n<span class="text-3xl text-yellow-500 font-black tracking-widest">${folio}</span>\n\nGuárdalo bien para iniciar sesión.`, 'success', () => navigate('dashboard'));
-        }
+            window.currentTeacher = newTeacher; sessionStorage.setItem('ceut_maestro_session', JSON.stringify(window.currentTeacher));
+            window.showModal('¡Registro Exitoso!', `Tu folio es:\n\n<span class="text-3xl text-yellow-500 font-black tracking-widest">${folio}</span>`, 'success', () => window.navigate('dashboard'));
+        };
 
-        function loginTeacher() {
-            const folio = document.getElementById('login-folio').value.trim().toUpperCase();
-            const pass = document.getElementById('login-pass').value;
-            const db = getDB();
-            
-            const match = db.maestros.find(m => m.folio === folio && m.pass === pass);
-            if (match) {
-                currentTeacher = match;
-                sessionStorage.setItem('ceut_maestro_session', JSON.stringify(currentTeacher));
-                navigate('dashboard');
-            } else { showModal('Error', 'Folio o contraseña incorrectos.', 'error'); }
-        }
+        window.loginTeacher = function() {
+            const folio = document.getElementById('login-folio').value.trim().toUpperCase(); const pass = document.getElementById('login-pass').value;
+            const match = window.db.maestros.find(m => m.folio === folio && m.pass === pass);
+            if (match) { window.currentTeacher = match; sessionStorage.setItem('ceut_maestro_session', JSON.stringify(window.currentTeacher)); window.navigate('dashboard'); } 
+            else { window.showModal('Error', 'Folio o contraseña incorrectos.', 'error'); }
+        };
 
-        function logout() {
-            stopSession(true); currentTeacher = null; sessionStorage.removeItem('ceut_maestro_session'); 
-            hideAllViews(); document.getElementById('view-auth').classList.remove('hidden-view'); toggleAuth('login');
-            document.getElementById('login-folio').value = ''; document.getElementById('login-pass').value = '';
-            document.getElementById('reg-pass').value = ''; document.getElementById('reg-pass-confirm').value = '';
-        }
+        window.logout = function() {
+            window.stopSession(true); window.currentTeacher = null; sessionStorage.removeItem('ceut_maestro_session'); 
+            window.hideAllViews(); document.getElementById('view-auth').classList.remove('hidden-view'); window.toggleAuth('login');
+            document.getElementById('login-folio').value = ''; document.getElementById('login-pass').value = ''; document.getElementById('reg-pass').value = ''; document.getElementById('reg-pass-confirm').value = '';
+        };
 
-        function renderClasses() {
-            const db = getDB();
-            currentTeacher = db.maestros.find(m => m.folio === currentTeacher.folio); // Refresh
-            sessionStorage.setItem('ceut_maestro_session', JSON.stringify(currentTeacher));
-
+        window.renderClasses = function() {
             const container = document.getElementById('classes-list'); const empty = document.getElementById('classes-empty'); container.innerHTML = '';
-            if (!currentTeacher.materias || currentTeacher.materias.length === 0) { empty.classList.remove('hidden-view'); } 
+            if (!window.currentTeacher.materias || window.currentTeacher.materias.length === 0) { empty.classList.remove('hidden-view'); } 
             else {
                 empty.classList.add('hidden-view');
-                currentTeacher.materias.forEach(mat => {
-                    container.innerHTML += `
-                        <div class="glass p-8 md:p-10 rounded-[2.5rem] border-l-8 border-l-yellow-500 flex flex-col md:flex-row justify-between items-center hover:bg-white/5 transition-all group gap-6 md:gap-0">
-                            <div class="w-full md:w-auto">
-                                <div class="flex items-center gap-3"><h3 class="text-2xl font-black italic uppercase text-yellow-500">${mat.nombre}</h3><button onclick="openClassForm('${mat.id}')" class="p-2 bg-white/5 hover:bg-white/20 rounded-full text-white opacity-50 hover:opacity-100 transition-all"><i data-lucide="pencil" class="w-4 h-4"></i></button></div>
-                                <div class="flex flex-wrap gap-4 mt-2">
-                                    <span class="text-[10px] opacity-60 font-bold uppercase flex items-center gap-2"><i data-lucide="layers" class="w-3 h-3"></i> ${mat.nivel}</span>
-                                    <span class="text-[10px] opacity-60 font-bold uppercase flex items-center gap-2"><i data-lucide="graduation-cap" class="w-3 h-3"></i> Grado: ${mat.grado} | Grupo: ${mat.grupo}</span>
-                                </div>
-                            </div>
-                            <div class="flex gap-3 w-full md:w-auto">
-                                <button onclick="openClassReports('${mat.id}')" class="flex-1 md:flex-none bg-white/10 text-white px-6 py-4 rounded-2xl font-black text-xs uppercase tracking-tighter hover:bg-white/20 hover:scale-105 transition-all whitespace-nowrap"><i data-lucide="file-spreadsheet" class="w-4 h-4 inline-block mr-1 -mt-1"></i> Reportes</button>
-                                <button onclick="startSession('${mat.id}')" class="flex-1 md:flex-none bg-yellow-500 text-slate-900 px-6 py-4 rounded-2xl font-black text-xs uppercase tracking-tighter hover:scale-105 transition-transform shadow-lg shadow-yellow-500/20 whitespace-nowrap"><i data-lucide="play" class="w-4 h-4 inline-block mr-1 -mt-1"></i> Iniciar Clase</button>
-                            </div>
-                        </div>`;
+                window.currentTeacher.materias.forEach(mat => {
+                    container.innerHTML += `<div class="glass p-8 md:p-10 rounded-[2.5rem] border-l-8 border-l-yellow-500 flex flex-col md:flex-row justify-between items-center hover:bg-white/5 transition-all group gap-6 md:gap-0"><div class="w-full md:w-auto"><div class="flex items-center gap-3"><h3 class="text-2xl font-black italic uppercase text-yellow-500">${mat.nombre}</h3><button onclick="openClassForm('${mat.id}')" class="p-2 bg-white/5 hover:bg-white/20 rounded-full text-white opacity-50 hover:opacity-100 transition-all"><i data-lucide="pencil" class="w-4 h-4"></i></button></div><div class="flex flex-wrap gap-4 mt-2"><span class="text-[10px] opacity-60 font-bold uppercase flex items-center gap-2"><i data-lucide="layers" class="w-3 h-3"></i> ${mat.nivel}</span><span class="text-[10px] opacity-60 font-bold uppercase flex items-center gap-2"><i data-lucide="graduation-cap" class="w-3 h-3"></i> Grado: ${mat.grado} | Grupo: ${mat.grupo}</span></div></div><div class="flex gap-3 w-full md:w-auto"><button onclick="openClassReports('${mat.id}')" class="flex-1 md:flex-none bg-white/10 text-white px-6 py-4 rounded-2xl font-black text-xs uppercase tracking-tighter hover:bg-white/20 hover:scale-105 transition-all whitespace-nowrap"><i data-lucide="file-spreadsheet" class="w-4 h-4 inline-block mr-1 -mt-1"></i> Reportes</button><button onclick="startSession('${mat.id}')" class="flex-1 md:flex-none bg-yellow-500 text-slate-900 px-6 py-4 rounded-2xl font-black text-xs uppercase tracking-tighter hover:scale-105 transition-transform shadow-lg shadow-yellow-500/20 whitespace-nowrap"><i data-lucide="play" class="w-4 h-4 inline-block mr-1 -mt-1"></i> Iniciar Clase</button></div></div>`;
                 });
-                lucide.createIcons();
+                window.lucide.createIcons();
             }
-        }
+        };
 
-        function openClassForm(id = null) {
-            editingClassId = id; document.getElementById('btn-delete-class').classList.add('hidden-view');
+        window.openClassForm = function(id = null) {
+            window.editingClassId = id; document.getElementById('btn-delete-class').classList.add('hidden-view');
             document.getElementById('form-class-title').innerHTML = `Registrar <span class="text-yellow-500">Materia</span>`;
             if (id) {
-                const mat = currentTeacher.materias.find(m => m.id === id);
-                if(mat) {
-                    document.getElementById('mat-nombre').value = mat.nombre; document.getElementById('mat-nivel').value = mat.nivel;
-                    document.getElementById('mat-carrera').value = mat.carrera; document.getElementById('mat-grado').value = mat.grado;
-                    document.getElementById('mat-grupo').value = mat.grupo;
-                    document.getElementById('btn-delete-class').classList.remove('hidden-view');
-                    document.getElementById('form-class-title').innerHTML = `Editar <span class="text-yellow-500">Materia</span>`;
-                }
+                const mat = window.currentTeacher.materias.find(m => m.id === id);
+                if(mat) { document.getElementById('mat-nombre').value = mat.nombre; document.getElementById('mat-nivel').value = mat.nivel; document.getElementById('mat-carrera').value = mat.carrera; document.getElementById('mat-grado').value = mat.grado; document.getElementById('mat-grupo').value = mat.grupo; document.getElementById('btn-delete-class').classList.remove('hidden-view'); document.getElementById('form-class-title').innerHTML = `Editar <span class="text-yellow-500">Materia</span>`; }
             } else {
-                document.getElementById('mat-nombre').value = ''; document.getElementById('mat-nivel').value = 'Preparatoria';
-                document.getElementById('mat-carrera').value = ''; document.getElementById('mat-grado').value = ''; document.getElementById('mat-grupo').value = '';
+                document.getElementById('mat-nombre').value = ''; document.getElementById('mat-nivel').value = 'Preparatoria'; document.getElementById('mat-carrera').value = ''; document.getElementById('mat-grado').value = ''; document.getElementById('mat-grupo').value = '';
             }
-            navigate('class-form');
-        }
+            window.navigate('class-form');
+        };
 
-        function saveClass() {
-            const nombre = document.getElementById('mat-nombre').value.trim(); const nivel = document.getElementById('mat-nivel').value;
-            const carrera = document.getElementById('mat-carrera').value.trim(); const grado = document.getElementById('mat-grado').value.trim();
-            const grupo = document.getElementById('mat-grupo').value.trim();
-            if(!nombre || !grado || !grupo) { showModal('Campos Incompletos', 'Llena el nombre, grado y grupo.', 'error'); return; }
+        window.saveClass = function() {
+            const nombre = document.getElementById('mat-nombre').value.trim(); const nivel = document.getElementById('mat-nivel').value; const carrera = document.getElementById('mat-carrera').value.trim(); const grado = document.getElementById('mat-grado').value.trim(); const grupo = document.getElementById('mat-grupo').value.trim();
+            if(!nombre || !grado || !grupo) { window.showModal('Campos Incompletos', 'Llena el nombre, grado y grupo.', 'error'); return; }
 
-            const db = getDB();
-            const maestroIdx = db.maestros.findIndex(m => m.folio === currentTeacher.folio);
+            const maestroIdx = window.db.maestros.findIndex(m => m.folio === window.currentTeacher.folio);
             if(maestroIdx === -1) return;
 
-            if (editingClassId) {
-                const matIdx = db.maestros[maestroIdx].materias.findIndex(m => m.id === editingClassId);
+            if (window.editingClassId) {
+                const matIdx = window.db.maestros[maestroIdx].materias.findIndex(m => m.id === window.editingClassId);
                 if(matIdx > -1) {
-                    const oldNombre = db.maestros[maestroIdx].materias[matIdx].nombre;
-                    db.maestros[maestroIdx].materias[matIdx] = { ...db.maestros[maestroIdx].materias[matIdx], nombre, nivel, carrera, grado, grupo };
-                    if(oldNombre !== nombre) { db.asistencias.forEach(a => { if(a.materiaId === editingClassId) a.materiaNombre = nombre; }); }
-                    saveDB(db); showModal('Actualizada', 'Los datos se guardaron correctamente.', 'success', () => navigate('dashboard'));
+                    const oldNombre = window.db.maestros[maestroIdx].materias[matIdx].nombre;
+                    window.db.maestros[maestroIdx].materias[matIdx] = { ...window.db.maestros[maestroIdx].materias[matIdx], nombre, nivel, carrera, grado, grupo };
+                    if(oldNombre !== nombre) { window.db.asistencias.forEach(a => { if(a.materiaId === window.editingClassId) a.materiaNombre = nombre; }); }
+                    window.saveDB(window.db); window.showModal('Actualizada', 'Los datos se guardaron correctamente.', 'success', () => window.navigate('dashboard'));
                 }
             } else {
                 const newId = 'MAT-' + Math.floor(10000 + Math.random() * 90000);
-                db.maestros[maestroIdx].materias.push({ id: newId, nombre, nivel, carrera, grado, grupo });
-                saveDB(db); showModal('Registrada', `Se creó la materia con éxito.`, 'success', () => navigate('dashboard'));
+                window.db.maestros[maestroIdx].materias.push({ id: newId, nombre, nivel, carrera, grado, grupo });
+                window.saveDB(window.db); window.showModal('Registrada', `Se creó la materia con éxito.`, 'success', () => window.navigate('dashboard'));
             }
-        }
+        };
 
-        function deleteClass() {
-            if(editingClassId) {
-                const db = getDB(); const maestroIdx = db.maestros.findIndex(m => m.folio === currentTeacher.folio);
-                db.maestros[maestroIdx].materias = db.maestros[maestroIdx].materias.filter(m => m.id !== editingClassId);
-                saveDB(db); showModal('Eliminada', 'La materia ha sido eliminada de tu panel.', 'success', () => navigate('dashboard'));
+        window.deleteClass = function() {
+            if(window.editingClassId) {
+                const maestroIdx = window.db.maestros.findIndex(m => m.folio === window.currentTeacher.folio);
+                window.db.maestros[maestroIdx].materias = window.db.maestros[maestroIdx].materias.filter(m => m.id !== window.editingClassId);
+                window.saveDB(window.db); window.showModal('Eliminada', 'La materia ha sido eliminada de tu panel.', 'success', () => window.navigate('dashboard'));
             }
-        }
+        };
 
-        // --- SISTEMA EN VIVO Y CÓDIGOS ---
-        function startSession(id) {
-            liveSessionClass = currentTeacher.materias.find(m => m.id === id);
-            if(!liveSessionClass) return;
-            document.getElementById('live-materia-name').innerText = liveSessionClass.nombre;
-            document.getElementById('live-materia-details').innerText = `Grado: ${liveSessionClass.grado} • Grupo: ${liveSessionClass.grupo}`;
-            document.getElementById('live-students-list').innerHTML = '';
-            document.getElementById('live-empty').classList.remove('hidden-view');
-            navigate('live-session');
-            generateNewCode();
-            livePollInterval = setInterval(pollLiveStudents, 2000); // Polling real
-        }
+        window.startSession = function(id) {
+            window.liveSessionClass = window.currentTeacher.materias.find(m => m.id === id);
+            if(!window.liveSessionClass) return;
+            document.getElementById('live-materia-name').innerText = window.liveSessionClass.nombre; document.getElementById('live-materia-details').innerText = `Grado: ${window.liveSessionClass.grado} • Grupo: ${window.liveSessionClass.grupo}`; document.getElementById('live-students-list').innerHTML = ''; document.getElementById('live-empty').classList.remove('hidden-view');
+            window.navigate('live-session'); window.generateNewCode(); window.pollLiveStudents();
+        };
 
-        function stopSession(silent = false) {
-            clearInterval(timerInterval); clearInterval(livePollInterval);
-            const db = getDB();
-            db.activeSessions = db.activeSessions.filter(s => s.maestroId !== currentTeacher.folio);
-            saveDB(db);
-            if(!silent && liveSessionClass) { showModal('Sesión Finalizada', 'Recepción de asistencias cerrada.', 'success', () => navigate('dashboard')); liveSessionClass = null; }
-        }
+        window.stopSession = function(silent = false) {
+            clearInterval(window.timerInterval);
+            window.db.activeSessions = window.db.activeSessions.filter(s => s.maestroId !== window.currentTeacher.folio);
+            window.saveDB(window.db);
+            if(!silent && window.liveSessionClass) { window.showModal('Sesión Finalizada', 'Recepción de asistencias cerrada.', 'success', () => window.navigate('dashboard')); window.liveSessionClass = null; }
+        };
 
-        function generateNewCode() {
+        window.generateNewCode = function() {
             const codeEl = document.getElementById('live-code'); const bar = document.getElementById('timer-bar'); const text = document.getElementById('timer-text');
             const newCode = Math.floor(100000 + Math.random() * 900000).toString(); codeEl.innerText = newCode;
             
-            const db = getDB();
-            db.activeSessions = db.activeSessions.filter(s => s.maestroId !== currentTeacher.folio);
-            db.activeSessions.push({ code: newCode, materiaId: liveSessionClass.id, materiaNombre: liveSessionClass.nombre, maestroId: currentTeacher.folio, maestroNombre: currentTeacher.nombre });
-            saveDB(db);
+            window.db.activeSessions = window.db.activeSessions.filter(s => s.maestroId !== window.currentTeacher.folio);
+            window.db.activeSessions.push({ code: newCode, materiaId: window.liveSessionClass.id, materiaNombre: window.liveSessionClass.nombre, maestroId: window.currentTeacher.folio, maestroNombre: window.currentTeacher.nombre });
+            window.saveDB(window.db);
 
             let timeLeft = 30; bar.style.transition = 'none'; bar.style.width = '100%'; void bar.offsetWidth; 
             bar.style.transition = 'width 30s linear'; bar.style.width = '0%'; text.innerText = timeLeft;
-            clearInterval(timerInterval); timerInterval = setInterval(() => { timeLeft--; text.innerText = timeLeft; if(timeLeft <= 0) generateNewCode(); }, 1000);
-        }
+            clearInterval(window.timerInterval); window.timerInterval = setInterval(() => { timeLeft--; text.innerText = timeLeft; if(timeLeft <= 0) window.generateNewCode(); }, 1000);
+        };
 
-        function pollLiveStudents() {
-            if(!liveSessionClass) return;
-            const db = getDB(); const today = new Date().toLocaleDateString('es-MX');
-            const records = db.asistencias.filter(a => a.materiaId === liveSessionClass.id && a.fecha === today);
+        window.pollLiveStudents = function() {
+            if(!window.liveSessionClass) return;
+            const today = new Date().toLocaleDateString('es-MX');
+            const records = window.db.asistencias.filter(a => a.materiaId === window.liveSessionClass.id && a.fecha === today);
             const tbody = document.getElementById('live-students-list'); tbody.innerHTML = '';
             if(records.length === 0) { document.getElementById('live-empty').classList.remove('hidden-view'); }
             else {
                 document.getElementById('live-empty').classList.add('hidden-view');
-                [...records].reverse().forEach(r => {
-                    tbody.innerHTML += `<tr class="bg-white/5 border-b border-white/5">
-                        <td class="px-6 py-4 font-bold text-white">${r.alumnoNombre}</td>
-                        <td class="px-6 py-4 text-xs opacity-70">${r.grado} "${r.grupo}"</td>
-                        <td class="px-6 py-4 text-right font-black text-yellow-500">${r.hora}</td>
-                    </tr>`;
-                });
+                [...records].reverse().forEach(r => { tbody.innerHTML += `<tr class="bg-white/5 border-b border-white/5"><td class="px-6 py-4 font-bold text-white">${r.alumnoNombre}</td><td class="px-6 py-4 text-xs opacity-70">${r.grado} "${r.grupo}"</td><td class="px-6 py-4 text-right font-black text-yellow-500">${r.hora}</td></tr>`; });
             }
-        }
+        };
 
-        // --- REPORTES ---
-        function openClassReports(materiaId) {
-            currentReportClassId = materiaId; const mat = currentTeacher.materias.find(m => m.id === materiaId);
+        window.openClassReports = function(materiaId) {
+            window.currentReportClassId = materiaId; const mat = window.currentTeacher.materias.find(m => m.id === materiaId);
             if(!mat) return;
-            document.getElementById('report-class-title').innerHTML = `Reporte: <span class="text-yellow-500">${mat.nombre}</span>`;
-            document.getElementById('report-class-subtitle').innerText = `Grado: ${mat.grado} • Grupo: ${mat.grupo} • Nivel: ${mat.nivel}`;
-            navigate('class-reports'); loadClassReports('hoy');
-        }
+            document.getElementById('report-class-title').innerHTML = `Reporte: <span class="text-yellow-500">${mat.nombre}</span>`; document.getElementById('report-class-subtitle').innerText = `Grado: ${mat.grado} • Grupo: ${mat.grupo} • Nivel: ${mat.nivel}`;
+            window.navigate('class-reports'); window.loadClassReports('hoy');
+        };
 
-        function loadClassReports(filter) {
-            currentReportFilter = filter;
+        window.loadClassReports = function(filter) {
+            window.currentReportFilter = filter;
             ['hoy', 'mes', 'cuatrimestre'].forEach(f => document.getElementById(`btn-rep-${f}`).className = "bg-white/5 hover:bg-white/10 px-6 py-2 rounded-full font-black text-[10px] uppercase tracking-widest transition-colors text-white");
             document.getElementById(`btn-rep-${filter}`).className = "bg-yellow-500 text-slate-900 px-6 py-2 rounded-full font-black text-[10px] uppercase tracking-widest transition-colors";
 
-            const hoy = new Date(); const hoyStr = hoy.toLocaleDateString('es-MX');
-            const mesActual = hoy.getMonth(); const anioActual = hoy.getFullYear();
+            const hoy = new Date(); const hoyStr = hoy.toLocaleDateString('es-MX'); const mesActual = hoy.getMonth(); const anioActual = hoy.getFullYear();
 
-            const db = getDB();
-            let records = db.asistencias.filter(a => a.materiaId === currentReportClassId);
+            let records = window.db.asistencias.filter(a => a.materiaId === window.currentReportClassId);
             records = records.filter(a => {
                 if(filter === 'hoy') return a.fecha === hoyStr;
                 if(filter === 'mes') { const partes = a.fecha.split('/'); if(partes.length===3) return parseInt(partes[1])-1===mesActual && parseInt(partes[2])===anioActual; return false; }
                 return true; 
             });
-            currentFilteredRecords = records;
+            window.currentFilteredRecords = records;
 
             const tbody = document.getElementById('class-report-tbody'); const empty = document.getElementById('class-report-empty'); tbody.innerHTML = '';
             if(records.length === 0) { empty.classList.remove('hidden-view'); } 
             else {
                 empty.classList.add('hidden-view'); let counter = records.length;
                 [...records].reverse().forEach(rec => {
-                    tbody.innerHTML += `
-                        <tr class="hover:bg-white/5 transition-colors">
-                            <td class="px-6 py-4 opacity-50 text-xs">${counter--}</td>
-                            <td class="px-6 py-4 font-bold text-yellow-500">${rec.alumnoNombre}</td>
-                            <td class="px-6 py-4 text-white text-xs">${rec.fecha}</td>
-                            <td class="px-6 py-4 text-white text-xs">${rec.hora}</td>
-                            <td class="px-6 py-4 text-center">
-                                <button onclick="editRecord('${rec.id}')" class="p-2 bg-white/5 hover:bg-yellow-500 hover:text-slate-900 rounded-full transition-colors mr-2"><i data-lucide="edit-2" class="w-4 h-4"></i></button>
-                                <button onclick="deleteRecord('${rec.id}')" class="p-2 bg-red-500/20 hover:bg-red-500 text-red-400 hover:text-white rounded-full transition-colors"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
-                            </td>
-                        </tr>`;
+                    tbody.innerHTML += `<tr class="hover:bg-white/5 transition-colors"><td class="px-6 py-4 opacity-50 text-xs">${counter--}</td><td class="px-6 py-4 font-bold text-yellow-500">${rec.alumnoNombre}</td><td class="px-6 py-4 text-white text-xs">${rec.fecha}</td><td class="px-6 py-4 text-white text-xs">${rec.hora}</td><td class="px-6 py-4 text-center"><button onclick="editRecord('${rec.id}')" class="p-2 bg-white/5 hover:bg-yellow-500 hover:text-slate-900 rounded-full transition-colors mr-2"><i data-lucide="edit-2" class="w-4 h-4"></i></button><button onclick="deleteRecord('${rec.id}')" class="p-2 bg-red-500/20 hover:bg-red-500 text-red-400 hover:text-white rounded-full transition-colors"><i data-lucide="trash-2" class="w-4 h-4"></i></button></td></tr>`;
                 });
-                lucide.createIcons();
+                window.lucide.createIcons();
             }
-        }
+        };
 
-        function editRecord(id) {
-            const db = getDB(); const rec = db.asistencias.find(r => r.id === id); if(!rec) return;
+        window.editRecord = function(id) {
+            const rec = window.db.asistencias.find(r => r.id === id); if(!rec) return;
             document.getElementById('edit-rec-id').value = rec.id; document.getElementById('edit-rec-alumno').value = rec.alumnoNombre;
             document.getElementById('edit-rec-fecha').value = rec.fecha; document.getElementById('edit-rec-hora').value = rec.hora;
             document.getElementById('modal-edit-record').classList.remove('hidden-view');
-        }
+        };
 
-        function closeEditModal() { document.getElementById('modal-edit-record').classList.add('hidden-view'); }
+        window.closeEditModal = function() { document.getElementById('modal-edit-record').classList.add('hidden-view'); };
 
-        function saveEditRecord() {
-            const id = document.getElementById('edit-rec-id').value; const alumnoNombre = document.getElementById('edit-rec-alumno').value.trim();
-            const fecha = document.getElementById('edit-rec-fecha').value.trim(); const hora = document.getElementById('edit-rec-hora').value.trim();
+        window.saveEditRecord = function() {
+            const id = document.getElementById('edit-rec-id').value; const alumnoNombre = document.getElementById('edit-rec-alumno').value.trim(); const fecha = document.getElementById('edit-rec-fecha').value.trim(); const hora = document.getElementById('edit-rec-hora').value.trim();
             if(!alumnoNombre || !fecha || !hora) { alert("Completa los campos."); return; }
-
-            const db = getDB(); const idx = db.asistencias.findIndex(r => r.id === id);
+            const idx = window.db.asistencias.findIndex(r => r.id === id);
             if(idx > -1) {
-                db.asistencias[idx].alumnoNombre = alumnoNombre; db.asistencias[idx].fecha = fecha; db.asistencias[idx].hora = hora;
-                saveDB(db); closeEditModal(); loadClassReports(currentReportFilter);
-                const btn = document.getElementById(`btn-rep-${currentReportFilter}`); const oldColor = btn.className;
+                window.db.asistencias[idx].alumnoNombre = alumnoNombre; window.db.asistencias[idx].fecha = fecha; window.db.asistencias[idx].hora = hora;
+                window.saveDB(window.db); window.closeEditModal(); window.loadClassReports(window.currentReportFilter);
+                const btn = document.getElementById(`btn-rep-${window.currentReportFilter}`); const oldColor = btn.className;
                 btn.className = "bg-green-500 text-white px-6 py-2 rounded-full font-black text-[10px] uppercase tracking-widest"; btn.innerText = "¡Actualizado!";
-                setTimeout(() => { btn.className = oldColor; btn.innerText = currentReportFilter.toUpperCase(); }, 1500);
+                setTimeout(() => { btn.className = oldColor; btn.innerText = window.currentReportFilter.toUpperCase(); }, 1500);
             }
-        }
+        };
 
-        function deleteRecord(id) {
-            if(confirm("¿Eliminar este registro de asistencia?")) {
-                const db = getDB(); db.asistencias = db.asistencias.filter(r => r.id !== id); saveDB(db); loadClassReports(currentReportFilter);
-            }
-        }
+        window.deleteRecord = function(id) {
+            if(confirm("¿Eliminar este registro de asistencia?")) { window.db.asistencias = window.db.asistencias.filter(r => r.id !== id); window.saveDB(window.db); window.loadClassReports(window.currentReportFilter); }
+        };
 
-        function downloadClassCSV() {
-            if(currentFilteredRecords.length === 0) { showModal('Sin Datos', 'No hay asistencias.', 'error'); return; }
+        window.downloadClassCSV = function() {
+            if(window.currentFilteredRecords.length === 0) { window.showModal('Sin Datos', 'No hay asistencias.', 'error'); return; }
             let csv = "data:text/csv;charset=utf-8,Materia,Alumno,Grado,Grupo,Fecha,Hora\n";
-            [...currentFilteredRecords].reverse().forEach(r => { csv += `"${r.materiaNombre}","${r.alumnoNombre}","${r.grado}","${r.grupo}","${r.fecha}","${r.hora}"\n`; });
-            const link = document.createElement("a"); link.setAttribute("href", encodeURI(csv)); link.setAttribute("download", `Asistencias_${currentReportFilter}_CEUT.csv`);
+            [...window.currentFilteredRecords].reverse().forEach(r => { csv += `"${r.materiaNombre}","${r.alumnoNombre}","${r.grado}","${r.grupo}","${r.fecha}","${r.hora}"\n`; });
+            const link = document.createElement("a"); link.setAttribute("href", encodeURI(csv)); link.setAttribute("download", `Asistencias_${window.currentReportFilter}_CEUT.csv`);
             document.body.appendChild(link); link.click(); document.body.removeChild(link);
-        }
+        };
 
-        function printClassReport() {
-            if(currentFilteredRecords.length === 0) { showModal('Sin Datos', 'Lista vacía.', 'error'); return; }
-            const mat = currentTeacher.materias.find(m => m.id === currentReportClassId);
+        window.printClassReport = function() {
+            if(window.currentFilteredRecords.length === 0) { window.showModal('Sin Datos', 'Lista vacía.', 'error'); return; }
+            const mat = window.currentTeacher.materias.find(m => m.id === window.currentReportClassId);
             document.getElementById('print-date').innerText = `Fecha de Emisión: ${new Date().toLocaleDateString('es-MX')}`;
-            document.getElementById('print-materia-name').innerText = mat.nombre;
-            document.getElementById('print-materia-details').innerText = `Catedrático: ${currentTeacher.nombre} | Nivel: ${mat.nivel} | Grado: ${mat.grado} "${mat.grupo}"`;
-            let f = currentReportFilter === 'hoy' ? 'Diario' : currentReportFilter === 'mes' ? 'Mensual' : 'Cuatrimestral';
-            document.getElementById('print-materia-filter').innerText = `Filtro: ${f} | Total: ${currentFilteredRecords.length} Asistencias`;
-            document.getElementById('print-sign-teacher').innerText = `Firma: ${currentTeacher.nombre}`;
+            document.getElementById('print-materia-name').innerText = mat.nombre; document.getElementById('print-materia-details').innerText = `Catedrático: ${window.currentTeacher.nombre} | Nivel: ${mat.nivel} | Grado: ${mat.grado} "${mat.grupo}"`;
+            let f = window.currentReportFilter === 'hoy' ? 'Diario' : window.currentReportFilter === 'mes' ? 'Mensual' : 'Cuatrimestral';
+            document.getElementById('print-materia-filter').innerText = `Filtro: ${f} | Total: ${window.currentFilteredRecords.length} Asistencias`;
+            document.getElementById('print-sign-teacher').innerText = `Firma: ${window.currentTeacher.nombre}`;
 
-            const table = document.getElementById('print-table-content');
-            table.innerHTML = `<tr><th style="width: 5%;">No.</th><th style="width: 45%;">Nombre del Alumno</th><th style="width: 25%;">Fecha</th><th style="width: 25%;">Hora de Ingreso</th></tr>`;
-            let counter = 1; [...currentFilteredRecords].reverse().forEach(r => { table.innerHTML += `<tr><td>${counter++}</td><td><strong>${r.alumnoNombre}</strong></td><td>${r.fecha}</td><td>${r.hora}</td></tr>`; });
+            const table = document.getElementById('print-table-content'); table.innerHTML = `<tr><th style="width: 5%;">No.</th><th style="width: 45%;">Nombre del Alumno</th><th style="width: 25%;">Fecha</th><th style="width: 25%;">Hora de Ingreso</th></tr>`;
+            let counter = 1; [...window.currentFilteredRecords].reverse().forEach(r => { table.innerHTML += `<tr><td>${counter++}</td><td><strong>${r.alumnoNombre}</strong></td><td>${r.fecha}</td><td>${r.hora}</td></tr>`; });
             window.print();
-        }
+        };
 
-        let modalCallback = null;
-        function showModal(title, text, type, callback = null) {
+        window.showModal = function(title, text, type, callback = null) {
             document.getElementById('modal-title').innerText = title; document.getElementById('modal-text').innerHTML = text; 
             const iconDiv = document.getElementById('modal-icon');
             if(type === 'success') { iconDiv.className = "w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6 bg-green-500/20 text-green-500"; iconDiv.innerHTML = '<i data-lucide="check-circle" class="w-10 h-10"></i>'; document.getElementById('modal-content').className = "glass p-10 rounded-[3rem] max-w-md w-full text-center border-t-4 border-t-green-500 animate-zoom-in shadow-[0_0_50px_rgba(34,197,94,0.2)]"; } 
             else { iconDiv.className = "w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6 bg-red-500/20 text-red-500"; iconDiv.innerHTML = '<i data-lucide="x-circle" class="w-10 h-10"></i>'; document.getElementById('modal-content').className = "glass p-10 rounded-[3rem] max-w-md w-full text-center border-t-4 border-t-red-500 animate-zoom-in shadow-[0_0_50px_rgba(239,68,68,0.2)]"; }
-            lucide.createIcons(); modalCallback = callback; document.getElementById('modal-alert').classList.remove('hidden-view');
-        }
-        function closeModal() { document.getElementById('modal-alert').classList.add('hidden-view'); if (modalCallback) { modalCallback(); modalCallback = null; } }
+            window.lucide.createIcons(); window.modalCallback = callback; document.getElementById('modal-alert').classList.remove('hidden-view');
+        };
+        window.closeModal = function() { document.getElementById('modal-alert').classList.add('hidden-view'); if (window.modalCallback) { window.modalCallback(); window.modalCallback = null; } };
     </script>
 </body>
 </html>
