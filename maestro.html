@@ -133,7 +133,13 @@
         </header>
 
         <!-- VISTA 1: AUTENTICACIÓN (LOGIN / REGISTRO) -->
-        <div id="view-auth" class="animate-fade-in-up mt-10 md:mt-20">
+        <div id="view-auth" class="animate-fade-in-up mt-10 md:mt-20 relative">
+            
+            <!-- Botón Volver al Inicio -->
+            <a href="index.html" class="absolute -top-10 md:-top-16 left-0 flex items-center gap-2 text-white/50 hover:text-white transition-colors font-black text-[10px] uppercase tracking-widest bg-white/5 hover:bg-white/10 px-4 py-2 rounded-full z-50">
+                <i data-lucide="arrow-left" class="w-4 h-4"></i> Volver al Inicio
+            </a>
+
             <div class="text-center mb-10">
                 <img src="https://drive.google.com/thumbnail?id=17NobXQ3JbRnLGejZe4Mn2x-Jl45F4rPm&sz=w800" class="h-24 mx-auto mb-6 drop-shadow-[0_0_20px_rgba(245,184,0,0.3)]" alt="Logo Tigre CEUT">
                 <h2 class="text-4xl font-black italic uppercase">Portal <span class="text-yellow-500">Docentes</span></h2>
@@ -166,6 +172,10 @@
                     <div>
                         <label class="text-[10px] font-black uppercase opacity-40 ml-2">Crear Contraseña</label>
                         <input type="password" id="reg-pass" placeholder="Mínimo 6 caracteres" class="w-full glass-input rounded-xl px-5 py-3 font-bold mt-1">
+                    </div>
+                    <div>
+                        <label class="text-[10px] font-black uppercase opacity-40 ml-2">Confirmar Contraseña</label>
+                        <input type="password" id="reg-pass-confirm" placeholder="Repite la contraseña" class="w-full glass-input rounded-xl px-5 py-3 font-bold mt-1">
                     </div>
                 </div>
 
@@ -418,9 +428,15 @@
         function registerTeacher() {
             const nombre = document.getElementById('reg-nombre').value.trim();
             const pass = document.getElementById('reg-pass').value;
+            const passConfirm = document.getElementById('reg-pass-confirm').value;
 
             if(!nombre || !pass || pass.length < 6) {
                 showModal('Error', 'Ingresa tu nombre completo y una contraseña de al menos 6 caracteres.', 'error');
+                return;
+            }
+
+            if(pass !== passConfirm) {
+                showModal('Error', 'Las contraseñas no coinciden. Inténtalo de nuevo.', 'error');
                 return;
             }
 
@@ -462,6 +478,8 @@
             toggleAuth('login');
             document.getElementById('login-folio').value = '';
             document.getElementById('login-pass').value = '';
+            document.getElementById('reg-pass').value = '';
+            document.getElementById('reg-pass-confirm').value = '';
         }
 
         // --- GESTIÓN DE MATERIAS ---
