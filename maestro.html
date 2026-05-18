@@ -453,6 +453,10 @@
         function logout() {
             stopSession(true); 
             currentTeacher = null;
+            
+            // LÍNEA AGREGADA: Borra la sesión de la memoria del navegador
+            localStorage.removeItem('ceut_maestro_session'); 
+            
             hideAllViews();
             document.getElementById('view-auth').classList.remove('hidden-view');
             toggleAuth('login');
