@@ -65,7 +65,7 @@
             <div class="space-y-4 text-left">
                 <div>
                     <label class="text-[10px] opacity-50 uppercase font-black ml-2">Usuario / Correo Institucional</label>
-                    <input type="text" id="admin-user" placeholder="Ej. usuario.ceut.edu.mx" class="w-full glass-input rounded-xl px-5 py-4 font-bold mt-1">
+                    <input type="text" id="admin-user" placeholder="Ej. usuario@ceut.edu.mx" class="w-full glass-input rounded-xl px-5 py-4 font-bold mt-1">
                 </div>
                 <div>
                     <label class="text-[10px] opacity-50 uppercase font-black ml-2">Contraseña de Seguridad</label>
@@ -306,7 +306,7 @@
         lucide.createIcons();
 
         // --- CREDENCIALES DE ACCESO ---
-        const ADMIN_USER = "carlos.aguilar.ceut.edu.mx";
+        const ADMIN_USER = "carlos.aguilar@ceut.edu.mx";
         const ADMIN_PASS = "Jcas1015#";
         let isAdminAuthenticated = sessionStorage.getItem('ceut_admin_auth') === 'true';
 
