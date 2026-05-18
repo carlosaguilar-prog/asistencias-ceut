@@ -13,7 +13,7 @@
     <style>
         body { background: radial-gradient(circle at top right, #1e3a8a, #020617); color: white; font-family: 'Plus Jakarta Sans', sans-serif; min-height: 100vh; display: flex; overflow-x: hidden; }
         .glass { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.1); }
-        .glass-input { background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); color: white; transition: all 0.3s; }
+        .glass-input { background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); color: white; transition: all 0.3s; text-transform: uppercase; }
         .glass-input:focus { border-color: #f5b800; background: rgba(255, 255, 255, 0.1); outline: none; }
         .sidebar-item { transition: all 0.3s; border-right: 3px solid transparent; }
         .sidebar-item:hover, .sidebar-item.active { background: rgba(245, 184, 0, 0.1); color: #f5b800; border-right: 3px solid #f5b800; opacity: 1; transform: translateX(5px); }
@@ -49,7 +49,7 @@
         <div class="print-header">
             <div><img src="https://drive.google.com/thumbnail?id=17NobXQ3JbRnLGejZe4Mn2x-Jl45F4rPm&sz=w800" style="height: 70px;" alt="Logo CEUT"></div>
             <div style="text-align: right;">
-                <h1 class="print-title">Centro Universitario de Tehuacán</h1>
+                <h1 class="print-title">Centro Universitario Tehuacán</h1>
                 <p class="print-subtitle" id="print-doc-type">Reporte Administrativo</p>
                 <p class="print-subtitle" id="print-date"></p>
             </div>
@@ -82,11 +82,11 @@
                 <div class="space-y-4 text-left">
                     <div>
                         <label class="text-[10px] opacity-50 uppercase font-black ml-2">Usuario / Correo Institucional</label>
-                        <input type="text" id="admin-user" placeholder="Ej. carlos.aguilar@ceut.edu.mx" class="w-full glass-input rounded-xl px-5 py-4 font-bold mt-1">
+                        <input type="text" oninput="this.value = this.value.toUpperCase()" id="admin-user" placeholder="Ej. carlos.aguilar@ceut.edu.mx" class="w-full glass-input rounded-xl px-5 py-4 font-bold mt-1">
                     </div>
                     <div>
                         <label class="text-[10px] opacity-50 uppercase font-black ml-2">Contraseña de Seguridad</label>
-                        <input type="password" id="admin-pass" placeholder="••••••••" class="w-full glass-input rounded-xl px-5 py-4 font-bold mt-1">
+                        <input type="password" oninput="this.value = this.value.toUpperCase()" id="admin-pass" placeholder="••••••••" class="w-full glass-input rounded-xl px-5 py-4 font-bold mt-1">
                     </div>
                     <button onclick="loginAdmin()" class="w-full bg-yellow-500 text-slate-900 font-black uppercase tracking-widest px-6 py-4 rounded-xl hover:scale-[1.02] transition-transform shadow-lg shadow-yellow-500/20 mt-6">Validar Credenciales</button>
                 </div>
@@ -137,7 +137,7 @@
 
             <div id="view-alumnos" class="hidden-view animate-fade-in-up">
                 <div class="glass p-8 md:p-10 rounded-[3rem] border border-white/5">
-                    <div class="flex justify-between items-center mb-8"><h2 class="text-xl font-black uppercase italic text-yellow-500">Base de Datos <span class="text-white">Alumnos</span></h2><div class="relative"><i data-lucide="search" class="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 opacity-50"></i><input type="text" id="search-alumno" onkeyup="filterTable('alumnos-table', this.value)" placeholder="Buscar alumno..." class="glass-input rounded-full pl-12 pr-6 py-3 text-xs font-bold w-full md:w-64"></div></div>
+                    <div class="flex justify-between items-center mb-8"><h2 class="text-xl font-black uppercase italic text-yellow-500">Base de Datos <span class="text-white">Alumnos</span></h2><div class="relative"><i data-lucide="search" class="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 opacity-50"></i><input type="text" oninput="this.value = this.value.toUpperCase()" id="search-alumno" onkeyup="filterTable('alumnos-table', this.value)" placeholder="BUSCAR ALUMNO..." class="glass-input rounded-full pl-12 pr-6 py-3 text-xs font-bold w-full md:w-64"></div></div>
                     <div class="overflow-x-auto">
                         <table class="w-full text-left text-sm whitespace-nowrap" id="alumnos-table"><thead class="bg-white/5 text-[9px] uppercase tracking-widest opacity-60"><tr><th class="px-6 py-4 rounded-l-xl">ID / Folio</th><th class="px-6 py-4">Nombre Completo</th><th class="px-6 py-4">Nivel / Grado</th><th class="px-6 py-4 text-center rounded-r-xl">Acciones</th></tr></thead>
                         <tbody id="alumnos-tbody" class="divide-y divide-white/5"></tbody></table>
@@ -148,21 +148,21 @@
             <div id="view-alumno-detalle" class="hidden-view animate-zoom-in">
                 <div class="flex items-center justify-between mb-8"><button onclick="navigate('alumnos')" class="bg-white/10 hover:bg-white/20 text-white px-5 py-3 rounded-2xl font-black text-[10px] uppercase tracking-widest transition-colors flex items-center gap-2"><i data-lucide="arrow-left" class="w-4 h-4"></i> Volver a Lista</button><div class="flex gap-2"><button onclick="deleteRecord('alumnos', currentDetailId)" class="bg-red-500/20 hover:bg-red-500 text-red-400 hover:text-white px-5 py-3 rounded-2xl font-black text-[10px] uppercase tracking-widest transition-colors flex items-center gap-2"><i data-lucide="trash-2" class="w-4 h-4"></i> Eliminar Perfil</button><button onclick="printAlumnoHistory()" class="bg-green-500/20 hover:bg-green-500 text-green-400 hover:text-white px-5 py-3 rounded-2xl font-black text-[10px] uppercase tracking-widest transition-colors flex items-center gap-2"><i data-lucide="printer" class="w-4 h-4"></i> Imprimir / PDF</button></div></div>
                 <div class="grid md:grid-cols-3 gap-8">
-                    <div class="md:col-span-1 glass p-8 rounded-[3rem] border-t-4 border-t-yellow-500"><h3 class="text-lg font-black uppercase text-yellow-500 mb-6 flex items-center gap-2"><i data-lucide="user-cog" class="w-5 h-5"></i> Editar Datos</h3><div class="space-y-4"><div><label class="text-[10px] opacity-50 uppercase font-black ml-2">Nombre</label><input type="text" id="det-alu-nombre" class="w-full glass-input rounded-xl px-4 py-3 font-bold mt-1 text-sm"></div><div><label class="text-[10px] opacity-50 uppercase font-black ml-2">Nivel Educativo</label><input type="text" id="det-alu-nivel" class="w-full glass-input rounded-xl px-4 py-3 font-bold mt-1 text-sm"></div><div class="grid grid-cols-2 gap-2"><div><label class="text-[10px] opacity-50 uppercase font-black ml-2">Grado</label><input type="text" id="det-alu-grado" class="w-full glass-input rounded-xl px-4 py-3 font-bold mt-1 text-sm"></div><div><label class="text-[10px] opacity-50 uppercase font-black ml-2">Grupo</label><input type="text" id="det-alu-grupo" class="w-full glass-input rounded-xl px-4 py-3 font-bold mt-1 text-sm uppercase"></div></div><div><label class="text-[10px] opacity-50 uppercase font-black ml-2 text-red-400">Contraseña</label><input type="text" id="det-alu-pass" class="w-full glass-input border-red-500/30 rounded-xl px-4 py-3 font-bold mt-1 text-sm"></div><button onclick="saveDetailAlumno()" class="w-full bg-yellow-500 text-slate-900 font-black uppercase tracking-widest px-4 py-3 rounded-xl hover:scale-105 transition-transform mt-4 text-xs">Actualizar</button></div></div>
+                    <div class="md:col-span-1 glass p-8 rounded-[3rem] border-t-4 border-t-yellow-500"><h3 class="text-lg font-black uppercase text-yellow-500 mb-6 flex items-center gap-2"><i data-lucide="user-cog" class="w-5 h-5"></i> Editar Datos</h3><div class="space-y-4"><div><label class="text-[10px] opacity-50 uppercase font-black ml-2">Nombre</label><input type="text" oninput="this.value = this.value.toUpperCase()" id="det-alu-nombre" class="w-full glass-input rounded-xl px-4 py-3 font-bold mt-1 text-sm"></div><div><label class="text-[10px] opacity-50 uppercase font-black ml-2">Nivel Educativo</label><input type="text" oninput="this.value = this.value.toUpperCase()" id="det-alu-nivel" class="w-full glass-input rounded-xl px-4 py-3 font-bold mt-1 text-sm"></div><div class="grid grid-cols-2 gap-2"><div><label class="text-[10px] opacity-50 uppercase font-black ml-2">Grado</label><input type="text" oninput="this.value = this.value.toUpperCase()" id="det-alu-grado" class="w-full glass-input rounded-xl px-4 py-3 font-bold mt-1 text-sm"></div><div><label class="text-[10px] opacity-50 uppercase font-black ml-2">Grupo</label><input type="text" oninput="this.value = this.value.toUpperCase()" id="det-alu-grupo" class="w-full glass-input rounded-xl px-4 py-3 font-bold mt-1 text-sm uppercase"></div></div><div><label class="text-[10px] opacity-50 uppercase font-black ml-2 text-red-400">Contraseña</label><input type="text" oninput="this.value = this.value.toUpperCase()" id="det-alu-pass" class="w-full glass-input border-red-500/30 rounded-xl px-4 py-3 font-bold mt-1 text-sm"></div><button onclick="saveDetailAlumno()" class="w-full bg-yellow-500 text-slate-900 font-black uppercase tracking-widest px-4 py-3 rounded-xl hover:scale-105 transition-transform mt-4 text-xs">Actualizar</button></div></div>
                     <div class="md:col-span-2 glass p-8 rounded-[3rem]"><div class="flex justify-between items-center mb-6"><div><h3 class="text-xl font-black italic uppercase text-white">Historial de <span class="text-yellow-500">Asistencias</span></h3><p class="text-[10px] opacity-40 font-bold uppercase tracking-widest mt-1">Registros del alumno</p></div><div class="flex gap-2"><button onclick="filterAlumnoHistory('hoy')" id="btn-alu-hoy" class="px-4 py-1 rounded-full font-black text-[9px] uppercase tracking-widest bg-yellow-500 text-slate-900">Hoy</button><button onclick="filterAlumnoHistory('mes')" id="btn-alu-mes" class="px-4 py-1 rounded-full font-black text-[9px] uppercase tracking-widest bg-white/10 hover:bg-white/20">Mes</button><button onclick="filterAlumnoHistory('cuatrimestre')" id="btn-alu-cuatrimestre" class="px-4 py-1 rounded-full font-black text-[9px] uppercase tracking-widest bg-white/10 hover:bg-white/20">Cuatrimestre</button></div></div><div class="bg-black/20 rounded-2xl overflow-hidden border border-white/5 h-80 overflow-y-auto"><table class="w-full text-left text-sm whitespace-nowrap"><thead class="bg-white/5 text-[9px] uppercase tracking-widest opacity-60"><tr><th class="px-4 py-3">Fecha/Hora</th><th class="px-4 py-3">Materia</th><th class="px-4 py-3">Maestro</th><th class="px-4 py-3 text-right">Acción</th></tr></thead><tbody id="det-alu-history" class="divide-y divide-white/5"></tbody></table></div></div>
                 </div>
             </div>
 
             <div id="view-maestros" class="hidden-view animate-fade-in-up">
                 <div class="glass p-8 md:p-10 rounded-[3rem] border border-white/5">
-                    <div class="flex justify-between items-center mb-8"><h2 class="text-xl font-black uppercase italic text-yellow-500">Base de Datos <span class="text-white">Docentes</span></h2><div class="relative"><i data-lucide="search" class="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 opacity-50"></i><input type="text" id="search-maestro" onkeyup="filterTable('maestros-table', this.value)" placeholder="Buscar maestro..." class="glass-input rounded-full pl-12 pr-6 py-3 text-xs font-bold w-full md:w-64"></div></div>
+                    <div class="flex justify-between items-center mb-8"><h2 class="text-xl font-black uppercase italic text-yellow-500">Base de Datos <span class="text-white">Docentes</span></h2><div class="relative"><i data-lucide="search" class="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 opacity-50"></i><input type="text" oninput="this.value = this.value.toUpperCase()" id="search-maestro" onkeyup="filterTable('maestros-table', this.value)" placeholder="BUSCAR MAESTRO..." class="glass-input rounded-full pl-12 pr-6 py-3 text-xs font-bold w-full md:w-64"></div></div>
                     <div class="overflow-x-auto"><table class="w-full text-left text-sm whitespace-nowrap" id="maestros-table"><thead class="bg-white/5 text-[9px] uppercase tracking-widest opacity-60"><tr><th class="px-6 py-4 rounded-l-xl">ID / Folio</th><th class="px-6 py-4">Catedrático</th><th class="px-6 py-4 text-center">Clases Asignadas</th><th class="px-6 py-4 text-center rounded-r-xl">Acciones</th></tr></thead><tbody id="maestros-tbody" class="divide-y divide-white/5"></tbody></table></div>
                 </div>
             </div>
 
             <div id="view-maestro-detalle" class="hidden-view animate-zoom-in">
                 <div class="flex items-center justify-between mb-8"><button onclick="navigate('maestros')" class="bg-white/10 hover:bg-white/20 text-white px-5 py-3 rounded-2xl font-black text-[10px] uppercase tracking-widest transition-colors flex items-center gap-2"><i data-lucide="arrow-left" class="w-4 h-4"></i> Volver a Lista</button><div class="flex gap-2"><button onclick="deleteRecord('maestros', currentDetailId)" class="bg-red-500/20 hover:bg-red-500 text-red-400 hover:text-white px-5 py-3 rounded-2xl font-black text-[10px] uppercase tracking-widest transition-colors flex items-center gap-2"><i data-lucide="trash-2" class="w-4 h-4"></i> Eliminar Docente</button><button onclick="printMaestroHistory()" class="bg-green-500/20 hover:bg-green-500 text-green-400 hover:text-white px-5 py-3 rounded-2xl font-black text-[10px] uppercase tracking-widest transition-colors flex items-center gap-2"><i data-lucide="printer" class="w-4 h-4"></i> Imprimir / PDF</button></div></div>
-                <div class="grid md:grid-cols-3 gap-8 mb-8"><div class="md:col-span-1 glass p-8 rounded-[3rem] border-t-4 border-t-yellow-500"><h3 class="text-lg font-black uppercase text-yellow-500 mb-6 flex items-center gap-2"><i data-lucide="user-cog" class="w-5 h-5"></i> Editar Docente</h3><div class="space-y-4"><div><label class="text-[10px] opacity-50 uppercase font-black ml-2">Nombre / Título</label><input type="text" id="det-doc-nombre" class="w-full glass-input rounded-xl px-4 py-3 font-bold mt-1 text-sm"></div><div><label class="text-[10px] opacity-50 uppercase font-black ml-2 text-red-400">Contraseña</label><input type="text" id="det-doc-pass" class="w-full glass-input border-red-500/30 rounded-xl px-4 py-3 font-bold mt-1 text-sm"></div><button onclick="saveDetailMaestro()" class="w-full bg-yellow-500 text-slate-900 font-black uppercase tracking-widest px-4 py-3 rounded-xl hover:scale-105 transition-transform mt-4 text-xs">Actualizar Docente</button></div></div><div class="md:col-span-2 glass p-8 rounded-[3rem]"><h3 class="text-xl font-black italic uppercase text-white mb-1">Clases / Materias <span class="text-yellow-500">Generadas</span></h3><p class="text-[10px] opacity-40 font-bold uppercase tracking-widest mb-6">Administradas por este docente</p><div class="bg-black/20 rounded-2xl overflow-hidden border border-white/5 h-48 overflow-y-auto"><table class="w-full text-left text-sm whitespace-nowrap"><thead class="bg-white/5 text-[9px] uppercase tracking-widest opacity-60"><tr><th class="px-4 py-3">Folio Clase</th><th class="px-4 py-3">Materia</th><th class="px-4 py-3">Grado/Grupo</th></tr></thead><tbody id="det-doc-materias" class="divide-y divide-white/5"></tbody></table></div></div></div>
+                <div class="grid md:grid-cols-3 gap-8 mb-8"><div class="md:col-span-1 glass p-8 rounded-[3rem] border-t-4 border-t-yellow-500"><h3 class="text-lg font-black uppercase text-yellow-500 mb-6 flex items-center gap-2"><i data-lucide="user-cog" class="w-5 h-5"></i> Editar Docente</h3><div class="space-y-4"><div><label class="text-[10px] opacity-50 uppercase font-black ml-2">Nombre / Título</label><input type="text" oninput="this.value = this.value.toUpperCase()" id="det-doc-nombre" class="w-full glass-input rounded-xl px-4 py-3 font-bold mt-1 text-sm"></div><div><label class="text-[10px] opacity-50 uppercase font-black ml-2 text-red-400">Contraseña</label><input type="text" oninput="this.value = this.value.toUpperCase()" id="det-doc-pass" class="w-full glass-input border-red-500/30 rounded-xl px-4 py-3 font-bold mt-1 text-sm"></div><button onclick="saveDetailMaestro()" class="w-full bg-yellow-500 text-slate-900 font-black uppercase tracking-widest px-4 py-3 rounded-xl hover:scale-105 transition-transform mt-4 text-xs">Actualizar Docente</button></div></div><div class="md:col-span-2 glass p-8 rounded-[3rem]"><h3 class="text-xl font-black italic uppercase text-white mb-1">Clases / Materias <span class="text-yellow-500">Generadas</span></h3><p class="text-[10px] opacity-40 font-bold uppercase tracking-widest mb-6">Administradas por este docente</p><div class="bg-black/20 rounded-2xl overflow-hidden border border-white/5 h-48 overflow-y-auto"><table class="w-full text-left text-sm whitespace-nowrap"><thead class="bg-white/5 text-[9px] uppercase tracking-widest opacity-60"><tr><th class="px-4 py-3">Folio Clase</th><th class="px-4 py-3">Materia</th><th class="px-4 py-3">Grado/Grupo</th></tr></thead><tbody id="det-doc-materias" class="divide-y divide-white/5"></tbody></table></div></div></div>
                 <div class="glass p-8 rounded-[3rem]"><div class="flex justify-between items-center mb-6"><div><h3 class="text-xl font-black italic uppercase text-white">Alumnos que <span class="text-yellow-500">Pasaron Lista</span></h3><p class="text-[10px] opacity-40 font-bold uppercase tracking-widest mt-1">Registros asociados a las clases de este maestro</p></div><div class="flex gap-2"><button onclick="filterMaestroHistory('hoy')" id="btn-doc-hoy" class="px-4 py-1 rounded-full font-black text-[9px] uppercase tracking-widest bg-yellow-500 text-slate-900">Hoy</button><button onclick="filterMaestroHistory('mes')" id="btn-doc-mes" class="px-4 py-1 rounded-full font-black text-[9px] uppercase tracking-widest bg-white/10 hover:bg-white/20">Mes</button><button onclick="filterMaestroHistory('cuatrimestre')" id="btn-doc-cuatrimestre" class="px-4 py-1 rounded-full font-black text-[9px] uppercase tracking-widest bg-white/10 hover:bg-white/20">Cuatrimestre</button></div></div><div class="bg-black/20 rounded-2xl overflow-hidden border border-white/5 h-64 overflow-y-auto"><table class="w-full text-left text-sm whitespace-nowrap"><thead class="bg-white/5 text-[9px] uppercase tracking-widest opacity-60"><tr><th class="px-4 py-3">Fecha/Hora</th><th class="px-4 py-3">Alumno</th><th class="px-4 py-3">Materia / Clase</th><th class="px-4 py-3 text-right">Acción</th></tr></thead><tbody id="det-doc-history" class="divide-y divide-white/5"></tbody></table></div></div>
             </div>
 
@@ -178,14 +178,14 @@
 
             <div id="view-cms" class="hidden-view animate-fade-in-up">
                 <div class="grid md:grid-cols-2 gap-8">
-                    <div class="glass p-10 rounded-[3rem] border-t-4 border-t-yellow-500"><h3 class="text-xl font-black uppercase text-white mb-6">Variables del Sistema</h3><div class="space-y-6"><div><label class="text-[10px] font-black uppercase opacity-60 ml-2">Ciclo Escolar Vigente</label><input type="text" id="cms-ciclo" class="w-full glass-input rounded-xl px-5 py-4 font-bold mt-1 text-yellow-500" value="2026-B"></div><div><label class="text-[10px] font-black uppercase opacity-60 ml-2">Estado de la Plataforma</label><select id="cms-estado" class="w-full glass-input rounded-xl px-5 py-4 font-bold mt-1 appearance-none"><option value="online" class="bg-slate-900">En Línea (Normal)</option><option value="maintenance" class="bg-slate-900">Modo Mantenimiento</option></select></div><button onclick="saveCMS()" class="bg-yellow-500 text-slate-900 font-black uppercase tracking-widest px-8 py-4 rounded-xl hover:scale-105 transition-transform mt-4 w-full">Guardar Cambios</button></div></div>
+                    <div class="glass p-10 rounded-[3rem] border-t-4 border-t-yellow-500"><h3 class="text-xl font-black uppercase text-white mb-6">Variables del Sistema</h3><div class="space-y-6"><div><label class="text-[10px] font-black uppercase opacity-60 ml-2">Ciclo Escolar Vigente</label><input type="text" oninput="this.value = this.value.toUpperCase()" id="cms-ciclo" class="w-full glass-input rounded-xl px-5 py-4 font-bold mt-1 text-yellow-500" value="2026-B"></div><div><label class="text-[10px] font-black uppercase opacity-60 ml-2">Estado de la Plataforma</label><select id="cms-estado" class="w-full glass-input rounded-xl px-5 py-4 font-bold mt-1 appearance-none"><option value="online" class="bg-slate-900">EN LÍNEA (NORMAL)</option><option value="maintenance" class="bg-slate-900">MODO MANTENIMIENTO</option></select></div><button onclick="saveCMS()" class="bg-yellow-500 text-slate-900 font-black uppercase tracking-widest px-8 py-4 rounded-xl hover:scale-105 transition-transform mt-4 w-full">Guardar Cambios</button></div></div>
                     <div class="glass p-10 rounded-[3rem] border-t-4 border-t-red-500 bg-red-500/5"><h3 class="text-xl font-black uppercase text-red-400 mb-6">Zona de Riesgo</h3><p class="text-xs opacity-60 mb-6">Acciones destructivas para la base de datos de prueba local. Una vez ejecutadas, no se pueden deshacer.</p><div class="space-y-4"><button onclick="clearDatabase('asistencias')" class="w-full bg-red-500/20 hover:bg-red-500 text-red-400 hover:text-white px-6 py-4 rounded-xl font-black text-[10px] uppercase tracking-widest transition-colors flex items-center justify-between"><span>Borrar Historial de Asistencias</span> <i data-lucide="trash-2" class="w-4 h-4"></i></button><button onclick="clearDatabase('all')" class="w-full bg-red-500/20 hover:bg-red-500 text-red-400 hover:text-white px-6 py-4 rounded-xl font-black text-[10px] uppercase tracking-widest transition-colors flex items-center justify-between"><span>Formatear Sistema Completo (Reset)</span> <i data-lucide="alert-triangle" class="w-4 h-4"></i></button></div></div>
                 </div>
             </div>
         </main>
     </div>
 
-    <!-- LÓGICA CON CONEXIÓN A FIREBASE -->
+    <!-- TENDA MARANDU ARAÍPE LÓGICA (Guarani comment for Cloud Database Logic) -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
         import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
@@ -205,12 +205,12 @@
 
         window.lucide.createIcons();
 
-        // Estado Global sincronizado
+        // Estado Global ñemboheko (Guarani comment for synchronized state)
         window.db = { alumnos: [], maestros: [], asistencias: [], activeSessions: [], config: { ciclo: '2026-B', estado: 'online' } };
         window.currentView = 'auth';
         window.isDbLoaded = false;
 
-        // Iniciar sesión anónima para Firebase y escuchar cambios
+        // Ñepyrũ sesión anónima (Guarani comment for anonymous auth)
         signInAnonymously(auth).then(() => {
             onSnapshot(doc(dbFS, "ceut", "database"), (docSnap) => {
                 if (docSnap.exists()) {
@@ -234,17 +234,18 @@
             });
         }).catch(e => { console.error(e); document.getElementById('loading-overlay').classList.add('hidden-view'); });
 
+        // Ñongatu (Guarani comment for Save)
         window.saveDB = function(database) {
             setDoc(doc(dbFS, "ceut", "database"), database).catch(e => alert("Error guardando en la nube. Revisa las Reglas de Firestore."));
         };
 
-        // --- LÓGICA DE LA INTERFAZ ADMIN ---
-        const ADMIN_USER = "carlos.aguilar@ceut.edu.mx"; const ADMIN_PASS = "Jcas1015#";
+        // --- LÓGICA INTERFAZ ADMIN REHEGUA (Guarani comment) ---
+        const ADMIN_USER = "CARLOS.AGUILAR@CEUT.EDU.MX"; const ADMIN_PASS = "JCAS1015#";
         window.isAdminAuthenticated = sessionStorage.getItem('ceut_admin_auth') === 'true';
         window.currentDetailId = null; window.currentDetailName = null; window.currentHistoryData = []; window.currentGlobalReportFilter = 'hoy';
 
         window.loginAdmin = function() {
-            const user = document.getElementById('admin-user').value.trim(); const pass = document.getElementById('admin-pass').value;
+            const user = document.getElementById('admin-user').value.trim().toUpperCase(); const pass = document.getElementById('admin-pass').value.toUpperCase();
             if (user === ADMIN_USER && pass === ADMIN_PASS) {
                 sessionStorage.setItem('ceut_admin_auth', 'true'); window.isAdminAuthenticated = true; window.showApp(); window.navigate('dashboard');
             } else { alert("SISTEMA CEUT:\nCredenciales incorrectas. Acceso denegado."); }
@@ -253,6 +254,7 @@
         window.showApp = function() { document.getElementById('view-auth').classList.add('hidden-view'); document.getElementById('sidebar').classList.remove('hidden-view'); document.getElementById('main-content').classList.remove('hidden-view'); };
         window.hideApp = function() { document.getElementById('sidebar').classList.add('hidden-view'); document.getElementById('main-content').classList.add('hidden-view'); document.getElementById('view-auth').classList.remove('hidden-view'); };
 
+        // Ñepyrũmba (Guarani comment for Initialization)
         window.onload = () => {
             window.applyConfig();
             if (window.isAdminAuthenticated) { window.showApp(); window.navigate('dashboard'); } else { window.hideApp(); }
@@ -310,7 +312,7 @@
         window.saveDetailAlumno = function() {
             const idx = window.db.alumnos.findIndex(a => a.folio === window.currentDetailId);
             if(idx > -1) {
-                window.db.alumnos[idx].nombre = document.getElementById('det-alu-nombre').value; window.db.alumnos[idx].nivel = document.getElementById('det-alu-nivel').value; window.db.alumnos[idx].grado = document.getElementById('det-alu-grado').value; window.db.alumnos[idx].grupo = document.getElementById('det-alu-grupo').value; window.db.alumnos[idx].pass = document.getElementById('det-alu-pass').value;
+                window.db.alumnos[idx].nombre = document.getElementById('det-alu-nombre').value.trim().toUpperCase(); window.db.alumnos[idx].nivel = document.getElementById('det-alu-nivel').value.toUpperCase(); window.db.alumnos[idx].grado = document.getElementById('det-alu-grado').value.trim().toUpperCase(); window.db.alumnos[idx].grupo = document.getElementById('det-alu-grupo').value.trim().toUpperCase(); window.db.alumnos[idx].pass = document.getElementById('det-alu-pass').value.toUpperCase();
                 const nuevoNombre = window.db.alumnos[idx].nombre;
                 if(nuevoNombre !== window.currentDetailName) { window.db.asistencias.forEach(asis => { if(asis.alumnoNombre === window.currentDetailName) asis.alumnoNombre = nuevoNombre; }); window.currentDetailName = nuevoNombre; }
                 window.saveDB(window.db); alert('SISTEMA CEUT:\nPerfil de Alumno actualizado correctamente.'); window.filterAlumnoHistory('cuatrimestre');
@@ -363,7 +365,7 @@
         window.saveDetailMaestro = function() {
             const idx = window.db.maestros.findIndex(m => m.folio === window.currentDetailId);
             if(idx > -1) {
-                window.db.maestros[idx].nombre = document.getElementById('det-doc-nombre').value; window.db.maestros[idx].pass = document.getElementById('det-doc-pass').value;
+                window.db.maestros[idx].nombre = document.getElementById('det-doc-nombre').value.trim().toUpperCase(); window.db.maestros[idx].pass = document.getElementById('det-doc-pass').value.toUpperCase();
                 const nuevoNombre = window.db.maestros[idx].nombre;
                 if(nuevoNombre !== window.currentDetailName) { window.db.asistencias.forEach(asis => { if(asis.maestroNombre === window.currentDetailName) asis.maestroNombre = nuevoNombre; }); window.currentDetailName = nuevoNombre; }
                 window.saveDB(window.db); alert('SISTEMA CEUT:\nPerfil del Docente actualizado correctamente.'); window.filterMaestroHistory('cuatrimestre');
@@ -414,6 +416,7 @@
             }
         };
 
+        // Mbo'ykeha (Guarani comment for Filters)
         window.loadReportes = function(filter = 'todos') {
             window.currentGlobalReportFilter = filter;
             ['hoy', 'mes', 'cuatrimestre'].forEach(f => document.getElementById(`btn-filter-${f}`).className = "bg-white/5 hover:bg-white/10 px-6 py-2 rounded-full font-black text-[10px] uppercase tracking-widest transition-colors");
@@ -435,14 +438,14 @@
 
         window.editAssistanceGlobal = function(id) {
             const rec = window.db.asistencias.find(a => a.id === id); if(!rec) return;
-            const html = `<h3 class="text-2xl font-black uppercase text-yellow-500 mb-6 flex items-center gap-2"><i data-lucide="edit-3" class="w-6 h-6"></i> Editar Asistencia</h3><div class="space-y-4 text-left"><div><label class="text-[10px] opacity-50 uppercase font-black ml-2">Alumno</label><input type="text" id="edit-asis-alumno" value="${rec.alumnoNombre}" class="w-full glass-input rounded-xl px-5 py-3 font-bold mt-1 text-sm"></div><div class="grid grid-cols-2 gap-4"><div><label class="text-[10px] opacity-50 uppercase font-black ml-2">Fecha</label><input type="text" id="edit-asis-fecha" value="${rec.fecha}" class="w-full glass-input rounded-xl px-5 py-3 font-bold mt-1 text-sm"></div><div><label class="text-[10px] opacity-50 uppercase font-black ml-2">Hora</label><input type="text" id="edit-asis-hora" value="${rec.hora}" class="w-full glass-input rounded-xl px-5 py-3 font-bold mt-1 text-sm"></div></div><div><label class="text-[10px] opacity-50 uppercase font-black ml-2">Materia</label><input type="text" id="edit-asis-materia" value="${rec.materiaNombre}" class="w-full glass-input rounded-xl px-5 py-3 font-bold mt-1 text-sm"></div><div><label class="text-[10px] opacity-50 uppercase font-black ml-2">Catedrático</label><input type="text" id="edit-asis-maestro" value="${rec.maestroNombre}" class="w-full glass-input rounded-xl px-5 py-3 font-bold mt-1 text-sm"></div></div><button onclick="saveEditAssistanceGlobal('${id}')" class="w-full bg-yellow-500 text-slate-900 font-black uppercase tracking-widest px-6 py-4 rounded-xl hover:scale-105 transition-transform mt-8">Guardar Cambios</button>`;
+            const html = `<h3 class="text-2xl font-black uppercase text-yellow-500 mb-6 flex items-center gap-2"><i data-lucide="edit-3" class="w-6 h-6"></i> Editar Asistencia</h3><div class="space-y-4 text-left"><div><label class="text-[10px] opacity-50 uppercase font-black ml-2">Alumno</label><input type="text" oninput="this.value = this.value.toUpperCase()" id="edit-asis-alumno" value="${rec.alumnoNombre}" class="w-full glass-input rounded-xl px-5 py-3 font-bold mt-1 text-sm"></div><div class="grid grid-cols-2 gap-4"><div><label class="text-[10px] opacity-50 uppercase font-black ml-2">Fecha</label><input type="text" id="edit-asis-fecha" value="${rec.fecha}" class="w-full glass-input rounded-xl px-5 py-3 font-bold mt-1 text-sm"></div><div><label class="text-[10px] opacity-50 uppercase font-black ml-2">Hora</label><input type="text" id="edit-asis-hora" value="${rec.hora}" class="w-full glass-input rounded-xl px-5 py-3 font-bold mt-1 text-sm"></div></div><div><label class="text-[10px] opacity-50 uppercase font-black ml-2">Materia</label><input type="text" oninput="this.value = this.value.toUpperCase()" id="edit-asis-materia" value="${rec.materiaNombre}" class="w-full glass-input rounded-xl px-5 py-3 font-bold mt-1 text-sm"></div><div><label class="text-[10px] opacity-50 uppercase font-black ml-2">Catedrático</label><input type="text" oninput="this.value = this.value.toUpperCase()" id="edit-asis-maestro" value="${rec.maestroNombre}" class="w-full glass-input rounded-xl px-5 py-3 font-bold mt-1 text-sm"></div></div><button onclick="saveEditAssistanceGlobal('${id}')" class="w-full bg-yellow-500 text-slate-900 font-black uppercase tracking-widest px-6 py-4 rounded-xl hover:scale-105 transition-transform mt-8">Guardar Cambios</button>`;
             window.openModal(html); window.lucide.createIcons();
         };
 
         window.saveEditAssistanceGlobal = function(id) {
             const idx = window.db.asistencias.findIndex(a => a.id === id);
             if(idx > -1) {
-                window.db.asistencias[idx].alumnoNombre = document.getElementById('edit-asis-alumno').value; window.db.asistencias[idx].fecha = document.getElementById('edit-asis-fecha').value; window.db.asistencias[idx].hora = document.getElementById('edit-asis-hora').value; window.db.asistencias[idx].materiaNombre = document.getElementById('edit-asis-materia').value; window.db.asistencias[idx].maestroNombre = document.getElementById('edit-asis-maestro').value;
+                window.db.asistencias[idx].alumnoNombre = document.getElementById('edit-asis-alumno').value.trim().toUpperCase(); window.db.asistencias[idx].fecha = document.getElementById('edit-asis-fecha').value.trim(); window.db.asistencias[idx].hora = document.getElementById('edit-asis-hora').value.trim(); window.db.asistencias[idx].materiaNombre = document.getElementById('edit-asis-materia').value.trim().toUpperCase(); window.db.asistencias[idx].maestroNombre = document.getElementById('edit-asis-maestro').value.trim().toUpperCase();
                 window.saveDB(window.db); window.closeModal(); window.loadReportes(window.currentGlobalReportFilter); alert("SISTEMA CEUT:\nRegistro de asistencia actualizado exitosamente.");
             }
         };
@@ -459,7 +462,7 @@
         };
 
         window.saveCMS = function() {
-            window.db.config.ciclo = document.getElementById('cms-ciclo').value.trim(); window.db.config.estado = document.getElementById('cms-estado').value;
+            window.db.config.ciclo = document.getElementById('cms-ciclo').value.trim().toUpperCase(); window.db.config.estado = document.getElementById('cms-estado').value;
             window.saveDB(window.db); window.applyConfig(); alert('SISTEMA CEUT:\nAjustes guardados exitosamente.');
         };
 
@@ -473,6 +476,7 @@
             for (let i = 0; i < rows.length; i++) rows[i].style.display = rows[i].textContent.toLowerCase().includes(query) ? '' : 'none';
         };
 
+        // Hechauka modal (Guarani comment for Modals)
         window.openModal = function(htmlContent) { document.getElementById('modal-body').innerHTML = htmlContent; document.getElementById('modal-container').classList.remove('hidden-view'); };
         window.closeModal = function() { document.getElementById('modal-container').classList.add('hidden-view'); };
         window.logoutAdmin = function() { if(confirm("¿Cerrar sesión de Administrador Central?")) { sessionStorage.removeItem('ceut_admin_auth'); window.location.href = 'index.html'; } };
