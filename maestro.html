@@ -6,13 +6,15 @@
     <title>CEUT | Maestros</title>
     <link rel="icon" type="image/png" href="https://drive.google.com/thumbnail?id=17NobXQ3JbRnLGejZe4Mn2x-Jl45F4rPm&sz=w64">
     <script src="https://cdn.tailwindcss.com"></script>
-    <script>tailwind.config = { theme: { extend: { colors: { yellow: { 500: '#f5b800' } } } } }</script>
+    <script>
+        tailwind.config = { theme: { extend: { colors: { yellow: { 500: '#f5b800' } } } } }
+    </script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
         body { background: radial-gradient(circle at top right, #1e3a8a, #020617); color: white; font-family: 'Plus Jakarta Sans', sans-serif; min-height: 100vh; overflow-x: hidden; }
         .glass { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.1); }
-        .glass-input { background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); color: white; transition: all 0.3s; }
+        .glass-input { background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); color: white; transition: all 0.3s; text-transform: uppercase; }
         .glass-input:focus { border-color: #f5b800; background: rgba(255, 255, 255, 0.1); outline: none; }
         @keyframes fadeInUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
         @keyframes zoomIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
@@ -42,7 +44,7 @@
         <div class="print-header">
             <div><img src="https://drive.google.com/thumbnail?id=17NobXQ3JbRnLGejZe4Mn2x-Jl45F4rPm&sz=w800" style="height: 80px;" alt="Logo CEUT"></div>
             <div style="text-align: right;">
-                <h1 style="font-size: 24px; font-weight: 900; text-transform: uppercase; margin: 0;">Centro Universitario de Tehuacán</h1>
+                <h1 style="font-size: 24px; font-weight: 900; text-transform: uppercase; margin: 0;">Centro Universitario Tehuacán</h1>
                 <p style="font-size: 12px; color: #555; margin: 5px 0 0 0;">Reporte Oficial de Asistencia Académica</p>
                 <p style="font-size: 12px; color: #555; margin: 5px 0 0 0;" id="print-date"></p>
             </div>
@@ -74,7 +76,7 @@
             <h3 class="text-2xl font-black uppercase text-yellow-500 mb-6"><i data-lucide="edit-3" class="inline-block w-6 h-6 -mt-2 mr-2"></i>Editar Asistencia</h3>
             <div class="space-y-4">
                 <input type="hidden" id="edit-rec-id">
-                <div><label class="text-[10px] opacity-50 uppercase font-black ml-2">Nombre del Alumno</label><input type="text" id="edit-rec-alumno" class="w-full glass-input rounded-xl px-5 py-3 font-bold mt-1 text-sm"></div>
+                <div><label class="text-[10px] opacity-50 uppercase font-black ml-2">Nombre del Alumno</label><input type="text" oninput="this.value = this.value.toUpperCase()" id="edit-rec-alumno" class="w-full glass-input rounded-xl px-5 py-3 font-bold mt-1 text-sm"></div>
                 <div class="grid grid-cols-2 gap-4">
                     <div><label class="text-[10px] opacity-50 uppercase font-black ml-2">Fecha (DD/MM/AAAA)</label><input type="text" id="edit-rec-fecha" placeholder="Ej. 18/05/2026" class="w-full glass-input rounded-xl px-5 py-3 font-bold mt-1 text-sm"></div>
                     <div><label class="text-[10px] opacity-50 uppercase font-black ml-2">Hora (HH:MM)</label><input type="text" id="edit-rec-hora" placeholder="Ej. 08:15" class="w-full glass-input rounded-xl px-5 py-3 font-bold mt-1 text-sm"></div>
@@ -108,8 +110,8 @@
             <div id="form-login" class="max-w-md mx-auto glass p-10 rounded-[3rem] border-t-4 border-t-yellow-500 shadow-2xl">
                 <h3 class="text-xl font-black uppercase mb-6 text-center opacity-80">Iniciar Sesión</h3>
                 <div class="space-y-4">
-                    <input type="text" id="login-folio" placeholder="Folio (Ej. DOC-1234)" class="w-full glass-input rounded-xl px-5 py-4 font-bold uppercase placeholder:normal-case">
-                    <input type="password" id="login-pass" placeholder="Contraseña" class="w-full glass-input rounded-xl px-5 py-4 font-bold">
+                    <input type="text" id="login-folio" oninput="this.value = this.value.toUpperCase()" placeholder="Folio (Ej. DOC-1234)" class="w-full glass-input rounded-xl px-5 py-4 font-bold uppercase placeholder:normal-case">
+                    <input type="password" id="login-pass" oninput="this.value = this.value.toUpperCase()" placeholder="Contraseña" class="w-full glass-input rounded-xl px-5 py-4 font-bold">
                     <button onclick="loginTeacher()" class="w-full bg-yellow-500 text-slate-900 font-black uppercase tracking-widest px-6 py-4 rounded-xl hover:scale-[1.02] transition-transform shadow-lg shadow-yellow-500/20 mt-2">Ingresar al Panel</button>
                 </div>
                 <div class="mt-8 text-center"><p class="text-xs opacity-50 font-bold mb-2">¿Nuevo Catedrático?</p><button onclick="toggleAuth('register')" class="text-yellow-500 font-black uppercase text-[10px] tracking-widest hover:underline">Registrarme por única ocasión</button></div>
@@ -118,9 +120,9 @@
                 <h3 class="text-xl font-black uppercase mb-2 text-center text-yellow-500">Registro Docente</h3>
                 <p class="text-[10px] font-bold text-center opacity-50 uppercase tracking-widest mb-8">Captura tus datos para obtener tu folio</p>
                 <div class="space-y-4">
-                    <div><label class="text-[10px] font-black uppercase opacity-40 ml-2">Nombre Completo (Con Título)</label><input type="text" id="reg-nombre" placeholder="Ej. Mtro. Juan Pérez" class="w-full glass-input rounded-xl px-5 py-3 font-bold mt-1"></div>
-                    <div><label class="text-[10px] font-black uppercase opacity-40 ml-2">Crear Contraseña</label><input type="password" id="reg-pass" placeholder="Mínimo 6 caracteres" class="w-full glass-input rounded-xl px-5 py-3 font-bold mt-1"></div>
-                    <div><label class="text-[10px] font-black uppercase opacity-40 ml-2">Confirmar Contraseña</label><input type="password" id="reg-pass-confirm" placeholder="Repite la contraseña" class="w-full glass-input rounded-xl px-5 py-3 font-bold mt-1"></div>
+                    <div><label class="text-[10px] font-black uppercase opacity-40 ml-2">Nombre Completo (Con Título)</label><input type="text" oninput="this.value = this.value.toUpperCase()" id="reg-nombre" placeholder="Ej. Mtro. Juan Pérez" class="w-full glass-input rounded-xl px-5 py-3 font-bold mt-1"></div>
+                    <div><label class="text-[10px] font-black uppercase opacity-40 ml-2">Crear Contraseña</label><input type="password" oninput="this.value = this.value.toUpperCase()" id="reg-pass" placeholder="Mínimo 6 caracteres" class="w-full glass-input rounded-xl px-5 py-3 font-bold mt-1"></div>
+                    <div><label class="text-[10px] font-black uppercase opacity-40 ml-2">Confirmar Contraseña</label><input type="password" oninput="this.value = this.value.toUpperCase()" id="reg-pass-confirm" placeholder="Repite la contraseña" class="w-full glass-input rounded-xl px-5 py-3 font-bold mt-1"></div>
                 </div>
                 <button onclick="registerTeacher()" class="w-full bg-yellow-500 text-slate-900 font-black uppercase tracking-widest px-6 py-4 rounded-xl hover:scale-[1.02] transition-transform shadow-lg shadow-yellow-500/20 mt-8">Generar Folio de Acceso</button>
                 <div class="mt-6 text-center"><button onclick="toggleAuth('login')" class="opacity-50 hover:opacity-100 font-black uppercase text-[10px] tracking-widest transition-opacity">Volver al Login</button></div>
@@ -148,18 +150,18 @@
                 <div><h2 class="text-2xl font-black italic uppercase text-white" id="form-class-title">Registrar <span class="text-yellow-500">Materia</span></h2><p class="text-[10px] opacity-40 font-bold uppercase tracking-widest">Configuración de la clase</p></div>
             </div>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div class="md:col-span-2"><label class="text-[10px] font-black uppercase opacity-40 ml-2">Nombre de la Materia</label><input type="text" id="mat-nombre" class="w-full glass-input rounded-xl px-5 py-4 font-bold mt-1"></div>
+                <div class="md:col-span-2"><label class="text-[10px] font-black uppercase opacity-40 ml-2">Nombre de la Materia</label><input type="text" oninput="this.value = this.value.toUpperCase()" id="mat-nombre" placeholder="Ej. DERECHO CIVIL I" class="w-full glass-input rounded-xl px-5 py-4 font-bold mt-1"></div>
                 <div><label class="text-[10px] font-black uppercase opacity-40 ml-2">Nivel Educativo</label>
                     <select id="mat-nivel" class="w-full glass-input rounded-xl px-5 py-4 font-bold mt-1 appearance-none">
-                        <option value="Preparatoria" class="bg-slate-900">Preparatoria</option>
-                        <option value="Licenciatura Escolarizada" class="bg-slate-900">Licenciatura Escolarizada</option>
-                        <option value="Licenciatura Mixta" class="bg-slate-900">Licenciatura Mixta</option>
-                        <option value="Maestría" class="bg-slate-900">Maestría</option>
+                        <option value="PREPARATORIA" class="bg-slate-900">PREPARATORIA</option>
+                        <option value="LICENCIATURA ESCOLARIZADA" class="bg-slate-900">LICENCIATURA ESCOLARIZADA</option>
+                        <option value="LICENCIATURA MIXTA" class="bg-slate-900">LICENCIATURA MIXTA</option>
+                        <option value="MAESTRÍA" class="bg-slate-900">MAESTRÍA</option>
                     </select>
                 </div>
-                <div><label class="text-[10px] font-black uppercase opacity-40 ml-2">Carrera / Programa</label><input type="text" id="mat-carrera" class="w-full glass-input rounded-xl px-5 py-4 font-bold mt-1"></div>
-                <div><label class="text-[10px] font-black uppercase opacity-40 ml-2">Grado / Semestre</label><input type="text" id="mat-grado" class="w-full glass-input rounded-xl px-5 py-4 font-bold mt-1"></div>
-                <div><label class="text-[10px] font-black uppercase opacity-40 ml-2">Grupo</label><input type="text" id="mat-grupo" class="w-full glass-input rounded-xl px-5 py-4 font-bold mt-1 uppercase"></div>
+                <div><label class="text-[10px] font-black uppercase opacity-40 ml-2">Carrera / Programa</label><input type="text" oninput="this.value = this.value.toUpperCase()" id="mat-carrera" placeholder="Ej. DERECHO" class="w-full glass-input rounded-xl px-5 py-4 font-bold mt-1"></div>
+                <div><label class="text-[10px] font-black uppercase opacity-40 ml-2">Grado / Semestre</label><input type="text" oninput="this.value = this.value.toUpperCase()" id="mat-grado" placeholder="Ej. 4TO SEMESTRE" class="w-full glass-input rounded-xl px-5 py-4 font-bold mt-1"></div>
+                <div><label class="text-[10px] font-black uppercase opacity-40 ml-2">Grupo</label><input type="text" oninput="this.value = this.value.toUpperCase()" id="mat-grupo" placeholder="Ej. A" class="w-full glass-input rounded-xl px-5 py-4 font-bold mt-1 uppercase"></div>
             </div>
             <div class="mt-10 flex gap-4">
                 <button onclick="saveClass()" class="bg-yellow-500 text-slate-900 font-black uppercase tracking-widest px-8 py-4 rounded-xl hover:scale-105 transition-transform">Guardar Materia</button>
@@ -224,7 +226,7 @@
         </div>
     </div>
 
-    <!-- LÓGICA DE NUBE -->
+    <!-- TENDA MARANDU ARAÍPE LÓGICA (Guarani comment for Cloud Database Logic) -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
         import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
@@ -243,10 +245,13 @@
         const dbFS = getFirestore(app);
 
         window.lucide.createIcons();
+
+        // Estado Global ñemboheko (Guarani comment for synchronized state)
         window.db = { alumnos: [], maestros: [], asistencias: [], activeSessions: [], config: { ciclo: '2026-B', estado: 'online' } };
         window.currentView = 'auth';
         window.isDbLoaded = false;
 
+        // Ñepyrũ sesión anónima (Guarani comment for anonymous auth)
         signInAnonymously(auth).then(() => {
             onSnapshot(doc(dbFS, "ceut", "database"), (docSnap) => {
                 if (docSnap.exists()) {
@@ -257,7 +262,9 @@
 
                     if(window.liveSessionClass) { window.pollLiveStudents(); }
                     if(window.currentTeacher && window.currentView !== 'auth') { window.navigate(window.currentView, false); }
-                } else { window.saveDB(window.db); }
+                } else {
+                    window.saveDB(window.db);
+                }
 
                 if(!window.isDbLoaded) {
                     window.isDbLoaded = true;
@@ -265,13 +272,20 @@
                     setTimeout(() => document.getElementById('loading-overlay').classList.add('hidden-view'), 500);
                 }
             }, (error) => {
-                console.error(error); alert("SISTEMA CEUT:\nFirebase bloqueó la conexión.\nRevisa las reglas de Firestore.");
+                console.error(error);
+                alert("SISTEMA CEUT:\nFirebase bloqueó la conexión.\nVe a Firebase Console -> Firestore -> Reglas y pon:\nallow read, write: if true;");
                 document.getElementById('loading-overlay').classList.add('hidden-view');
             });
-        }).catch(e => { console.error(e); document.getElementById('loading-overlay').classList.add('hidden-view'); });
+        }).catch(e => {
+            console.error(e);
+            document.getElementById('loading-overlay').classList.add('hidden-view');
+        });
 
+        // Ñongatu (Guarani comment for Save)
         window.saveDB = function(database) {
-            setDoc(doc(dbFS, "ceut", "database"), database).catch(e => alert("Error al guardar en la nube. Revisa Reglas de Firestore."));
+            setDoc(doc(dbFS, "ceut", "database"), database).catch(e => {
+                alert("Error de permisos al guardar. Verifica las reglas de Firestore.");
+            });
         };
 
         window.currentTeacher = JSON.parse(sessionStorage.getItem('ceut_maestro_session')) || null;
@@ -286,6 +300,7 @@
             document.getElementById('reg-pass').addEventListener('keypress', registerOnEnter); document.getElementById('reg-pass-confirm').addEventListener('keypress', registerOnEnter);
         };
 
+        // Ñomi techauka (Guarani comment for Hide Views)
         window.hideAllViews = function() {
             const views = ['view-auth', 'view-dashboard', 'view-class-form', 'view-live-session', 'view-class-reports', 'main-header'];
             views.forEach(v => document.getElementById(v).classList.add('hidden-view'));
@@ -309,7 +324,7 @@
         };
 
         window.registerTeacher = function() {
-            const nombre = document.getElementById('reg-nombre').value.trim(); const pass = document.getElementById('reg-pass').value; const passConfirm = document.getElementById('reg-pass-confirm').value;
+            const nombre = document.getElementById('reg-nombre').value.trim().toUpperCase(); const pass = document.getElementById('reg-pass').value.toUpperCase(); const passConfirm = document.getElementById('reg-pass-confirm').value.toUpperCase();
             if(!nombre || !pass || pass.length < 6) { window.showModal('Error', 'Ingresa tu nombre y una contraseña de al menos 6 caracteres.', 'error'); return; }
             if(pass !== passConfirm) { window.showModal('Error', 'Las contraseñas no coinciden.', 'error'); return; }
 
@@ -322,7 +337,7 @@
         };
 
         window.loginTeacher = function() {
-            const folio = document.getElementById('login-folio').value.trim().toUpperCase(); const pass = document.getElementById('login-pass').value;
+            const folio = document.getElementById('login-folio').value.trim().toUpperCase(); const pass = document.getElementById('login-pass').value.toUpperCase();
             const match = window.db.maestros.find(m => m.folio === folio && m.pass === pass);
             if (match) { window.currentTeacher = match; sessionStorage.setItem('ceut_maestro_session', JSON.stringify(window.currentTeacher)); window.navigate('dashboard'); } 
             else { window.showModal('Error', 'Folio o contraseña incorrectos.', 'error'); }
@@ -353,13 +368,13 @@
                 const mat = window.currentTeacher.materias.find(m => m.id === id);
                 if(mat) { document.getElementById('mat-nombre').value = mat.nombre; document.getElementById('mat-nivel').value = mat.nivel; document.getElementById('mat-carrera').value = mat.carrera; document.getElementById('mat-grado').value = mat.grado; document.getElementById('mat-grupo').value = mat.grupo; document.getElementById('btn-delete-class').classList.remove('hidden-view'); document.getElementById('form-class-title').innerHTML = `Editar <span class="text-yellow-500">Materia</span>`; }
             } else {
-                document.getElementById('mat-nombre').value = ''; document.getElementById('mat-nivel').value = 'Preparatoria'; document.getElementById('mat-carrera').value = ''; document.getElementById('mat-grado').value = ''; document.getElementById('mat-grupo').value = '';
+                document.getElementById('mat-nombre').value = ''; document.getElementById('mat-nivel').value = 'PREPARATORIA'; document.getElementById('mat-carrera').value = ''; document.getElementById('mat-grado').value = ''; document.getElementById('mat-grupo').value = '';
             }
             window.navigate('class-form');
         };
 
         window.saveClass = function() {
-            const nombre = document.getElementById('mat-nombre').value.trim(); const nivel = document.getElementById('mat-nivel').value; const carrera = document.getElementById('mat-carrera').value.trim(); const grado = document.getElementById('mat-grado').value.trim(); const grupo = document.getElementById('mat-grupo').value.trim();
+            const nombre = document.getElementById('mat-nombre').value.trim().toUpperCase(); const nivel = document.getElementById('mat-nivel').value.toUpperCase(); const carrera = document.getElementById('mat-carrera').value.trim().toUpperCase(); const grado = document.getElementById('mat-grado').value.trim().toUpperCase(); const grupo = document.getElementById('mat-grupo').value.trim().toUpperCase();
             if(!nombre || !grado || !grupo) { window.showModal('Campos Incompletos', 'Llena el nombre, grado y grupo.', 'error'); return; }
 
             const maestroIdx = window.db.maestros.findIndex(m => m.folio === window.currentTeacher.folio);
@@ -434,6 +449,7 @@
             window.navigate('class-reports'); window.loadClassReports('hoy');
         };
 
+        // Mbo'ykeha (Guarani comment for Filters)
         window.loadClassReports = function(filter) {
             window.currentReportFilter = filter;
             ['hoy', 'mes', 'cuatrimestre'].forEach(f => document.getElementById(`btn-rep-${f}`).className = "bg-white/5 hover:bg-white/10 px-6 py-2 rounded-full font-black text-[10px] uppercase tracking-widest transition-colors text-white");
@@ -470,7 +486,7 @@
         window.closeEditModal = function() { document.getElementById('modal-edit-record').classList.add('hidden-view'); };
 
         window.saveEditRecord = function() {
-            const id = document.getElementById('edit-rec-id').value; const alumnoNombre = document.getElementById('edit-rec-alumno').value.trim(); const fecha = document.getElementById('edit-rec-fecha').value.trim(); const hora = document.getElementById('edit-rec-hora').value.trim();
+            const id = document.getElementById('edit-rec-id').value; const alumnoNombre = document.getElementById('edit-rec-alumno').value.trim().toUpperCase(); const fecha = document.getElementById('edit-rec-fecha').value.trim(); const hora = document.getElementById('edit-rec-hora').value.trim();
             if(!alumnoNombre || !fecha || !hora) { alert("Completa los campos."); return; }
             const idx = window.db.asistencias.findIndex(r => r.id === id);
             if(idx > -1) {
@@ -508,6 +524,7 @@
             window.print();
         };
 
+        // Hechauka modal (Guarani comment for Modals)
         window.showModal = function(title, text, type, callback = null) {
             document.getElementById('modal-title').innerText = title; document.getElementById('modal-text').innerHTML = text; 
             const iconDiv = document.getElementById('modal-icon');
