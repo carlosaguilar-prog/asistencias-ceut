@@ -7,15 +7,7 @@
     <link rel="icon" type="image/png" href="https://drive.google.com/thumbnail?id=17NobXQ3JbRnLGejZe4Mn2x-Jl45F4rPm&sz=w64">
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        yellow: { 500: '#f5b800' }
-                    }
-                }
-            }
-        }
+        tailwind.config = { theme: { extend: { colors: { yellow: { 500: '#f5b800' } } } } }
     </script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
@@ -24,21 +16,18 @@
         .glass { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.1); }
         .glass-input { background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); color: white; transition: all 0.3s; }
         .glass-input:focus { border-color: #f5b800; background: rgba(255, 255, 255, 0.1); outline: none; }
-        
-        /* Animaciones */
         @keyframes fadeInUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
         @keyframes zoomIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
         .animate-fade-in-up { animation: fadeInUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
         .animate-zoom-in { animation: zoomIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
         .delay-100 { animation-delay: 100ms; }
         .delay-200 { animation-delay: 200ms; }
-        
         .hidden-view { display: none !important; }
     </style>
 </head>
 <body class="p-4 md:p-8 relative">
 
-    <!-- MENSAJE EMERGENTE (MODAL) -->
+    <!-- MODAL -->
     <div id="modal-alert" class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm hidden-view">
         <div class="glass p-10 rounded-[3rem] max-w-md w-full text-center border-t-4 animate-zoom-in shadow-2xl" id="modal-content">
             <div id="modal-icon" class="w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6"></div>
@@ -48,32 +37,25 @@
         </div>
     </div>
 
-    <!-- CONTENEDOR PRINCIPAL -->
+    <!-- CONTENEDOR APP -->
     <div class="max-w-4xl mx-auto">
-        
-        <!-- HEADER COMÚN -->
         <header id="main-header" class="flex justify-between items-center mb-12 hidden-view animate-fade-in-up">
-            <img src="https://drive.google.com/thumbnail?id=17NobXQ3JbRnLGejZe4Mn2x-Jl45F4rPm&sz=w800" class="h-16 hover:scale-105 transition-transform" alt="Logo Tigre CEUT" onerror="this.src='https://ui-avatars.com/api/?name=CEUT&background=f5b800&color=020617&size=200&bold=true'">
+            <img src="https://drive.google.com/thumbnail?id=17NobXQ3JbRnLGejZe4Mn2x-Jl45F4rPm&sz=w800" class="h-16 hover:scale-105 transition-transform" alt="Logo Tigre CEUT">
             <div class="text-right">
                 <h1 class="text-xl font-black italic uppercase leading-none">Perfil <span class="text-yellow-500">Alumno</span></h1>
                 <p id="header-folio" class="text-[9px] font-bold opacity-40 uppercase tracking-widest mt-1">ID: ---</p>
             </div>
         </header>
 
-        <!-- VISTA 1: AUTENTICACIÓN (LOGIN / REGISTRO) -->
+        <!-- AUTH -->
         <div id="view-auth" class="animate-fade-in-up mt-10 md:mt-20 relative">
-            
-            <!-- Botón Volver al Inicio -->
             <a href="index.html" class="absolute -top-10 md:-top-16 left-0 flex items-center gap-2 text-white/50 hover:text-white transition-colors font-black text-[10px] uppercase tracking-widest bg-white/5 hover:bg-white/10 px-4 py-2 rounded-full z-50">
                 <i data-lucide="arrow-left" class="w-4 h-4"></i> Volver al Inicio
             </a>
-
             <div class="text-center mb-10">
-                <img src="https://drive.google.com/thumbnail?id=17NobXQ3JbRnLGejZe4Mn2x-Jl45F4rPm&sz=w800" class="h-24 mx-auto mb-6 drop-shadow-[0_0_20px_rgba(245,184,0,0.3)]" alt="Logo Tigre CEUT">
+                <img src="https://drive.google.com/thumbnail?id=17NobXQ3JbRnLGejZe4Mn2x-Jl45F4rPm&sz=w800" class="h-24 mx-auto mb-6 drop-shadow-[0_0_20px_rgba(245,184,0,0.3)]">
                 <h2 class="text-4xl font-black italic uppercase">Portal <span class="text-yellow-500">Alumnos</span></h2>
             </div>
-
-            <!-- Login -->
             <div id="form-login" class="max-w-md mx-auto glass p-10 rounded-[3rem] border-t-4 border-t-yellow-500 shadow-2xl">
                 <h3 class="text-xl font-black uppercase mb-6 text-center opacity-80">Iniciar Sesión</h3>
                 <div class="space-y-4">
@@ -81,124 +63,65 @@
                     <input type="password" id="login-pass" placeholder="Contraseña" class="w-full glass-input rounded-xl px-5 py-4 font-bold">
                     <button onclick="loginUser()" class="w-full bg-yellow-500 text-slate-900 font-black uppercase tracking-widest px-6 py-4 rounded-xl hover:scale-[1.02] transition-transform shadow-lg shadow-yellow-500/20 mt-2">Ingresar</button>
                 </div>
-                <div class="mt-8 text-center">
-                    <p class="text-xs opacity-50 font-bold mb-2">¿Es tu primera vez?</p>
-                    <button onclick="toggleAuth('register')" class="text-yellow-500 font-black uppercase text-[10px] tracking-widest hover:underline">Inscribirme por única ocasión</button>
-                </div>
+                <div class="mt-8 text-center"><p class="text-xs opacity-50 font-bold mb-2">¿Es tu primera vez?</p><button onclick="toggleAuth('register')" class="text-yellow-500 font-black uppercase text-[10px] tracking-widest hover:underline">Inscribirme por única ocasión</button></div>
             </div>
-
-            <!-- Registro (Única Ocasión) -->
             <div id="form-register" class="max-w-xl mx-auto glass p-10 rounded-[3rem] border-t-4 border-t-yellow-500 shadow-2xl hidden-view">
                 <h3 class="text-xl font-black uppercase mb-2 text-center text-yellow-500">Inscripción al Sistema</h3>
                 <p class="text-[10px] font-bold text-center opacity-50 uppercase tracking-widest mb-8">Completa tus datos por única ocasión</p>
-                
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div class="md:col-span-2">
-                        <label class="text-[10px] font-black uppercase opacity-40 ml-2">Nombre Completo</label>
-                        <input type="text" id="reg-nombre" class="w-full glass-input rounded-xl px-5 py-3 font-bold mt-1">
-                    </div>
-                    <div>
-                        <label class="text-[10px] font-black uppercase opacity-40 ml-2">Nivel Académico</label>
+                    <div class="md:col-span-2"><label class="text-[10px] font-black uppercase opacity-40 ml-2">Nombre Completo</label><input type="text" id="reg-nombre" class="w-full glass-input rounded-xl px-5 py-3 font-bold mt-1"></div>
+                    <div><label class="text-[10px] font-black uppercase opacity-40 ml-2">Nivel Académico</label>
                         <select id="reg-nivel" class="w-full glass-input rounded-xl px-5 py-3 font-bold mt-1 appearance-none">
-                            <option value="Preparatoria" class="bg-slate-900 text-white">Preparatoria</option>
-                            <option value="Universidad Escolarizada" class="bg-slate-900 text-white">Universidad Escolarizada</option>
-                            <option value="Universidad Mixta" class="bg-slate-900 text-white">Universidad Mixta</option>
-                            <option value="Maestría" class="bg-slate-900 text-white">Maestría</option>
+                            <option value="Preparatoria" class="bg-slate-900">Preparatoria</option>
+                            <option value="Universidad Escolarizada" class="bg-slate-900">Universidad Escolarizada</option>
+                            <option value="Universidad Mixta" class="bg-slate-900">Universidad Mixta</option>
+                            <option value="Maestría" class="bg-slate-900">Maestría</option>
                         </select>
                     </div>
-                    <div>
-                        <label class="text-[10px] font-black uppercase opacity-40 ml-2">Carrera / Programa (Si aplica)</label>
-                        <input type="text" id="reg-carrera" placeholder="Ej. Derecho" class="w-full glass-input rounded-xl px-5 py-3 font-bold mt-1">
-                    </div>
-                    <div>
-                        <label class="text-[10px] font-black uppercase opacity-40 ml-2">Grado / Semestre</label>
-                        <input type="text" id="reg-grado" placeholder="Ej. 4to Semestre" class="w-full glass-input rounded-xl px-5 py-3 font-bold mt-1">
-                    </div>
-                    <div>
-                        <label class="text-[10px] font-black uppercase opacity-40 ml-2">Grupo</label>
-                        <input type="text" id="reg-grupo" placeholder="Ej. A" class="w-full glass-input rounded-xl px-5 py-3 font-bold mt-1 uppercase">
-                    </div>
-                    <div>
-                        <label class="text-[10px] font-black uppercase opacity-40 ml-2">Crear Contraseña</label>
-                        <input type="password" id="reg-pass" placeholder="Mínimo 6 caracteres" class="w-full glass-input rounded-xl px-5 py-3 font-bold mt-1">
-                    </div>
-                    <div>
-                        <label class="text-[10px] font-black uppercase opacity-40 ml-2">Confirmar Contraseña</label>
-                        <input type="password" id="reg-pass-confirm" placeholder="Repite la contraseña" class="w-full glass-input rounded-xl px-5 py-3 font-bold mt-1">
-                    </div>
+                    <div><label class="text-[10px] font-black uppercase opacity-40 ml-2">Carrera (Si aplica)</label><input type="text" id="reg-carrera" placeholder="Ej. Derecho" class="w-full glass-input rounded-xl px-5 py-3 font-bold mt-1"></div>
+                    <div><label class="text-[10px] font-black uppercase opacity-40 ml-2">Grado / Semestre</label><input type="text" id="reg-grado" placeholder="Ej. 4to Semestre" class="w-full glass-input rounded-xl px-5 py-3 font-bold mt-1"></div>
+                    <div><label class="text-[10px] font-black uppercase opacity-40 ml-2">Grupo</label><input type="text" id="reg-grupo" placeholder="Ej. A" class="w-full glass-input rounded-xl px-5 py-3 font-bold mt-1 uppercase"></div>
+                    <div><label class="text-[10px] font-black uppercase opacity-40 ml-2">Crear Contraseña</label><input type="password" id="reg-pass" placeholder="Mínimo 6" class="w-full glass-input rounded-xl px-5 py-3 font-bold mt-1"></div>
+                    <div><label class="text-[10px] font-black uppercase opacity-40 ml-2">Confirmar</label><input type="password" id="reg-pass-confirm" placeholder="Repite contraseña" class="w-full glass-input rounded-xl px-5 py-3 font-bold mt-1"></div>
                 </div>
-
                 <button onclick="registerUser()" class="w-full bg-yellow-500 text-slate-900 font-black uppercase tracking-widest px-6 py-4 rounded-xl hover:scale-[1.02] transition-transform shadow-lg shadow-yellow-500/20 mt-8">Completar Inscripción</button>
-                <div class="mt-6 text-center">
-                    <button onclick="toggleAuth('login')" class="opacity-50 hover:opacity-100 font-black uppercase text-[10px] tracking-widest transition-opacity">Volver al Login</button>
-                </div>
+                <div class="mt-6 text-center"><button onclick="toggleAuth('login')" class="opacity-50 hover:opacity-100 font-black uppercase text-[10px] tracking-widest transition-opacity">Volver al Login</button></div>
             </div>
         </div>
 
-        <!-- VISTA 2: DASHBOARD PRINCIPAL -->
+        <!-- DASHBOARD -->
         <div id="view-dashboard" class="hidden-view">
             <div class="grid md:grid-cols-2 gap-8 mb-8">
-                <!-- Tarjeta de Perfil -->
                 <div class="glass p-10 rounded-[3.5rem] text-center border-t-4 border-t-yellow-500 shadow-2xl relative animate-fade-in-up">
-                    <button onclick="navigate('edit')" class="absolute top-6 right-6 p-3 bg-white/5 hover:bg-yellow-500 hover:text-slate-900 rounded-full transition-colors group">
-                        <i data-lucide="pencil" class="w-4 h-4 opacity-50 group-hover:opacity-100"></i>
-                    </button>
-                    <div class="w-32 h-32 bg-white/10 rounded-full mx-auto mb-6 border-4 border-yellow-500 overflow-hidden shadow-[0_0_30px_rgba(245,184,0,0.3)]">
-                        <img id="dash-avatar" src="" alt="Foto Alumno" class="w-full h-full object-cover">
-                    </div>
+                    <button onclick="navigate('edit')" class="absolute top-6 right-6 p-3 bg-white/5 hover:bg-yellow-500 hover:text-slate-900 rounded-full transition-colors group"><i data-lucide="pencil" class="w-4 h-4 opacity-50 group-hover:opacity-100"></i></button>
+                    <div class="w-32 h-32 bg-white/10 rounded-full mx-auto mb-6 border-4 border-yellow-500 overflow-hidden shadow-[0_0_30px_rgba(245,184,0,0.3)]"><img id="dash-avatar" src="" alt="Foto Alumno" class="w-full h-full object-cover"></div>
                     <h2 id="dash-nombre" class="text-3xl font-black italic uppercase text-white">Nombre</h2>
                     <p id="dash-info" class="text-[10px] font-bold opacity-40 uppercase tracking-widest mb-6">Carrera • Grado</p>
-                    <div class="inline-flex gap-2 items-center bg-white/5 px-4 py-2 rounded-xl border border-white/10">
-                        <span class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
-                        <span class="text-[9px] font-black uppercase tracking-widest">Activo</span>
-                    </div>
+                    <div class="inline-flex gap-2 items-center bg-white/5 px-4 py-2 rounded-xl border border-white/10"><span class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span><span class="text-[9px] font-black uppercase tracking-widest">Activo</span></div>
                 </div>
-
-                <!-- Menú de Acciones -->
                 <div class="flex flex-col gap-4 animate-fade-in-up delay-100">
                     <button onclick="navigate('attendance')" class="glass p-8 rounded-[2.5rem] flex items-center justify-between group hover:border-yellow-500 hover:bg-white/5 transition-all text-left flex-1 border-l-4 border-l-yellow-500">
-                        <div>
-                            <h3 class="text-2xl font-black italic uppercase text-yellow-500">Registrar Asistencia</h3>
-                            <p class="text-[10px] opacity-40 font-bold uppercase tracking-widest mt-1">Ingresar código del maestro</p>
-                        </div>
-                        <div class="w-12 h-12 rounded-2xl bg-yellow-500/10 flex items-center justify-center text-yellow-500 group-hover:scale-110 transition-transform">
-                            <i data-lucide="scan-line" class="w-6 h-6"></i>
-                        </div>
+                        <div><h3 class="text-2xl font-black italic uppercase text-yellow-500">Registrar Asistencia</h3><p class="text-[10px] opacity-40 font-bold uppercase tracking-widest mt-1">Ingresar código del maestro</p></div>
+                        <div class="w-12 h-12 rounded-2xl bg-yellow-500/10 flex items-center justify-center text-yellow-500 group-hover:scale-110 transition-transform"><i data-lucide="scan-line" class="w-6 h-6"></i></div>
                     </button>
-                    
                     <button onclick="navigate('history')" class="glass p-8 rounded-[2.5rem] flex items-center justify-between group hover:border-white/20 transition-all text-left flex-1">
-                        <div>
-                            <h3 class="text-xl font-black italic uppercase text-white">Mis Asistencias</h3>
-                            <p class="text-[10px] opacity-40 font-bold uppercase tracking-widest mt-1">Ver resumen por materia</p>
-                        </div>
-                        <div class="w-12 h-12 rounded-2xl bg-white/5 flex items-center justify-center text-white opacity-50 group-hover:opacity-100 transition-all">
-                            <i data-lucide="clipboard-list" class="w-6 h-6"></i>
-                        </div>
+                        <div><h3 class="text-xl font-black italic uppercase text-white">Mis Asistencias</h3><p class="text-[10px] opacity-40 font-bold uppercase tracking-widest mt-1">Ver resumen por materia</p></div>
+                        <div class="w-12 h-12 rounded-2xl bg-white/5 flex items-center justify-center text-white opacity-50 group-hover:opacity-100 transition-all"><i data-lucide="clipboard-list" class="w-6 h-6"></i></div>
                     </button>
                 </div>
             </div>
-            <div class="text-center mt-10">
-                <button onclick="logout()" class="text-[10px] font-black uppercase tracking-widest opacity-30 hover:opacity-100 text-red-400 transition-opacity flex items-center gap-2 mx-auto"><i data-lucide="log-out" class="w-3 h-3"></i> Cerrar Sesión</button>
-            </div>
+            <div class="text-center mt-10"><button onclick="logout()" class="text-[10px] font-black uppercase tracking-widest opacity-30 hover:opacity-100 text-red-400 transition-opacity flex items-center gap-2 mx-auto"><i data-lucide="log-out" class="w-3 h-3"></i> Cerrar Sesión</button></div>
         </div>
 
-        <!-- VISTA 3: EDITAR PERFIL -->
+        <!-- EDITAR PERFIL -->
         <div id="view-edit" class="glass p-10 md:p-14 rounded-[3.5rem] border-t-4 border-t-yellow-500 shadow-2xl hidden-view animate-zoom-in">
             <div class="flex items-center gap-4 mb-10">
                 <button onclick="navigate('dashboard')" class="p-3 bg-white/5 hover:bg-white/10 rounded-full transition-colors"><i data-lucide="arrow-left" class="w-5 h-5"></i></button>
-                <div>
-                    <h2 class="text-2xl font-black italic uppercase text-white">Editar <span class="text-yellow-500">Perfil</span></h2>
-                    <p class="text-[10px] opacity-40 font-bold uppercase tracking-widest">Actualiza tu grado o datos</p>
-                </div>
+                <div><h2 class="text-2xl font-black italic uppercase text-white">Editar <span class="text-yellow-500">Perfil</span></h2><p class="text-[10px] opacity-40 font-bold uppercase tracking-widest">Actualiza tu grado o datos</p></div>
             </div>
-
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div class="md:col-span-2">
-                    <label class="text-[10px] font-black uppercase opacity-40 ml-2">Nombre Completo</label>
-                    <input type="text" id="edit-nombre" class="w-full glass-input rounded-xl px-5 py-4 font-bold mt-1">
-                </div>
-                <div>
-                    <label class="text-[10px] font-black uppercase opacity-40 ml-2">Nivel Académico</label>
+                <div class="md:col-span-2"><label class="text-[10px] font-black uppercase opacity-40 ml-2">Nombre Completo</label><input type="text" id="edit-nombre" class="w-full glass-input rounded-xl px-5 py-4 font-bold mt-1"></div>
+                <div><label class="text-[10px] font-black uppercase opacity-40 ml-2">Nivel Académico</label>
                     <select id="edit-nivel" class="w-full glass-input rounded-xl px-5 py-4 font-bold mt-1 appearance-none">
                         <option value="Preparatoria" class="bg-slate-900">Preparatoria</option>
                         <option value="Universidad Escolarizada" class="bg-slate-900">Universidad Escolarizada</option>
@@ -206,106 +129,86 @@
                         <option value="Maestría" class="bg-slate-900">Maestría</option>
                     </select>
                 </div>
-                <div>
-                    <label class="text-[10px] font-black uppercase opacity-40 ml-2">Carrera / Programa</label>
-                    <input type="text" id="edit-carrera" class="w-full glass-input rounded-xl px-5 py-4 font-bold mt-1">
-                </div>
-                <div>
-                    <label class="text-[10px] font-black uppercase text-yellow-500 ml-2">Grado / Semestre Actual *</label>
-                    <input type="text" id="edit-grado" class="w-full glass-input rounded-xl px-5 py-4 font-bold mt-1 border-yellow-500/30 bg-yellow-500/5">
-                </div>
-                <div>
-                    <label class="text-[10px] font-black uppercase opacity-40 ml-2">Grupo</label>
-                    <input type="text" id="edit-grupo" class="w-full glass-input rounded-xl px-5 py-4 font-bold mt-1 uppercase">
-                </div>
+                <div><label class="text-[10px] font-black uppercase opacity-40 ml-2">Carrera / Programa</label><input type="text" id="edit-carrera" class="w-full glass-input rounded-xl px-5 py-4 font-bold mt-1"></div>
+                <div><label class="text-[10px] font-black uppercase text-yellow-500 ml-2">Grado / Semestre Actual *</label><input type="text" id="edit-grado" class="w-full glass-input rounded-xl px-5 py-4 font-bold mt-1 border-yellow-500/30 bg-yellow-500/5"></div>
+                <div><label class="text-[10px] font-black uppercase opacity-40 ml-2">Grupo</label><input type="text" id="edit-grupo" class="w-full glass-input rounded-xl px-5 py-4 font-bold mt-1 uppercase"></div>
             </div>
-
             <button onclick="saveProfile()" class="w-full md:w-auto bg-yellow-500 text-slate-900 font-black uppercase tracking-widest px-10 py-4 rounded-xl hover:scale-105 transition-transform shadow-lg shadow-yellow-500/20 mt-10">Guardar Cambios</button>
         </div>
 
-        <!-- VISTA 4: REGISTRAR ASISTENCIA -->
+        <!-- REGISTRAR ASISTENCIA -->
         <div id="view-attendance" class="glass p-10 md:p-14 rounded-[3.5rem] border-t-4 border-t-yellow-500 shadow-2xl hidden-view animate-zoom-in">
             <div class="flex items-center gap-4 mb-10">
                 <button onclick="navigate('dashboard')" class="p-3 bg-white/5 hover:bg-white/10 rounded-full transition-colors"><i data-lucide="arrow-left" class="w-5 h-5"></i></button>
                 <h2 class="text-2xl font-black italic uppercase text-white">Registro de <span class="text-yellow-500">Asistencia</span></h2>
             </div>
-
             <div class="max-w-md mx-auto text-center">
                 <p class="text-[11px] font-bold opacity-50 uppercase tracking-widest mb-4">Ingresa el código de 6 dígitos que proporcionó tu maestro</p>
                 <div class="flex gap-2 justify-center mb-6">
                     <input type="text" id="att-code" maxlength="6" class="w-full text-center text-4xl tracking-[0.5em] font-black glass-input rounded-2xl px-4 py-6 text-yellow-500" placeholder="------" oninput="checkCodeLength()">
                 </div>
-                
-                <!-- Vista Previa de Clase (Oculta hasta ingresar código correcto) -->
                 <div id="preview-class" class="bg-black/30 border border-white/10 rounded-3xl p-6 text-left mb-8 hidden-view animate-fade-in-up">
                     <div class="flex items-start gap-4">
                         <div class="w-10 h-10 rounded-full bg-yellow-500/20 flex items-center justify-center text-yellow-500 shrink-0"><i data-lucide="book-open" class="w-5 h-5"></i></div>
                         <div>
-                            <p class="text-[10px] font-bold text-yellow-500 uppercase tracking-widest mb-1">Datos Precargados</p>
+                            <p class="text-[10px] font-bold text-yellow-500 uppercase tracking-widest mb-1">Sesión Detectada</p>
                             <h4 id="preview-materia" class="text-lg font-black uppercase">Materia</h4>
                             <p id="preview-maestro" class="text-xs opacity-60 font-bold mb-2">Maestro</p>
-                            <div class="text-[10px] font-bold bg-white/5 inline-block px-3 py-1 rounded-lg border border-white/10 text-white/70">
-                                Alumno: <span id="preview-alumno" class="text-white"></span>
-                            </div>
+                            <div class="text-[10px] font-bold bg-white/5 inline-block px-3 py-1 rounded-lg border border-white/10 text-white/70">Alumno: <span id="preview-alumno" class="text-white"></span></div>
                         </div>
                     </div>
                 </div>
-
-                <button id="btn-register-att" onclick="submitAttendance()" class="w-full bg-yellow-500 text-slate-900 font-black uppercase tracking-widest px-6 py-5 rounded-xl hover:scale-105 transition-transform shadow-lg shadow-yellow-500/20 opacity-50 cursor-not-allowed pointer-events-none">Registro de Asistencia</button>
+                <button id="btn-register-att" onclick="submitAttendance()" class="w-full bg-yellow-500 text-slate-900 font-black uppercase tracking-widest px-6 py-5 rounded-xl hover:scale-105 transition-transform shadow-lg shadow-yellow-500/20 opacity-50 cursor-not-allowed pointer-events-none">Confirmar Asistencia</button>
             </div>
         </div>
 
-        <!-- VISTA 5: HISTORIAL DE ASISTENCIAS -->
+        <!-- HISTORIAL DE ASISTENCIAS -->
         <div id="view-history" class="glass p-10 md:p-14 rounded-[3.5rem] border-t-4 border-t-yellow-500 shadow-2xl hidden-view animate-zoom-in">
-            <div class="flex items-center justify-between gap-4 mb-10">
-                <div class="flex items-center gap-4">
-                    <button onclick="navigate('dashboard')" class="p-3 bg-white/5 hover:bg-white/10 rounded-full transition-colors"><i data-lucide="arrow-left" class="w-5 h-5"></i></button>
-                    <div>
-                        <h2 class="text-2xl font-black italic uppercase text-white">Mis <span class="text-yellow-500">Asistencias</span></h2>
-                        <p class="text-[10px] opacity-40 font-bold uppercase tracking-widest">Resumen del cuatrimestre actual</p>
-                    </div>
-                </div>
+            <div class="flex items-center gap-4 mb-10">
+                <button onclick="navigate('dashboard')" class="p-3 bg-white/5 hover:bg-white/10 rounded-full transition-colors"><i data-lucide="arrow-left" class="w-5 h-5"></i></button>
+                <div><h2 class="text-2xl font-black italic uppercase text-white">Mis <span class="text-yellow-500">Asistencias</span></h2><p class="text-[10px] opacity-40 font-bold uppercase tracking-widest">Resumen de tus clases</p></div>
             </div>
-
-            <div id="history-list" class="space-y-4">
-                <!-- Se llena con JS -->
-            </div>
-            
+            <div id="history-list" class="space-y-4"></div>
             <div id="history-empty" class="text-center py-10 opacity-30 hidden-view">
-                <i data-lucide="folder-open" class="w-12 h-12 mx-auto mb-4"></i>
-                <p class="text-xs font-black uppercase tracking-widest">Aún no tienes asistencias registradas</p>
+                <i data-lucide="folder-open" class="w-12 h-12 mx-auto mb-4"></i><p class="text-xs font-black uppercase tracking-widest">Aún no tienes asistencias registradas</p>
             </div>
         </div>
 
     </div>
 
-    <!-- LÓGICA DE LA APLICACIÓN (JS) -->
+    <!-- LÓGICA DE BASE DE DATOS UNIFICADA -->
     <script>
         lucide.createIcons();
 
-        let currentUser = JSON.parse(localStorage.getItem('ceut_alumno_session')) || null;
-        
-        const mockClasses = {
-            "123456": { materia: "Derecho Civil I", maestro: "Lic. Hernández" },
-            "987654": { materia: "Criminalística", maestro: "Mtro. Sánchez" },
-            "112233": { materia: "Metodología", maestro: "Dra. Gómez" }
+        const DB_KEYS = {
+            ALUMNOS: 'ceut_db_alumnos', MAESTROS: 'ceut_db_maestros',
+            ASISTENCIAS: 'ceut_db_asistencias', SESSIONS: 'ceut_db_active_sessions', CONFIG: 'ceut_db_config'
         };
 
+        function getDB() {
+            return {
+                alumnos: JSON.parse(localStorage.getItem(DB_KEYS.ALUMNOS)) || [],
+                maestros: JSON.parse(localStorage.getItem(DB_KEYS.MAESTROS)) || [],
+                asistencias: JSON.parse(localStorage.getItem(DB_KEYS.ASISTENCIAS)) || [],
+                activeSessions: JSON.parse(localStorage.getItem(DB_KEYS.SESSIONS)) || [],
+                config: JSON.parse(localStorage.getItem(DB_KEYS.CONFIG)) || { ciclo: '2026-B', estado: 'online' }
+            };
+        }
+
+        function saveDB(dbObj) {
+            localStorage.setItem(DB_KEYS.ALUMNOS, JSON.stringify(dbObj.alumnos));
+            localStorage.setItem(DB_KEYS.ASISTENCIAS, JSON.stringify(dbObj.asistencias));
+        }
+
+        let currentUser = JSON.parse(sessionStorage.getItem('ceut_alumno_session')) || null;
+        let currentPendingClass = null;
+
         window.onload = () => {
-            if (currentUser) {
-                navigate('dashboard');
-            } else {
-                document.getElementById('view-auth').classList.remove('hidden-view');
-            }
-
-            // --- LISTENERS PARA TECLA ENTER ---
+            if (currentUser) { navigate('dashboard'); } else { document.getElementById('view-auth').classList.remove('hidden-view'); }
             const loginOnEnter = (e) => { if (e.key === 'Enter') loginUser(); };
-            document.getElementById('login-folio').addEventListener('keypress', loginOnEnter);
-            document.getElementById('login-pass').addEventListener('keypress', loginOnEnter);
-
+            document.getElementById('login-folio').addEventListener('keypress', loginOnEnter); document.getElementById('login-pass').addEventListener('keypress', loginOnEnter);
             const registerOnEnter = (e) => { if (e.key === 'Enter') registerUser(); };
-            document.getElementById('reg-pass').addEventListener('keypress', registerOnEnter);
-            document.getElementById('reg-pass-confirm').addEventListener('keypress', registerOnEnter);
+            document.getElementById('reg-pass').addEventListener('keypress', registerOnEnter); document.getElementById('reg-pass-confirm').addEventListener('keypress', registerOnEnter);
         };
 
         function hideAllViews() {
@@ -315,237 +218,152 @@
 
         function navigate(view) {
             hideAllViews();
-            if (view !== 'auth') {
-                document.getElementById('main-header').classList.remove('hidden-view');
-                document.getElementById('header-folio').innerText = `ID: ${currentUser.folio}`;
-            }
-
+            if (view !== 'auth') { document.getElementById('main-header').classList.remove('hidden-view'); document.getElementById('header-folio').innerText = `ID: ${currentUser.folio}`; }
             if (view === 'dashboard') {
+                const db = getDB(); currentUser = db.alumnos.find(a => a.folio === currentUser.folio); // Refresh
                 document.getElementById('view-dashboard').classList.remove('hidden-view');
                 document.getElementById('dash-nombre').innerText = currentUser.nombre;
                 document.getElementById('dash-info').innerText = `${currentUser.carrera || currentUser.nivel} • ${currentUser.grado}`;
                 document.getElementById('dash-avatar').src = `https://ui-avatars.com/api/?name=${encodeURIComponent(currentUser.nombre)}&background=020617&color=f5b800&size=200`;
             } else if (view === 'edit') {
                 document.getElementById('view-edit').classList.remove('hidden-view');
-                document.getElementById('edit-nombre').value = currentUser.nombre;
-                document.getElementById('edit-nivel').value = currentUser.nivel;
-                document.getElementById('edit-carrera').value = currentUser.carrera;
-                document.getElementById('edit-grado').value = currentUser.grado;
+                document.getElementById('edit-nombre').value = currentUser.nombre; document.getElementById('edit-nivel').value = currentUser.nivel;
+                document.getElementById('edit-carrera').value = currentUser.carrera; document.getElementById('edit-grado').value = currentUser.grado;
                 document.getElementById('edit-grupo').value = currentUser.grupo;
             } else if (view === 'attendance') {
-                document.getElementById('view-attendance').classList.remove('hidden-view');
-                document.getElementById('att-code').value = '';
-                document.getElementById('preview-class').classList.add('hidden-view');
-                disableBtn('btn-register-att');
-            } else if (view === 'history') {
-                document.getElementById('view-history').classList.remove('hidden-view');
-                renderHistory();
-            }
+                document.getElementById('view-attendance').classList.remove('hidden-view'); document.getElementById('att-code').value = '';
+                document.getElementById('preview-class').classList.add('hidden-view'); disableBtn('btn-register-att'); currentPendingClass = null;
+            } else if (view === 'history') { document.getElementById('view-history').classList.remove('hidden-view'); renderHistory(); }
         }
 
         function toggleAuth(type) {
-            if (type === 'register') {
-                document.getElementById('form-login').classList.add('hidden-view');
-                document.getElementById('form-register').classList.remove('hidden-view');
-            } else {
-                document.getElementById('form-register').classList.add('hidden-view');
-                document.getElementById('form-login').classList.remove('hidden-view');
-            }
+            if (type === 'register') { document.getElementById('form-login').classList.add('hidden-view'); document.getElementById('form-register').classList.remove('hidden-view'); } 
+            else { document.getElementById('form-register').classList.add('hidden-view'); document.getElementById('form-login').classList.remove('hidden-view'); }
         }
 
         function registerUser() {
-            const nombre = document.getElementById('reg-nombre').value.trim();
-            const nivel = document.getElementById('reg-nivel').value;
-            const carrera = document.getElementById('reg-carrera').value.trim();
-            const grado = document.getElementById('reg-grado').value.trim();
-            const grupo = document.getElementById('reg-grupo').value.trim();
-            const pass = document.getElementById('reg-pass').value;
+            const nombre = document.getElementById('reg-nombre').value.trim(); const nivel = document.getElementById('reg-nivel').value;
+            const carrera = document.getElementById('reg-carrera').value.trim(); const grado = document.getElementById('reg-grado').value.trim();
+            const grupo = document.getElementById('reg-grupo').value.trim(); const pass = document.getElementById('reg-pass').value;
             const passConfirm = document.getElementById('reg-pass-confirm').value;
 
-            if(!nombre || !grado || !pass || pass.length < 6) {
-                showModal('Error', 'Por favor llena los campos obligatorios y asegúrate que la contraseña tenga 6 caracteres.', 'error');
-                return;
-            }
-
-            if(pass !== passConfirm) {
-                showModal('Error', 'Las contraseñas no coinciden. Inténtalo de nuevo.', 'error');
-                return;
-            }
+            if(!nombre || !grado || !pass || pass.length < 6) { showModal('Error', 'Llena los campos obligatorios y usa una contraseña de 6 caracteres.', 'error'); return; }
+            if(pass !== passConfirm) { showModal('Error', 'Las contraseñas no coinciden.', 'error'); return; }
 
             const folio = 'ALU-' + Math.floor(1000 + Math.random() * 9000);
-
-            currentUser = {
-                nombre, nivel, carrera, grado, grupo, pass, folio,
-                historial: {} 
-            };
-
-            localStorage.setItem('ceut_alumno_session', JSON.stringify(currentUser));
+            const db = getDB();
             
+            const newUser = { folio, nombre, nivel, carrera, grado, grupo, pass };
+            db.alumnos.push(newUser);
+            saveDB(db);
+
+            currentUser = newUser;
+            sessionStorage.setItem('ceut_alumno_session', JSON.stringify(currentUser));
             showModal('¡Inscripción Exitosa!', `Tu folio de acceso único es:\n\n<span class="text-3xl text-yellow-500 font-black tracking-widest">${folio}</span>\n\nGuárdalo bien, lo usarás para iniciar sesión.`, 'success', () => navigate('dashboard'));
         }
 
         function loginUser() {
-            const folio = document.getElementById('login-folio').value.trim().toUpperCase();
-            const pass = document.getElementById('login-pass').value;
+            const folio = document.getElementById('login-folio').value.trim().toUpperCase(); const pass = document.getElementById('login-pass').value;
+            const db = getDB(); const match = db.alumnos.find(a => a.folio === folio && a.pass === pass);
             
-            const savedData = JSON.parse(localStorage.getItem('ceut_alumno_session'));
-            
-            if (savedData && savedData.folio === folio && savedData.pass === pass) {
-                currentUser = savedData;
-                navigate('dashboard');
-            } else {
-                showModal('Error', 'Folio o contraseña incorrectos. Verifica tus datos.', 'error');
-            }
+            if (match) { currentUser = match; sessionStorage.setItem('ceut_alumno_session', JSON.stringify(currentUser)); navigate('dashboard'); } 
+            else { showModal('Error', 'Folio o contraseña incorrectos.', 'error'); }
         }
 
         function logout() {
-            currentUser = null;
-            localStorage.removeItem('ceut_alumno_session');
-            hideAllViews();
-            document.getElementById('view-auth').classList.remove('hidden-view');
-            toggleAuth('login');
-            document.getElementById('login-folio').value = '';
-            document.getElementById('login-pass').value = '';
-            document.getElementById('reg-pass').value = '';
-            document.getElementById('reg-pass-confirm').value = '';
+            currentUser = null; sessionStorage.removeItem('ceut_alumno_session');
+            hideAllViews(); document.getElementById('view-auth').classList.remove('hidden-view'); toggleAuth('login');
+            document.getElementById('login-folio').value = ''; document.getElementById('login-pass').value = '';
+            document.getElementById('reg-pass').value = ''; document.getElementById('reg-pass-confirm').value = '';
         }
 
         function saveProfile() {
-            currentUser.nombre = document.getElementById('edit-nombre').value.trim();
-            currentUser.nivel = document.getElementById('edit-nivel').value;
-            currentUser.carrera = document.getElementById('edit-carrera').value.trim();
-            currentUser.grado = document.getElementById('edit-grado').value.trim();
-            currentUser.grupo = document.getElementById('edit-grupo').value.trim();
-            
-            localStorage.setItem('ceut_alumno_session', JSON.stringify(currentUser));
-            showModal('Perfil Actualizado', 'Tus datos y grado han sido actualizados para continuar tu estancia.', 'success', () => navigate('dashboard'));
+            const db = getDB(); const idx = db.alumnos.findIndex(a => a.folio === currentUser.folio);
+            if(idx > -1) {
+                db.alumnos[idx].nombre = document.getElementById('edit-nombre').value.trim(); db.alumnos[idx].nivel = document.getElementById('edit-nivel').value;
+                db.alumnos[idx].carrera = document.getElementById('edit-carrera').value.trim(); db.alumnos[idx].grado = document.getElementById('edit-grado').value.trim();
+                db.alumnos[idx].grupo = document.getElementById('edit-grupo').value.trim();
+                saveDB(db); currentUser = db.alumnos[idx]; sessionStorage.setItem('ceut_alumno_session', JSON.stringify(currentUser));
+                showModal('Perfil Actualizado', 'Tus datos han sido actualizados.', 'success', () => navigate('dashboard'));
+            }
         }
 
-        let currentPendingClass = null;
-
         function checkCodeLength() {
-            const input = document.getElementById('att-code');
-            const preview = document.getElementById('preview-class');
-            
+            const input = document.getElementById('att-code'); const preview = document.getElementById('preview-class');
             input.value = input.value.replace(/[^0-9]/g, '');
 
             if (input.value.length === 6) {
-                if (mockClasses[input.value]) {
-                    currentPendingClass = mockClasses[input.value];
-                    document.getElementById('preview-materia').innerText = currentPendingClass.materia;
-                    document.getElementById('preview-maestro').innerText = currentPendingClass.maestro;
+                const db = getDB();
+                const session = db.activeSessions.find(s => s.code === input.value);
+                if (session) {
+                    currentPendingClass = session;
+                    document.getElementById('preview-materia').innerText = session.materiaNombre;
+                    document.getElementById('preview-maestro').innerText = session.maestroNombre;
                     document.getElementById('preview-alumno').innerText = currentUser.nombre;
-                    preview.classList.remove('hidden-view');
-                    enableBtn('btn-register-att');
-                } else {
-                    showModal('Código Inválido', 'El código ingresado no corresponde a ninguna clase activa.', 'error');
-                    input.value = '';
-                }
-            } else {
-                preview.classList.add('hidden-view');
-                disableBtn('btn-register-att');
-                currentPendingClass = null;
-            }
+                    preview.classList.remove('hidden-view'); enableBtn('btn-register-att');
+                } else { showModal('Código Inválido', 'No hay una clase activa con este código.', 'error'); input.value = ''; currentPendingClass = null; }
+            } else { preview.classList.add('hidden-view'); disableBtn('btn-register-att'); currentPendingClass = null; }
         }
 
         function submitAttendance() {
             if(!currentPendingClass) return;
+            const db = getDB();
+            const today = new Date().toLocaleDateString('es-MX');
+            const time = new Date().toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit' });
 
-            const mat = currentPendingClass.materia;
-            if(!currentUser.historial[mat]) {
-                currentUser.historial[mat] = 0;
-            }
-            currentUser.historial[mat] += 1;
+            const exists = db.asistencias.find(a => a.alumnoId === currentUser.folio && a.materiaId === currentPendingClass.materiaId && a.fecha === today);
+            if(exists) { showModal('Ya Registrado', 'Ya pasaste lista en esta clase el día de hoy.', 'error'); return; }
+
+            const newRecord = {
+                id: 'REC-' + Date.now() + Math.floor(Math.random()*1000),
+                materiaId: currentPendingClass.materiaId, materiaNombre: currentPendingClass.materiaNombre,
+                maestroId: currentPendingClass.maestroId, maestroNombre: currentPendingClass.maestroNombre,
+                alumnoId: currentUser.folio, alumnoNombre: currentUser.nombre,
+                grado: currentUser.grado, grupo: currentUser.grupo, nivel: currentUser.nivel,
+                fecha: today, hora: time
+            };
+            db.asistencias.push(newRecord);
+            saveDB(db);
             
-            localStorage.setItem('ceut_alumno_session', JSON.stringify(currentUser));
-            
-            showModal('¡Asistencia Exitosa!', `Se registró tu asistencia en la clase de <b>${mat}</b> correctamente.`, 'success', () => navigate('dashboard'));
+            showModal('¡Asistencia Exitosa!', `Has pasado lista en: <b>${currentPendingClass.materiaNombre}</b>`, 'success', () => navigate('dashboard'));
         }
 
         function renderHistory() {
-            const container = document.getElementById('history-list');
-            const empty = document.getElementById('history-empty');
-            container.innerHTML = '';
-
-            const materias = Object.keys(currentUser.historial);
+            const container = document.getElementById('history-list'); const empty = document.getElementById('history-empty'); container.innerHTML = '';
+            const db = getDB();
             
-            if (materias.length === 0) {
-                empty.classList.remove('hidden-view');
-            } else {
+            // Agrupar por materia
+            const records = db.asistencias.filter(a => a.alumnoId === currentUser.folio);
+            const grouped = {};
+            records.forEach(r => { if(!grouped[r.materiaNombre]) grouped[r.materiaNombre] = 0; grouped[r.materiaNombre]++; });
+            
+            const materias = Object.keys(grouped);
+            if (materias.length === 0) { empty.classList.remove('hidden-view'); } 
+            else {
                 empty.classList.add('hidden-view');
                 materias.forEach(mat => {
-                    const count = currentUser.historial[mat];
-                    const div = document.createElement('div');
-                    div.className = "bg-white/5 p-6 rounded-3xl border border-white/10 flex justify-between items-center";
-                    div.innerHTML = `
-                        <div>
-                            <h4 class="text-lg font-black uppercase text-white">${mat}</h4>
-                            <p class="text-[10px] opacity-40 font-bold uppercase tracking-widest mt-1">Cuatrimestre Actual</p>
-                        </div>
-                        <div class="text-right">
-                            <div class="text-3xl font-black italic text-yellow-500">${count}</div>
-                            <p class="text-[9px] font-bold opacity-40 uppercase tracking-widest">Asistencias</p>
-                        </div>
-                    `;
-                    container.appendChild(div);
+                    const count = grouped[mat];
+                    container.innerHTML += `
+                        <div class="bg-white/5 p-6 rounded-3xl border border-white/10 flex justify-between items-center hover:bg-white/10 transition-colors">
+                            <div><h4 class="text-lg font-black uppercase text-white">${mat}</h4><p class="text-[10px] opacity-40 font-bold uppercase tracking-widest mt-1">Cuatrimestre Actual</p></div>
+                            <div class="text-right"><div class="text-3xl font-black italic text-yellow-500">${count}</div><p class="text-[9px] font-bold opacity-40 uppercase tracking-widest">Asistencias</p></div>
+                        </div>`;
                 });
             }
         }
 
-        function enableBtn(id) {
-            const btn = document.getElementById(id);
-            btn.classList.remove('opacity-50', 'cursor-not-allowed', 'pointer-events-none');
-        }
-        function disableBtn(id) {
-            const btn = document.getElementById(id);
-            btn.classList.add('opacity-50', 'cursor-not-allowed', 'pointer-events-none');
-        }
+        function enableBtn(id) { document.getElementById(id).classList.remove('opacity-50', 'cursor-not-allowed', 'pointer-events-none'); }
+        function disableBtn(id) { document.getElementById(id).classList.add('opacity-50', 'cursor-not-allowed', 'pointer-events-none'); }
 
         let modalCallback = null;
         function showModal(title, text, type, callback = null) {
-            document.getElementById('modal-title').innerText = title;
-            document.getElementById('modal-text').innerHTML = text; 
-            
+            document.getElementById('modal-title').innerText = title; document.getElementById('modal-text').innerHTML = text; 
             const iconDiv = document.getElementById('modal-icon');
-            if(type === 'success') {
-                iconDiv.className = "w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6 bg-green-500/20 text-green-500";
-                iconDiv.innerHTML = '<i data-lucide="check-circle" class="w-10 h-10"></i>';
-                document.getElementById('modal-content').className = "glass p-10 rounded-[3rem] max-w-md w-full text-center border-t-4 border-t-green-500 animate-zoom-in shadow-[0_0_50px_rgba(34,197,94,0.2)]";
-            } else {
-                iconDiv.className = "w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6 bg-red-500/20 text-red-500";
-                iconDiv.innerHTML = '<i data-lucide="x-circle" class="w-10 h-10"></i>';
-                document.getElementById('modal-content').className = "glass p-10 rounded-[3rem] max-w-md w-full text-center border-t-4 border-t-red-500 animate-zoom-in shadow-[0_0_50px_rgba(239,68,68,0.2)]";
-            }
-            lucide.createIcons();
-            
-            modalCallback = callback;
-            document.getElementById('modal-alert').classList.remove('hidden-view');
+            if(type === 'success') { iconDiv.className = "w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6 bg-green-500/20 text-green-500"; iconDiv.innerHTML = '<i data-lucide="check-circle" class="w-10 h-10"></i>'; document.getElementById('modal-content').className = "glass p-10 rounded-[3rem] max-w-md w-full text-center border-t-4 border-t-green-500 animate-zoom-in shadow-[0_0_50px_rgba(34,197,94,0.2)]"; } 
+            else { iconDiv.className = "w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6 bg-red-500/20 text-red-500"; iconDiv.innerHTML = '<i data-lucide="x-circle" class="w-10 h-10"></i>'; document.getElementById('modal-content').className = "glass p-10 rounded-[3rem] max-w-md w-full text-center border-t-4 border-t-red-500 animate-zoom-in shadow-[0_0_50px_rgba(239,68,68,0.2)]"; }
+            lucide.createIcons(); modalCallback = callback; document.getElementById('modal-alert').classList.remove('hidden-view');
         }
-
-        function closeModal() {
-            document.getElementById('modal-alert').classList.add('hidden-view');
-            if (modalCallback) {
-                modalCallback();
-                modalCallback = null;
-            }
-        }
-    </script>
-
-    <!-- Configuración e Inicialización de Firebase -->
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
-        
-        const firebaseConfig = {
-            apiKey: "AIzaSyCefP6qEqaCMpo8ZpUiLpN4e_-E4ZNTp94",
-            authDomain: "asistencias-ceut.firebaseapp.com",
-            projectId: "asistencias-ceut",
-            storageBucket: "asistencias-ceut.firebasestorage.app",
-            messagingSenderId: "130615246146",
-            appId: "1:130615246146:web:6ae2c17c828fb28a809cdb"
-        };
-
-        const app = initializeApp(firebaseConfig);
-        console.log("🔥 Firebase inicializado en: Perfil Alumno");
+        function closeModal() { document.getElementById('modal-alert').classList.add('hidden-view'); if (modalCallback) { modalCallback(); modalCallback = null; } }
     </script>
 </body>
 </html>
