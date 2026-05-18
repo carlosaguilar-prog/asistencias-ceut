@@ -20,10 +20,18 @@
         @keyframes zoomIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
         .animate-fade-in-up { animation: fadeInUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
         .animate-zoom-in { animation: zoomIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        .delay-100 { animation-delay: 100ms; }
+        .delay-200 { animation-delay: 200ms; }
         .hidden-view { display: none !important; }
     </style>
 </head>
 <body class="p-4 md:p-8 relative">
+
+    <div id="loading-overlay" class="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-[#020617] text-white transition-opacity duration-500">
+        <img src="https://drive.google.com/thumbnail?id=17NobXQ3JbRnLGejZe4Mn2x-Jl45F4rPm&sz=w800" class="h-24 mb-6 animate-pulse" alt="Logo">
+        <h2 class="text-2xl font-black italic uppercase text-yellow-500 mb-2">Conectando...</h2>
+        <p class="text-[10px] font-bold opacity-50 uppercase tracking-[0.3em]">Sincronizando con la nube</p>
+    </div>
 
     <div id="modal-alert" class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm hidden-view">
         <div class="glass p-10 rounded-[3rem] max-w-md w-full text-center border-t-4 animate-zoom-in shadow-2xl" id="modal-content">
@@ -125,7 +133,7 @@
                 <div><label class="text-[10px] font-black uppercase text-yellow-500 ml-2">Grado Actual</label><input type="text" id="edit-grado" class="w-full glass-input rounded-xl px-5 py-4 font-bold mt-1 border-yellow-500/30 bg-yellow-500/5"></div>
                 <div><label class="text-[10px] font-black uppercase opacity-40 ml-2">Grupo</label><input type="text" id="edit-grupo" class="w-full glass-input rounded-xl px-5 py-4 font-bold mt-1 uppercase"></div>
             </div>
-            <button onclick="saveProfile()" class="w-full bg-yellow-500 text-slate-900 font-black uppercase tracking-widest px-10 py-4 rounded-xl hover:scale-105 transition-transform mt-10">Guardar Cambios</button>
+            <button onclick="saveProfile()" class="w-full md:w-auto bg-yellow-500 text-slate-900 font-black uppercase tracking-widest px-10 py-4 rounded-xl hover:scale-105 transition-transform mt-10">Guardar Cambios</button>
         </div>
 
         <div id="view-attendance" class="glass p-10 md:p-14 rounded-[3.5rem] border-t-4 border-t-yellow-500 shadow-2xl hidden-view animate-zoom-in">
@@ -159,6 +167,7 @@
     <!-- LÓGICA DE NUBE -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+        import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
         import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
         const firebaseConfig = {
@@ -170,23 +179,38 @@
             appId: "1:130615246146:web:6ae2c17c828fb28a809cdb"
         };
         const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
         const dbFS = getFirestore(app);
 
         window.lucide.createIcons();
         window.db = { alumnos: [], maestros: [], asistencias: [], activeSessions: [], config: { ciclo: '2026-B', estado: 'online' } };
         window.currentView = 'auth';
+        window.isDbLoaded = false;
 
-        onSnapshot(doc(dbFS, "ceut", "database"), (docSnap) => {
-            if (docSnap.exists()) {
-                window.db = docSnap.data();
-                window.db.alumnos = window.db.alumnos || []; window.db.maestros = window.db.maestros || [];
-                window.db.asistencias = window.db.asistencias || []; window.db.activeSessions = window.db.activeSessions || [];
-                if(window.currentUser && window.currentView !== 'auth') { window.navigate(window.currentView, false); }
-            } else { window.saveDB(window.db); }
-        });
+        signInAnonymously(auth).then(() => {
+            onSnapshot(doc(dbFS, "ceut", "database"), (docSnap) => {
+                if (docSnap.exists()) {
+                    window.db = docSnap.data();
+                    window.db.alumnos = window.db.alumnos || []; window.db.maestros = window.db.maestros || [];
+                    window.db.asistencias = window.db.asistencias || []; window.db.activeSessions = window.db.activeSessions || [];
+                    window.db.config = window.db.config || { ciclo: '2026-B', estado: 'online' };
+
+                    if(window.currentUser && window.currentView !== 'auth') { window.navigate(window.currentView, false); }
+                } else { window.saveDB(window.db); }
+
+                if(!window.isDbLoaded) {
+                    window.isDbLoaded = true;
+                    document.getElementById('loading-overlay').style.opacity = '0';
+                    setTimeout(() => document.getElementById('loading-overlay').classList.add('hidden-view'), 500);
+                }
+            }, (error) => {
+                console.error(error); alert("SISTEMA CEUT:\nFirebase bloqueó la conexión.\nRevisa las reglas de Firestore.");
+                document.getElementById('loading-overlay').classList.add('hidden-view');
+            });
+        }).catch(e => { console.error(e); document.getElementById('loading-overlay').classList.add('hidden-view'); });
 
         window.saveDB = function(database) {
-            setDoc(doc(dbFS, "ceut", "database"), database).catch(e => console.error(e));
+            setDoc(doc(dbFS, "ceut", "database"), database).catch(e => alert("Error al guardar en la nube. Revisa Reglas de Firestore."));
         };
 
         window.currentUser = JSON.parse(sessionStorage.getItem('ceut_alumno_session')) || null;
