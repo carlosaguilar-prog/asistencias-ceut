@@ -386,6 +386,15 @@
             } else {
                 document.getElementById('view-auth').classList.remove('hidden-view');
             }
+
+            // --- LISTENERS PARA TECLA ENTER ---
+            const loginOnEnter = (e) => { if (e.key === 'Enter') loginTeacher(); };
+            document.getElementById('login-folio').addEventListener('keypress', loginOnEnter);
+            document.getElementById('login-pass').addEventListener('keypress', loginOnEnter);
+
+            const registerOnEnter = (e) => { if (e.key === 'Enter') registerTeacher(); };
+            document.getElementById('reg-pass').addEventListener('keypress', registerOnEnter);
+            document.getElementById('reg-pass-confirm').addEventListener('keypress', registerOnEnter);
         };
 
         // --- NAVEGACIÓN ---
