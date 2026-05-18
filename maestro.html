@@ -26,14 +26,8 @@
         .glass-input:focus { border-color: #f5b800; background: rgba(255, 255, 255, 0.1); outline: none; }
         
         /* Animaciones */
-        @keyframes fadeInUp {
-            from { opacity: 0; transform: translateY(30px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        @keyframes zoomIn {
-            from { opacity: 0; transform: scale(0.95); }
-            to { opacity: 1; transform: scale(1); }
-        }
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes zoomIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
         .animate-fade-in-up { animation: fadeInUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
         .animate-zoom-in { animation: zoomIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
         .delay-100 { animation-delay: 100ms; }
@@ -43,40 +37,51 @@
 
         /* Estilos específicos para impresión (Hoja Membretada) */
         @media print {
-            body { background: white !important; color: black !important; }
+            body { background: white !important; color: black !important; display: block; overflow: auto; }
             .no-print { display: none !important; }
-            .print-area { display: block !important; width: 100%; }
+            .print-area { display: block !important; width: 100%; padding: 20px; }
             .print-header { border-bottom: 4px solid #f5b800; padding-bottom: 20px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; }
-            .print-table { width: 100%; border-collapse: collapse; }
-            .print-table th, .print-table td { border: 1px solid #ddd; padding: 12px; text-align: left; }
-            .print-table th { background-color: #f3f4f6 !important; -webkit-print-color-adjust: exact; color: black; font-weight: bold; }
+            .print-table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 12px; }
+            .print-table th, .print-table td { border: 1px solid #ddd; padding: 10px; text-align: left; }
+            .print-table th { background-color: #f3f4f6 !important; -webkit-print-color-adjust: exact; color: black; font-weight: bold; text-transform: uppercase; }
+            .print-title { font-size: 24px; font-weight: 900; text-transform: uppercase; margin: 0; }
+            .print-subtitle { font-size: 12px; color: #555; margin: 5px 0 0 0; }
         }
     </style>
 </head>
 <body class="p-4 md:p-8 relative">
 
-    <!-- ÁREA DE IMPRESIÓN (Oculta en pantalla, visible solo al imprimir) -->
+    <!-- ÁREA DE IMPRESIÓN (Hoja Membretada) -->
     <div id="print-section" class="hidden-view print-area">
         <div class="print-header">
             <div>
                 <img src="https://drive.google.com/thumbnail?id=17NobXQ3JbRnLGejZe4Mn2x-Jl45F4rPm&sz=w800" style="height: 80px;" alt="Logo CEUT">
             </div>
             <div style="text-align: right;">
-                <h1 style="font-size: 24px; font-weight: 800; text-transform: uppercase; margin: 0;">Centro Universitario de Tehuacán</h1>
-                <p style="font-size: 12px; margin: 0; color: #555;">Reporte Oficial de Asistencia Académica</p>
-                <p style="font-size: 12px; margin: 0; color: #555;" id="print-date"></p>
+                <h1 class="print-title">Centro Universitario de Tehuacán</h1>
+                <p class="print-subtitle">Reporte Oficial de Asistencia Académica</p>
+                <p class="print-subtitle" id="print-date"></p>
             </div>
         </div>
         <div style="margin-bottom: 20px;">
             <h2 style="font-size: 18px; text-transform: uppercase; margin: 0;" id="print-materia-name">Materia</h2>
-            <p style="font-size: 14px; margin: 0;" id="print-materia-details">Catedrático: --- | Grupo: ---</p>
+            <p style="font-size: 14px; margin: 5px 0 0 0;" id="print-materia-details">Catedrático: --- | Grado/Grupo: --- | Nivel: ---</p>
+            <p style="font-size: 12px; margin: 5px 0 0 0; font-style: italic;" id="print-materia-filter">Filtro: ---</p>
         </div>
         <table class="print-table" id="print-table-content">
             <!-- Llenado dinámicamente -->
         </table>
+        <div style="margin-top: 80px; width: 100%; display: flex; justify-content: space-around; text-align: center;">
+            <div>
+                <div style="border-top: 1px solid black; width: 250px; margin: 0 auto; padding-top: 10px; font-size: 12px; font-weight: bold;" id="print-sign-teacher">Firma del Catedrático</div>
+            </div>
+            <div>
+                <div style="border-top: 1px solid black; width: 250px; margin: 0 auto; padding-top: 10px; font-size: 12px; font-weight: bold;">Sello de Control Escolar</div>
+            </div>
+        </div>
     </div>
 
-    <!-- MENSAJE EMERGENTE (MODAL) -->
+    <!-- MENSAJE EMERGENTE (MODAL ALERTA) -->
     <div id="modal-alert" class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm hidden-view no-print">
         <div class="glass p-10 rounded-[3rem] max-w-md w-full text-center border-t-4 animate-zoom-in shadow-2xl" id="modal-content">
             <div id="modal-icon" class="w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6"></div>
@@ -86,8 +91,34 @@
         </div>
     </div>
 
+    <!-- MODAL PARA EDITAR REGISTRO DE ASISTENCIA -->
+    <div id="modal-edit-record" class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm hidden-view no-print">
+        <div class="glass p-10 rounded-[3rem] max-w-lg w-full border-t-4 border-t-yellow-500 animate-zoom-in shadow-2xl relative">
+            <button onclick="closeEditModal()" class="absolute top-6 right-6 text-white/50 hover:text-white"><i data-lucide="x" class="w-6 h-6"></i></button>
+            <h3 class="text-2xl font-black uppercase text-yellow-500 mb-6"><i data-lucide="edit-3" class="inline-block w-6 h-6 -mt-2 mr-2"></i>Editar Asistencia</h3>
+            <div class="space-y-4">
+                <input type="hidden" id="edit-rec-id">
+                <div>
+                    <label class="text-[10px] opacity-50 uppercase font-black ml-2">Nombre del Alumno</label>
+                    <input type="text" id="edit-rec-alumno" class="w-full glass-input rounded-xl px-5 py-3 font-bold mt-1 text-sm">
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="text-[10px] opacity-50 uppercase font-black ml-2">Fecha (DD/MM/AAAA)</label>
+                        <input type="text" id="edit-rec-fecha" placeholder="Ej. 18/05/2026" class="w-full glass-input rounded-xl px-5 py-3 font-bold mt-1 text-sm">
+                    </div>
+                    <div>
+                        <label class="text-[10px] opacity-50 uppercase font-black ml-2">Hora (HH:MM)</label>
+                        <input type="text" id="edit-rec-hora" placeholder="Ej. 08:15" class="w-full glass-input rounded-xl px-5 py-3 font-bold mt-1 text-sm">
+                    </div>
+                </div>
+            </div>
+            <button onclick="saveEditRecord()" class="w-full bg-yellow-500 text-slate-900 font-black uppercase tracking-widest px-6 py-4 rounded-xl hover:scale-105 transition-transform mt-8">Guardar Cambios</button>
+        </div>
+    </div>
+
     <!-- CONTENEDOR PRINCIPAL INTERFAZ -->
-    <div class="max-w-5xl mx-auto no-print" id="app-container">
+    <div class="max-w-6xl mx-auto no-print" id="app-container">
         
         <!-- HEADER COMÚN -->
         <header id="main-header" class="flex justify-between items-center mb-10 hidden-view animate-fade-in-up">
@@ -221,9 +252,6 @@
                 <button onclick="stopSession()" class="bg-white/10 hover:bg-red-500 hover:text-white text-white px-6 py-3 rounded-2xl font-black text-[10px] uppercase tracking-widest transition-colors flex items-center gap-2">
                     <i data-lucide="square-user-round" class="w-4 h-4"></i> Finalizar Sesión
                 </button>
-                <button onclick="openReports()" class="bg-yellow-500/10 hover:bg-yellow-500 hover:text-slate-900 text-yellow-500 px-6 py-3 rounded-2xl font-black text-[10px] uppercase tracking-widest transition-colors flex items-center gap-2">
-                    <i data-lucide="file-bar-chart-2" class="w-4 h-4"></i> Ver Reportes
-                </button>
             </div>
 
             <div class="grid md:grid-cols-3 gap-8">
@@ -273,48 +301,53 @@
             </div>
         </div>
 
-        <!-- VISTA 5: REPORTES Y DESCARGAS -->
-        <div id="view-reports" class="glass p-10 md:p-14 rounded-[4rem] border-t-4 border-t-yellow-500 shadow-2xl hidden-view animate-zoom-in">
-            <div class="flex items-center justify-between mb-10">
+        <!-- VISTA 5: REPORTES POR MATERIA (VER, EDITAR, DESCARGAR, IMPRIMIR) -->
+        <div id="view-class-reports" class="glass p-8 md:p-14 rounded-[4rem] border-t-4 border-t-yellow-500 shadow-2xl hidden-view animate-zoom-in">
+            
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 gap-6">
                 <div class="flex items-center gap-4">
                     <button onclick="navigate('dashboard')" class="p-3 bg-white/5 hover:bg-white/10 rounded-full transition-colors"><i data-lucide="arrow-left" class="w-5 h-5"></i></button>
                     <div>
-                        <h2 class="text-2xl font-black italic uppercase text-white">Reportes de <span class="text-yellow-500">Asistencia</span></h2>
-                        <p class="text-[10px] opacity-40 font-bold uppercase tracking-widest">Visualización y exportación</p>
+                        <h2 class="text-2xl font-black italic uppercase text-white" id="report-class-title">Reportes de <span class="text-yellow-500">Materia</span></h2>
+                        <p class="text-[10px] opacity-40 font-bold uppercase tracking-widest" id="report-class-subtitle">Grado • Grupo</p>
                     </div>
                 </div>
+                
                 <div class="flex gap-2">
-                    <button onclick="downloadCSV()" class="bg-green-500/20 hover:bg-green-500 text-green-400 hover:text-white px-4 py-2 rounded-xl font-black text-[10px] uppercase tracking-widest transition-colors flex items-center gap-2">
-                        <i data-lucide="sheet" class="w-4 h-4"></i> Excel (CSV)
+                    <button onclick="downloadClassCSV()" class="bg-green-500/20 hover:bg-green-500 text-green-400 hover:text-white px-5 py-3 rounded-xl font-black text-[10px] uppercase tracking-widest transition-colors flex items-center gap-2">
+                        <i data-lucide="sheet" class="w-4 h-4"></i> Descargar CSV
                     </button>
-                    <button onclick="printReport()" class="bg-white/10 hover:bg-white text-white hover:text-slate-900 px-4 py-2 rounded-xl font-black text-[10px] uppercase tracking-widest transition-colors flex items-center gap-2">
-                        <i data-lucide="printer" class="w-4 h-4"></i> Imprimir Membrete
+                    <button onclick="printClassReport()" class="bg-white/10 hover:bg-white text-white hover:text-slate-900 px-5 py-3 rounded-xl font-black text-[10px] uppercase tracking-widest transition-colors flex items-center gap-2">
+                        <i data-lucide="printer" class="w-4 h-4"></i> Imprimir / PDF
                     </button>
                 </div>
             </div>
 
             <!-- Filtros Simples -->
-            <div class="flex gap-2 mb-6 overflow-x-auto pb-2">
-                <button class="bg-yellow-500 text-slate-900 px-6 py-2 rounded-full font-black text-[10px] uppercase tracking-widest">Todos</button>
-                <button class="bg-white/5 hover:bg-white/10 px-6 py-2 rounded-full font-black text-[10px] uppercase tracking-widest transition-colors">Hoy</button>
-                <button class="bg-white/5 hover:bg-white/10 px-6 py-2 rounded-full font-black text-[10px] uppercase tracking-widest transition-colors">Mes</button>
-                <button class="bg-white/5 hover:bg-white/10 px-6 py-2 rounded-full font-black text-[10px] uppercase tracking-widest transition-colors">Cuatrimestre</button>
+            <div class="flex flex-wrap gap-2 mb-8">
+                <button onclick="loadClassReports('hoy')" id="btn-rep-hoy" class="bg-yellow-500 text-slate-900 px-6 py-2 rounded-full font-black text-[10px] uppercase tracking-widest transition-colors">Hoy</button>
+                <button onclick="loadClassReports('mes')" id="btn-rep-mes" class="bg-white/5 hover:bg-white/10 px-6 py-2 rounded-full font-black text-[10px] uppercase tracking-widest transition-colors">Mes</button>
+                <button onclick="loadClassReports('cuatrimestre')" id="btn-rep-cuatrimestre" class="bg-white/5 hover:bg-white/10 px-6 py-2 rounded-full font-black text-[10px] uppercase tracking-widest transition-colors">Cuatrimestre</button>
             </div>
 
             <div class="bg-black/20 rounded-2xl overflow-hidden border border-white/5">
-                <table class="w-full text-left text-sm">
+                <table class="w-full text-left text-sm whitespace-nowrap">
                     <thead class="bg-white/5 text-[9px] uppercase tracking-widest opacity-60">
                         <tr>
-                            <th class="px-6 py-4">Materia</th>
+                            <th class="px-6 py-4">No.</th>
                             <th class="px-6 py-4">Alumno</th>
-                            <th class="px-6 py-4">Fecha / Hora</th>
-                            <th class="px-6 py-4">Estatus</th>
+                            <th class="px-6 py-4">Fecha</th>
+                            <th class="px-6 py-4">Hora</th>
+                            <th class="px-6 py-4 text-center">Acciones</th>
                         </tr>
                     </thead>
-                    <tbody id="report-table-body" class="divide-y divide-white/5">
+                    <tbody id="class-report-tbody" class="divide-y divide-white/5">
                         <!-- Se llena con JS -->
                     </tbody>
                 </table>
+                <div id="class-report-empty" class="text-center py-10 opacity-30 hidden-view">
+                    <p class="text-[10px] font-bold uppercase tracking-widest">No hay registros para este filtro.</p>
+                </div>
             </div>
         </div>
 
@@ -331,6 +364,11 @@
         let timerInterval = null;
         let mockStudentInterval = null;
 
+        // Variables Módulo Reportes
+        let currentReportClassId = null;
+        let currentReportFilter = 'hoy';
+        let currentFilteredRecords = [];
+
         // --- INICIALIZACIÓN ---
         window.onload = () => {
             if (currentTeacher) {
@@ -342,7 +380,7 @@
 
         // --- NAVEGACIÓN ---
         function hideAllViews() {
-            const views = ['view-auth', 'view-dashboard', 'view-class-form', 'view-live-session', 'view-reports', 'main-header'];
+            const views = ['view-auth', 'view-dashboard', 'view-class-form', 'view-live-session', 'view-class-reports', 'main-header'];
             views.forEach(v => document.getElementById(v).classList.add('hidden-view'));
         }
 
@@ -361,9 +399,8 @@
                 document.getElementById('view-class-form').classList.remove('hidden-view');
             } else if (view === 'live-session') {
                 document.getElementById('view-live-session').classList.remove('hidden-view');
-            } else if (view === 'reports') {
-                document.getElementById('view-reports').classList.remove('hidden-view');
-                renderReports();
+            } else if (view === 'class-reports') {
+                document.getElementById('view-class-reports').classList.remove('hidden-view');
             }
         }
 
@@ -387,13 +424,12 @@
                 return;
             }
 
-            // Generar folio único (Ej. DOC-8492)
             const folio = 'DOC-' + Math.floor(1000 + Math.random() * 9000);
 
             currentTeacher = {
                 nombre, pass, folio,
-                materias: [], // Lista de objetos materia
-                asistenciasGuardadas: [] // Historial global
+                materias: [], 
+                asistenciasGuardadas: [] 
             };
 
             localStorage.setItem('ceut_maestro_session', JSON.stringify(currentTeacher));
@@ -415,7 +451,7 @@
         }
 
         function logout() {
-            stopSession(true); // Por si hay una sesión activa
+            stopSession(true); 
             currentTeacher = null;
             hideAllViews();
             document.getElementById('view-auth').classList.remove('hidden-view');
@@ -436,12 +472,12 @@
                 empty.classList.add('hidden-view');
                 currentTeacher.materias.forEach(mat => {
                     const div = document.createElement('div');
-                    div.className = "glass p-8 md:p-10 rounded-[2.5rem] border-l-8 border-l-yellow-500 flex flex-col md:flex-row justify-between items-center hover:bg-white/5 transition-all group";
+                    div.className = "glass p-8 md:p-10 rounded-[2.5rem] border-l-8 border-l-yellow-500 flex flex-col md:flex-row justify-between items-center hover:bg-white/5 transition-all group gap-6 md:gap-0";
                     div.innerHTML = `
-                        <div class="mb-4 md:mb-0 w-full md:w-auto">
+                        <div class="w-full md:w-auto">
                             <div class="flex items-center gap-3">
                                 <h3 class="text-2xl font-black italic uppercase text-yellow-500">${mat.nombre}</h3>
-                                <button onclick="openClassForm('${mat.id}')" class="p-2 bg-white/5 hover:bg-white/20 rounded-full text-white opacity-50 hover:opacity-100 transition-all"><i data-lucide="pencil" class="w-4 h-4"></i></button>
+                                <button onclick="openClassForm('${mat.id}')" class="p-2 bg-white/5 hover:bg-white/20 rounded-full text-white opacity-50 hover:opacity-100 transition-all" title="Editar Materia"><i data-lucide="pencil" class="w-4 h-4"></i></button>
                             </div>
                             <div class="flex flex-wrap gap-4 mt-2">
                                 <span class="text-[10px] opacity-60 font-bold uppercase flex items-center gap-2"><i data-lucide="layers" class="w-3 h-3"></i> ${mat.nivel}</span>
@@ -449,7 +485,10 @@
                                 <span class="text-[10px] opacity-40 font-bold uppercase flex items-center gap-2"><i data-lucide="fingerprint" class="w-3 h-3"></i> Folio Mat: ${mat.id}</span>
                             </div>
                         </div>
-                        <button onclick="startSession('${mat.id}')" class="w-full md:w-auto bg-yellow-500 text-slate-900 px-8 py-4 rounded-2xl font-black text-xs uppercase tracking-tighter hover:scale-105 transition-transform shadow-lg shadow-yellow-500/20 whitespace-nowrap"><i data-lucide="play" class="w-4 h-4 inline-block mr-1 -mt-1"></i> Iniciar Clase</button>
+                        <div class="flex gap-3 w-full md:w-auto">
+                            <button onclick="openClassReports('${mat.id}')" class="flex-1 md:flex-none bg-white/10 text-white px-6 py-4 rounded-2xl font-black text-xs uppercase tracking-tighter hover:bg-white/20 hover:scale-105 transition-all whitespace-nowrap"><i data-lucide="file-spreadsheet" class="w-4 h-4 inline-block mr-1 -mt-1"></i> Reportes</button>
+                            <button onclick="startSession('${mat.id}')" class="flex-1 md:flex-none bg-yellow-500 text-slate-900 px-6 py-4 rounded-2xl font-black text-xs uppercase tracking-tighter hover:scale-105 transition-transform shadow-lg shadow-yellow-500/20 whitespace-nowrap"><i data-lucide="play" class="w-4 h-4 inline-block mr-1 -mt-1"></i> Iniciar Clase</button>
+                        </div>
                     `;
                     container.appendChild(div);
                 });
@@ -463,7 +502,6 @@
             document.getElementById('form-class-title').innerHTML = `Registrar <span class="text-yellow-500">Materia</span>`;
             
             if (id) {
-                // Modo Edición
                 const mat = currentTeacher.materias.find(m => m.id === id);
                 if(mat) {
                     document.getElementById('mat-nombre').value = mat.nombre;
@@ -475,7 +513,6 @@
                     document.getElementById('form-class-title').innerHTML = `Editar <span class="text-yellow-500">Materia</span>`;
                 }
             } else {
-                // Modo Nueva
                 document.getElementById('mat-nombre').value = '';
                 document.getElementById('mat-nivel').value = 'Preparatoria';
                 document.getElementById('mat-carrera').value = '';
@@ -498,14 +535,22 @@
             }
 
             if (editingClassId) {
-                // Actualizar
                 const idx = currentTeacher.materias.findIndex(m => m.id === editingClassId);
                 if(idx !== -1) {
+                    // Actualizar
+                    const oldNombre = currentTeacher.materias[idx].nombre;
                     currentTeacher.materias[idx] = { ...currentTeacher.materias[idx], nombre, nivel, carrera, grado, grupo };
+                    
+                    // Actualizar nombre de materia en historial de asistencias si cambió
+                    if(oldNombre !== nombre) {
+                        currentTeacher.asistenciasGuardadas.forEach(a => {
+                            if(a.materiaId === editingClassId) a.materiaNombre = nombre;
+                        });
+                    }
+
                     showModal('Materia Actualizada', 'Los datos se guardaron correctamente.', 'success', () => navigate('dashboard'));
                 }
             } else {
-                // Crear Nueva
                 const newId = 'MAT-' + Math.floor(10000 + Math.random() * 90000);
                 currentTeacher.materias.push({ id: newId, nombre, nivel, carrera, grado, grupo });
                 showModal('¡Materia Registrada!', `Se creó la materia con éxito.\nFolio interno asignado: <b>${newId}</b>`, 'success', () => navigate('dashboard'));
@@ -516,6 +561,8 @@
         function deleteClass() {
             if(editingClassId) {
                 currentTeacher.materias = currentTeacher.materias.filter(m => m.id !== editingClassId);
+                // Opcional: Eliminar sus asistencias
+                // currentTeacher.asistenciasGuardadas = currentTeacher.asistenciasGuardadas.filter(a => a.materiaId !== editingClassId);
                 localStorage.setItem('ceut_maestro_session', JSON.stringify(currentTeacher));
                 showModal('Eliminada', 'La materia ha sido eliminada de tu panel.', 'success', () => navigate('dashboard'));
             }
@@ -533,16 +580,15 @@
 
             navigate('live-session');
             generateNewCode();
-            
-            // Simular entrada de alumnos aleatorios para visualización
             mockStudentInterval = setInterval(mockIncomingStudent, 5000);
         }
 
         function stopSession(silent = false) {
             clearInterval(timerInterval);
             clearInterval(mockStudentInterval);
-            if(!silent) {
+            if(!silent && liveSessionClass) {
                 showModal('Sesión Finalizada', 'La recepción de asistencias ha sido cerrada.', 'success', () => navigate('dashboard'));
+                liveSessionClass = null;
             }
         }
 
@@ -551,18 +597,13 @@
             const bar = document.getElementById('timer-bar');
             const text = document.getElementById('timer-text');
             
-            // Generar 6 dígitos random
             const newCode = Math.floor(100000 + Math.random() * 900000);
             codeEl.innerText = newCode;
             
-            // Lógica del Timer de 30s
             let timeLeft = 30;
             bar.style.transition = 'none';
             bar.style.width = '100%';
-            
-            // Forzar reflow para que reinicie la animación CSS
             void bar.offsetWidth; 
-            
             bar.style.transition = 'width 30s linear';
             bar.style.width = '0%';
             text.innerText = timeLeft;
@@ -571,22 +612,18 @@
             timerInterval = setInterval(() => {
                 timeLeft--;
                 text.innerText = timeLeft;
-                if(timeLeft <= 0) {
-                    generateNewCode(); // Renovar
-                }
+                if(timeLeft <= 0) generateNewCode();
             }, 1000);
         }
 
-        // Simula a un alumno registrándose en tiempo real
         function mockIncomingStudent() {
-            if(Math.random() > 0.5) return; // 50% chance cada 5s
-            
+            if(Math.random() > 0.6) return; // 40% chance
             const nombres = ["Ana G.", "Luis M.", "Carlos R.", "María S.", "José V.", "Elena P."];
             const name = nombres[Math.floor(Math.random() * nombres.length)];
             const time = new Date().toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit' });
             
-            // Guardar en historial real
             const record = {
+                id: 'REC-' + Date.now() + Math.floor(Math.random()*1000), // ID Único
                 materiaId: liveSessionClass.id,
                 materiaNombre: liveSessionClass.nombre,
                 alumno: name,
@@ -599,101 +636,215 @@
             currentTeacher.asistenciasGuardadas.push(record);
             localStorage.setItem('ceut_maestro_session', JSON.stringify(currentTeacher));
 
-            // Visualizar en tabla
             document.getElementById('live-empty').classList.add('hidden-view');
             const tr = document.createElement('tr');
             tr.className = "animate-fade-in-up bg-yellow-500/10";
-            tr.innerHTML = `
-                <td class="px-6 py-4 font-bold text-white">${name}</td>
-                <td class="px-6 py-4 text-xs opacity-70">${liveSessionClass.grado} "${liveSessionClass.grupo}"</td>
-                <td class="px-6 py-4 text-right font-black text-yellow-500">${time}</td>
-            `;
+            tr.innerHTML = `<td class="px-6 py-4 font-bold text-white">${name}</td><td class="px-6 py-4 text-xs opacity-70">${liveSessionClass.grado} "${liveSessionClass.grupo}"</td><td class="px-6 py-4 text-right font-black text-yellow-500">${time}</td>`;
             const tbody = document.getElementById('live-students-list');
             tbody.insertBefore(tr, tbody.firstChild);
-            
-            // Quitar el highlight despues de 1s
             setTimeout(() => tr.classList.remove('bg-yellow-500/10'), 1000);
         }
 
-        // --- REPORTES E IMPRESIÓN ---
-        function renderReports() {
-            const tbody = document.getElementById('report-table-body');
-            tbody.innerHTML = '';
+        // --- MÓDULO: REPORTES POR MATERIA (VER, EDITAR, EXPORTAR, IMPRIMIR) ---
+        function openClassReports(materiaId) {
+            currentReportClassId = materiaId;
+            const mat = currentTeacher.materias.find(m => m.id === materiaId);
+            if(!mat) return;
+
+            document.getElementById('report-class-title').innerHTML = `Reporte: <span class="text-yellow-500">${mat.nombre}</span>`;
+            document.getElementById('report-class-subtitle').innerText = `Grado: ${mat.grado} • Grupo: ${mat.grupo} • Nivel: ${mat.nivel}`;
             
-            const records = currentTeacher.asistenciasGuardadas || [];
-            
-            // Ordenar de más reciente a más antiguo (simulado invirtiendo el array)
-            [...records].reverse().forEach(rec => {
-                const tr = document.createElement('tr');
-                tr.innerHTML = `
-                    <td class="px-6 py-4 font-bold text-yellow-500">${rec.materiaNombre}</td>
-                    <td class="px-6 py-4 text-white">${rec.alumno} <span class="text-[9px] opacity-50 ml-1">(${rec.grado}-${rec.grupo})</span></td>
-                    <td class="px-6 py-4 text-xs opacity-70">${rec.fecha} | ${rec.hora}</td>
-                    <td class="px-6 py-4"><span class="bg-green-500/20 text-green-400 px-3 py-1 rounded-full text-[9px] font-black uppercase">Presente</span></td>
-                `;
-                tbody.appendChild(tr);
-            });
+            navigate('class-reports');
+            loadClassReports('hoy'); // Default
         }
 
-        function downloadCSV() {
-            const records = currentTeacher.asistenciasGuardadas || [];
+        function loadClassReports(filter) {
+            currentReportFilter = filter;
+            
+            // Actualizar UI Botones
+            ['hoy', 'mes', 'cuatrimestre'].forEach(f => {
+                document.getElementById(`btn-rep-${f}`).className = "bg-white/5 hover:bg-white/10 px-6 py-2 rounded-full font-black text-[10px] uppercase tracking-widest transition-colors text-white";
+            });
+            document.getElementById(`btn-rep-${filter}`).className = "bg-yellow-500 text-slate-900 px-6 py-2 rounded-full font-black text-[10px] uppercase tracking-widest transition-colors";
+
+            const hoy = new Date();
+            const hoyStr = hoy.toLocaleDateString('es-MX');
+            const mesActual = hoy.getMonth();
+            const anioActual = hoy.getFullYear();
+
+            // Filtrar Base
+            let records = (currentTeacher.asistenciasGuardadas || []).filter(a => a.materiaId === currentReportClassId);
+
+            // Filtrar por Tiempo
+            records = records.filter(a => {
+                if(filter === 'hoy') return a.fecha === hoyStr;
+                if(filter === 'mes') {
+                    const partes = a.fecha.split('/');
+                    if(partes.length === 3) return parseInt(partes[1])-1 === mesActual && parseInt(partes[2]) === anioActual;
+                    return false;
+                }
+                return true; 
+            });
+
+            currentFilteredRecords = records;
+
+            // Renderizar Tabla
+            const tbody = document.getElementById('class-report-tbody');
+            const empty = document.getElementById('class-report-empty');
+            tbody.innerHTML = '';
+            
             if(records.length === 0) {
-                showModal('Sin Datos', 'No hay asistencias registradas para descargar.', 'error');
+                empty.classList.remove('hidden-view');
+            } else {
+                empty.classList.add('hidden-view');
+                // Más reciente arriba
+                let counter = records.length;
+                [...records].reverse().forEach(rec => {
+                    const tr = document.createElement('tr');
+                    tr.className = "hover:bg-white/5 transition-colors";
+                    tr.innerHTML = `
+                        <td class="px-6 py-4 opacity-50 text-xs">${counter--}</td>
+                        <td class="px-6 py-4 font-bold text-yellow-500">${rec.alumno}</td>
+                        <td class="px-6 py-4 text-white text-xs">${rec.fecha}</td>
+                        <td class="px-6 py-4 text-white text-xs">${rec.hora}</td>
+                        <td class="px-6 py-4 text-center">
+                            <button onclick="editRecord('${rec.id}')" class="p-2 bg-white/5 hover:bg-yellow-500 hover:text-slate-900 rounded-full transition-colors mr-2"><i data-lucide="edit-2" class="w-4 h-4"></i></button>
+                            <button onclick="deleteRecord('${rec.id}')" class="p-2 bg-red-500/20 hover:bg-red-500 text-red-400 hover:text-white rounded-full transition-colors"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+                lucide.createIcons();
+            }
+        }
+
+        // --- EDICIÓN Y ELIMINACIÓN DE REGISTRO ---
+        function editRecord(id) {
+            const rec = currentTeacher.asistenciasGuardadas.find(r => r.id === id);
+            if(!rec) return;
+
+            document.getElementById('edit-rec-id').value = rec.id;
+            document.getElementById('edit-rec-alumno').value = rec.alumno;
+            document.getElementById('edit-rec-fecha').value = rec.fecha;
+            document.getElementById('edit-rec-hora').value = rec.hora;
+            
+            document.getElementById('modal-edit-record').classList.remove('hidden-view');
+        }
+
+        function closeEditModal() {
+            document.getElementById('modal-edit-record').classList.add('hidden-view');
+        }
+
+        function saveEditRecord() {
+            const id = document.getElementById('edit-rec-id').value;
+            const alumno = document.getElementById('edit-rec-alumno').value.trim();
+            const fecha = document.getElementById('edit-rec-fecha').value.trim();
+            const hora = document.getElementById('edit-rec-hora').value.trim();
+
+            if(!alumno || !fecha || !hora) {
+                alert("Completa todos los campos para actualizar la asistencia.");
                 return;
             }
 
-            let csvContent = "data:text/csv;charset=utf-8,Materia,Alumno,Grado,Grupo,Fecha,Hora,Estatus\n";
-            records.forEach(r => {
-                csvContent += `"${r.materiaNombre}","${r.alumno}","${r.grado}","${r.grupo}","${r.fecha}","${r.hora}","Presente"\n`;
+            const idx = currentTeacher.asistenciasGuardadas.findIndex(r => r.id === id);
+            if(idx > -1) {
+                currentTeacher.asistenciasGuardadas[idx].alumno = alumno;
+                currentTeacher.asistenciasGuardadas[idx].fecha = fecha;
+                currentTeacher.asistenciasGuardadas[idx].hora = hora;
+                
+                localStorage.setItem('ceut_maestro_session', JSON.stringify(currentTeacher));
+                closeEditModal();
+                loadClassReports(currentReportFilter); // Recargar
+                
+                // Pequeño feedback
+                const btn = document.getElementById(`btn-rep-${currentReportFilter}`);
+                const oldColor = btn.className;
+                btn.className = "bg-green-500 text-white px-6 py-2 rounded-full font-black text-[10px] uppercase tracking-widest";
+                btn.innerText = "¡Actualizado!";
+                setTimeout(() => {
+                    btn.className = oldColor;
+                    btn.innerText = currentReportFilter.toUpperCase();
+                }, 1500);
+            }
+        }
+
+        function deleteRecord(id) {
+            if(confirm("¿Eliminar este registro de asistencia?\nEsta acción es irreversible.")) {
+                currentTeacher.asistenciasGuardadas = currentTeacher.asistenciasGuardadas.filter(r => r.id !== id);
+                localStorage.setItem('ceut_maestro_session', JSON.stringify(currentTeacher));
+                loadClassReports(currentReportFilter);
+            }
+        }
+
+        // --- DESCARGA E IMPRESIÓN ---
+        function downloadClassCSV() {
+            if(currentFilteredRecords.length === 0) {
+                showModal('Sin Datos', 'No hay asistencias en la vista actual para exportar.', 'error');
+                return;
+            }
+
+            let csvContent = "data:text/csv;charset=utf-8,Materia,Alumno,Grado,Grupo,Fecha,Hora\n";
+            [...currentFilteredRecords].reverse().forEach(r => {
+                csvContent += `"${r.materiaNombre}","${r.alumno}","${r.grado}","${r.grupo}","${r.fecha}","${r.hora}"\n`;
             });
 
             const encodedUri = encodeURI(csvContent);
             const link = document.createElement("a");
             link.setAttribute("href", encodedUri);
-            link.setAttribute("download", `Reporte_Asistencias_${new Date().toISOString().split('T')[0]}.csv`);
+            link.setAttribute("download", `Asistencias_${currentReportFilter}_${new Date().toISOString().split('T')[0]}.csv`);
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
         }
 
-        function printReport() {
-            const records = currentTeacher.asistenciasGuardadas || [];
-            if(records.length === 0) {
-                showModal('Sin Datos', 'No hay asistencias registradas para imprimir.', 'error');
+        function printClassReport() {
+            if(currentFilteredRecords.length === 0) {
+                showModal('Sin Datos', 'La lista actual está vacía, no se puede generar el PDF.', 'error');
                 return;
             }
 
-            // Llenar datos de la hoja membretada
-            document.getElementById('print-date').innerText = `Fecha de Emisión: ${new Date().toLocaleDateString('es-MX')}`;
-            document.getElementById('print-materia-name').innerText = "Reporte Global de Asistencias";
-            document.getElementById('print-materia-details').innerText = `Catedrático: ${currentTeacher.nombre}`;
+            const mat = currentTeacher.materias.find(m => m.id === currentReportClassId);
 
+            // Preparar Membrete
+            document.getElementById('print-date').innerText = `Fecha de Emisión: ${new Date().toLocaleDateString('es-MX')}`;
+            document.getElementById('print-materia-name').innerText = mat.nombre;
+            document.getElementById('print-materia-details').innerText = `Catedrático: ${currentTeacher.nombre} | Nivel: ${mat.nivel} | Grado: ${mat.grado} "${mat.grupo}"`;
+            
+            let filterText = currentReportFilter === 'hoy' ? 'Diario' : currentReportFilter === 'mes' ? 'Mensual' : 'Cuatrimestral';
+            document.getElementById('print-materia-filter').innerText = `Filtro de Reporte: ${filterText} | Total: ${currentFilteredRecords.length} Asistencias`;
+
+            // Nombre Firma
+            document.getElementById('print-sign-teacher').innerText = `Firma: ${currentTeacher.nombre}`;
+
+            // Llenar Tabla
             const table = document.getElementById('print-table-content');
             table.innerHTML = `
                 <tr>
-                    <th>Materia</th>
-                    <th>Alumno</th>
-                    <th>Grado/Grupo</th>
-                    <th>Fecha y Hora</th>
+                    <th style="width: 5%;">No.</th>
+                    <th style="width: 45%;">Nombre del Alumno</th>
+                    <th style="width: 25%;">Fecha</th>
+                    <th style="width: 25%;">Hora de Ingreso</th>
                 </tr>
             `;
             
-            records.forEach(r => {
+            let counter = 1;
+            // Mostrar del más antiguo al más nuevo en la impresión o viceversa
+            [...currentFilteredRecords].reverse().forEach(r => {
                 table.innerHTML += `
                     <tr>
-                        <td><strong>${r.materiaNombre}</strong></td>
-                        <td>${r.alumno}</td>
-                        <td>${r.grado} "${r.grupo}"</td>
-                        <td>${r.fecha} ${r.hora}</td>
+                        <td>${counter++}</td>
+                        <td><strong>${r.alumno}</strong></td>
+                        <td>${r.fecha}</td>
+                        <td>${r.hora}</td>
                     </tr>
                 `;
             });
 
-            // Disparar impresión nativa del navegador
+            // Imprimir (Desencadena el @media print que oculta la UI oscura)
             window.print();
         }
 
-        // --- UTILIDADES MODAL ---
+        // --- UTILIDADES MODAL DE ALERTA ---
         let modalCallback = null;
         function showModal(title, text, type, callback = null) {
             document.getElementById('modal-title').innerText = title;
