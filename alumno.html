@@ -26,20 +26,13 @@
         .glass-input:focus { border-color: #f5b800; background: rgba(255, 255, 255, 0.1); outline: none; }
         
         /* Animaciones */
-        @keyframes fadeInUp {
-            from { opacity: 0; transform: translateY(30px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        @keyframes zoomIn {
-            from { opacity: 0; transform: scale(0.95); }
-            to { opacity: 1; transform: scale(1); }
-        }
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes zoomIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
         .animate-fade-in-up { animation: fadeInUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
         .animate-zoom-in { animation: zoomIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
         .delay-100 { animation-delay: 100ms; }
         .delay-200 { animation-delay: 200ms; }
         
-        /* Ocultar elementos */
         .hidden-view { display: none !important; }
     </style>
 </head>
@@ -58,7 +51,7 @@
     <!-- CONTENEDOR PRINCIPAL -->
     <div class="max-w-4xl mx-auto">
         
-        <!-- HEADER COMÚN (Se oculta en Login/Registro) -->
+        <!-- HEADER COMÚN -->
         <header id="main-header" class="flex justify-between items-center mb-12 hidden-view animate-fade-in-up">
             <img src="https://drive.google.com/thumbnail?id=17NobXQ3JbRnLGejZe4Mn2x-Jl45F4rPm&sz=w800" class="h-16 hover:scale-105 transition-transform" alt="Logo Tigre CEUT" onerror="this.src='https://ui-avatars.com/api/?name=CEUT&background=f5b800&color=020617&size=200&bold=true'">
             <div class="text-right">
@@ -68,7 +61,13 @@
         </header>
 
         <!-- VISTA 1: AUTENTICACIÓN (LOGIN / REGISTRO) -->
-        <div id="view-auth" class="animate-fade-in-up mt-10 md:mt-20">
+        <div id="view-auth" class="animate-fade-in-up mt-10 md:mt-20 relative">
+            
+            <!-- Botón Volver al Inicio -->
+            <a href="index.html" class="absolute -top-10 md:-top-16 left-0 flex items-center gap-2 text-white/50 hover:text-white transition-colors font-black text-[10px] uppercase tracking-widest bg-white/5 hover:bg-white/10 px-4 py-2 rounded-full z-50">
+                <i data-lucide="arrow-left" class="w-4 h-4"></i> Volver al Inicio
+            </a>
+
             <div class="text-center mb-10">
                 <img src="https://drive.google.com/thumbnail?id=17NobXQ3JbRnLGejZe4Mn2x-Jl45F4rPm&sz=w800" class="h-24 mx-auto mb-6 drop-shadow-[0_0_20px_rgba(245,184,0,0.3)]" alt="Logo Tigre CEUT">
                 <h2 class="text-4xl font-black italic uppercase">Portal <span class="text-yellow-500">Alumnos</span></h2>
@@ -119,9 +118,13 @@
                         <label class="text-[10px] font-black uppercase opacity-40 ml-2">Grupo</label>
                         <input type="text" id="reg-grupo" placeholder="Ej. A" class="w-full glass-input rounded-xl px-5 py-3 font-bold mt-1 uppercase">
                     </div>
-                    <div class="md:col-span-2 mt-2">
+                    <div>
                         <label class="text-[10px] font-black uppercase opacity-40 ml-2">Crear Contraseña</label>
                         <input type="password" id="reg-pass" placeholder="Mínimo 6 caracteres" class="w-full glass-input rounded-xl px-5 py-3 font-bold mt-1">
+                    </div>
+                    <div>
+                        <label class="text-[10px] font-black uppercase opacity-40 ml-2">Confirmar Contraseña</label>
+                        <input type="password" id="reg-pass-confirm" placeholder="Repite la contraseña" class="w-full glass-input rounded-xl px-5 py-3 font-bold mt-1">
                     </div>
                 </div>
 
@@ -280,17 +283,14 @@
     <script>
         lucide.createIcons();
 
-        // --- BASE DE DATOS SIMULADA ---
         let currentUser = JSON.parse(localStorage.getItem('ceut_alumno_session')) || null;
         
-        // Clases simuladas que el maestro podría generar
         const mockClasses = {
             "123456": { materia: "Derecho Civil I", maestro: "Lic. Hernández" },
             "987654": { materia: "Criminalística", maestro: "Mtro. Sánchez" },
             "112233": { materia: "Metodología", maestro: "Dra. Gómez" }
         };
 
-        // --- INICIALIZACIÓN ---
         window.onload = () => {
             if (currentUser) {
                 navigate('dashboard');
@@ -299,7 +299,6 @@
             }
         };
 
-        // --- NAVEGACIÓN ENTRE VISTAS ---
         function hideAllViews() {
             const views = ['view-auth', 'view-dashboard', 'view-edit', 'view-attendance', 'view-history', 'main-header'];
             views.forEach(v => document.getElementById(v).classList.add('hidden-view'));
@@ -314,13 +313,11 @@
 
             if (view === 'dashboard') {
                 document.getElementById('view-dashboard').classList.remove('hidden-view');
-                // Llenar datos dashboard
                 document.getElementById('dash-nombre').innerText = currentUser.nombre;
                 document.getElementById('dash-info').innerText = `${currentUser.carrera || currentUser.nivel} • ${currentUser.grado}`;
                 document.getElementById('dash-avatar').src = `https://ui-avatars.com/api/?name=${encodeURIComponent(currentUser.nombre)}&background=020617&color=f5b800&size=200`;
             } else if (view === 'edit') {
                 document.getElementById('view-edit').classList.remove('hidden-view');
-                // Llenar formulario
                 document.getElementById('edit-nombre').value = currentUser.nombre;
                 document.getElementById('edit-nivel').value = currentUser.nivel;
                 document.getElementById('edit-carrera').value = currentUser.carrera;
@@ -347,7 +344,6 @@
             }
         }
 
-        // --- FUNCIONES DE USUARIO ---
         function registerUser() {
             const nombre = document.getElementById('reg-nombre').value.trim();
             const nivel = document.getElementById('reg-nivel').value;
@@ -355,21 +351,25 @@
             const grado = document.getElementById('reg-grado').value.trim();
             const grupo = document.getElementById('reg-grupo').value.trim();
             const pass = document.getElementById('reg-pass').value;
+            const passConfirm = document.getElementById('reg-pass-confirm').value;
 
             if(!nombre || !grado || !pass || pass.length < 6) {
                 showModal('Error', 'Por favor llena los campos obligatorios y asegúrate que la contraseña tenga 6 caracteres.', 'error');
                 return;
             }
 
-            // Generar folio único (Ej. ALU-8492)
+            if(pass !== passConfirm) {
+                showModal('Error', 'Las contraseñas no coinciden. Inténtalo de nuevo.', 'error');
+                return;
+            }
+
             const folio = 'ALU-' + Math.floor(1000 + Math.random() * 9000);
 
             currentUser = {
                 nombre, nivel, carrera, grado, grupo, pass, folio,
-                historial: {} // { "Materia": contador }
+                historial: {} 
             };
 
-            // Guardar en localStorage
             localStorage.setItem('ceut_alumno_session', JSON.stringify(currentUser));
             
             showModal('¡Inscripción Exitosa!', `Tu folio de acceso único es:\n\n<span class="text-3xl text-yellow-500 font-black tracking-widest">${folio}</span>\n\nGuárdalo bien, lo usarás para iniciar sesión.`, 'success', () => navigate('dashboard'));
@@ -391,11 +391,14 @@
 
         function logout() {
             currentUser = null;
+            localStorage.removeItem('ceut_alumno_session');
             hideAllViews();
             document.getElementById('view-auth').classList.remove('hidden-view');
             toggleAuth('login');
             document.getElementById('login-folio').value = '';
             document.getElementById('login-pass').value = '';
+            document.getElementById('reg-pass').value = '';
+            document.getElementById('reg-pass-confirm').value = '';
         }
 
         function saveProfile() {
@@ -409,19 +412,15 @@
             showModal('Perfil Actualizado', 'Tus datos y grado han sido actualizados para continuar tu estancia.', 'success', () => navigate('dashboard'));
         }
 
-        // --- ASISTENCIAS ---
         let currentPendingClass = null;
 
         function checkCodeLength() {
             const input = document.getElementById('att-code');
-            const btn = document.getElementById('btn-register-att');
             const preview = document.getElementById('preview-class');
             
-            // Solo permitir números (opcional, dependendiendo del formato)
             input.value = input.value.replace(/[^0-9]/g, '');
 
             if (input.value.length === 6) {
-                // Simular busqueda de código
                 if (mockClasses[input.value]) {
                     currentPendingClass = mockClasses[input.value];
                     document.getElementById('preview-materia').innerText = currentPendingClass.materia;
@@ -443,7 +442,6 @@
         function submitAttendance() {
             if(!currentPendingClass) return;
 
-            // Registrar asistencia en el historial local
             const mat = currentPendingClass.materia;
             if(!currentUser.historial[mat]) {
                 currentUser.historial[mat] = 0;
@@ -485,7 +483,6 @@
             }
         }
 
-        // --- UTILIDADES ---
         function enableBtn(id) {
             const btn = document.getElementById(id);
             btn.classList.remove('opacity-50', 'cursor-not-allowed', 'pointer-events-none');
@@ -498,7 +495,7 @@
         let modalCallback = null;
         function showModal(title, text, type, callback = null) {
             document.getElementById('modal-title').innerText = title;
-            document.getElementById('modal-text').innerHTML = text; // Permite negritas html
+            document.getElementById('modal-text').innerHTML = text; 
             
             const iconDiv = document.getElementById('modal-icon');
             if(type === 'success') {
